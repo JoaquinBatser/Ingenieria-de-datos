@@ -1,31 +1,30 @@
 ---
-title: "Análisis Geoespacial con GeoPandas"
-description: "Pipeline completo de análisis geoespacial: carga de datos, gestión de CRS, joins espaciales, agregaciones zonales y visualización de datos sobre CABA."
+title: "Leer CABA con GeoPandas"
+description: "Recorrido por los radios censales de CABA: CRS, áreas, densidad, joins espaciales, buffers y mapas con GeoPandas."
 ---
 
-# Análisis Geoespacial con GeoPandas: Estudio de Radios Censales en CABA
+# Radios censales de CABA con GeoPandas
 
-## Objetivos de Aprendizaje
+## Qué quería obtener
 
-- **Trabajar con datos geoespaciales** utilizando GeoPandas y Shapely
-- **Comprender y gestionar CRS** (Coordinate Reference Systems) para cálculos correctos
-- **Implementar joins espaciales** para combinar datos por ubicación
-- **Realizar agregaciones zonales** para resumir información por áreas
-- **Crear visualizaciones** estáticas e interactivas con mapas
-- **Aplicar análisis de proximidad** y operaciones geométricas
-- **Discretizar el espacio** usando grillas hexagonales (H3)
+- Cargar los radios censales y comprobar que sus geometrías sean utilizables.
+- Elegir un CRS métrico antes de calcular áreas o distancias.
+- Unir puntos y polígonos por ubicación.
+- Resumir población y densidad por barrio.
+- Comparar un mapa estático con una vista interactiva.
+- Probar proximidad y una grilla H3.
 
-## Contexto de Negocio
+## La tabla
 
-El dataset contiene información de **radios censales de la Ciudad Autónoma de Buenos Aires (CABA)**. Los radios censales son unidades geográficas utilizadas por los censos para dividir el territorio y recopilar información demográfica.
+La tabla contiene **radios censales de la Ciudad Autónoma de Buenos Aires (CABA)**. Cada radio es un polígono usado por el censo para reunir información demográfica.
 
-Como analista de datos urbanos, necesitamos:
+Con ella quiero:
 - **Analizar la distribución poblacional** por áreas de la ciudad
 - **Identificar zonas con alta densidad** habitacional
 - **Estudiar relaciones espaciales** entre diferentes variables
 - **Crear visualizaciones informativas** para toma de decisiones
 
-### Descripción del Dataset
+### Qué trae el archivo
 
 - **Fuente:** GeoJSON de radios censales de CABA
 - **Registros:** ~3,554 radios censales
@@ -43,7 +42,7 @@ Como analista de datos urbanos, necesitamos:
 - `AREA_KM2`: Área en kilómetros cuadrados
 - `geometry`: Geometría del polígono
 
-## Proceso de Análisis
+## Recorrido
 
 ### 1. Preparación del Entorno
 
@@ -87,7 +86,7 @@ print(f"Geometrías vacías: {radios.geometry.is_empty.sum()}")
 print(f"Geometrías nulas: {radios.geometry.isna().sum()}")
 ```
 
-**Resultados:**
+**Lo que encontré:**
 - **3,554 radios censales** en total
 - **CRS:** EPSG:4326 (coordenadas latitud/longitud)
 - **Sin geometrías vacías o nulas** (dataset limpio)
@@ -102,11 +101,11 @@ print(radios[['POBLACION', 'AREA_KM2', 'HOGARES']].describe())
 print(radios.head())
 ```
 
-**Decisión tomada:** El CRS original (EPSG:4326) usa grados, lo cual **no es adecuado para cálculos de área y distancia**. Necesitamos proyectar a un CRS métrico.
+**Decisión:** EPSG:4326 está expresado en grados, así que no sirve para áreas ni distancias directas. Proyecté los radios a un CRS métrico antes de calcularlos.
 
 ### 3. Gestión de CRS (Coordinate Reference Systems)
 
-#### ¿Por qué es importante el CRS?
+#### Qué cambia el CRS
 
 El **Coordinate Reference System** define cómo las coordenadas se mapean a ubicaciones en la Tierra:
 - **Geográficas (EPSG:4326):** Latitud/Longitud en grados
@@ -127,7 +126,7 @@ radios_m['densidad_hab_km2'] = radios_m['POBLACION'] / (radios_m['area_m2'] / 1e
 print(radios_m[['BARRIO', 'area_m2', 'densidad_hab_km2']].head())
 ```
 
-**Resultados:**
+**Después de proyectar:**
 - Áreas correctamente calculadas en m²
 - Densidad poblacional muestra **alta variabilidad** entre radios
 - Algunos radios tienen densidad > 30,000 hab/km²
@@ -167,7 +166,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Insight:** Las zonas céntricas muestran **mayor densidad poblacional**, mientras que áreas periféricas tienen densidades más bajas.
+**Lectura:** Los radios céntricos concentran mayor densidad; en la periferia las densidades bajan.
 
 ### 5. Agregación por Barrio
 
@@ -188,13 +187,13 @@ barrios_top = barrios.nlargest(10, 'densidad_hab_km2')
 print(barrios_top[['BARRIO', 'POBLACION', 'densidad_hab_km2']])
 ```
 
-**Resultados:**
+**Al agrupar por barrio:**
 - **Barrios más densos:** San Nicolás, Montserrat, Constitución
 - **Menos densos:** Villa Soldati, Villa Riachuelo, Parque Avellaneda
 
 ### 6. Joins Espaciales
 
-Los **spatial joins** permiten combinar datos basándose en relaciones geométricas (intersección, contención, proximidad).
+Un **spatial join** combina tablas por una relación geométrica: intersección, contención o proximidad.
 
 #### 6.1 Ejemplo: Puntos de Interés
 
@@ -216,7 +215,7 @@ pois_con_radio = gpd.sjoin(pois_m, radios_m, how='left', predicate='within')
 print(pois_con_radio[['nombre', 'BARRIO', 'COMUNA']])
 ```
 
-**Resultado:** Cada punto queda asociado a su radio censal y barrio correspondiente.
+**Resultado:** Cada punto queda asociado a un radio censal y a su barrio.
 
 ### 7. Buffers y Análisis de Proximidad
 
@@ -231,7 +230,7 @@ radios_cercanos = radios_m[radios_m.geometry.intersects(buffer_500m.iloc[0])]
 print(f"Radios dentro de 500m del Obelisco: {len(radios_cercanos)}")
 ```
 
-**Aplicación:** Útil para análisis de **cobertura de servicios**, **zonas de influencia** o **estudios de accesibilidad**.
+**Para qué sirve:** este buffer permite estudiar **cobertura de servicios**, **zonas de influencia** y **accesibilidad**.
 
 ### 8. Visualización con Mapa Base
 
@@ -259,7 +258,7 @@ plt.show()
 
 ### 9. Grillas Hexagonales (H3)
 
-La discretización con grillas hexagonales permite **agregar datos en celdas uniformes**, útil para análisis espaciales y visualizaciones.
+Una grilla hexagonal permite **agregar datos en celdas uniformes** y comparar zonas sin depender de los límites administrativos.
 
 ```python
 import h3
@@ -281,13 +280,13 @@ print("Ejemplo de hexágonos H3:")
 print(sample_radios[['RADIO_ID', 'h3_hexagons']].head())
 ```
 
-**Ventajas de H3:**
+**Qué aporta H3:**
 - Tamaño uniforme de celdas
 - Vecindad bien definida
 - Eficiente para agregaciones espaciales
 - Compatible con análisis a múltiples escalas (resoluciones)
 
-## Análisis Crítico y Decisiones
+## Decisiones y límites
 
 ### Decisiones de CRS
 
@@ -298,7 +297,7 @@ print(sample_radios[['RADIO_ID', 'h3_hexagons']].head())
 
 **Alternativa:** EPSG:22185 (POSGAR 2007 / Argentina zona 5) sería más preciso para Argentina, pero menos compatible con mapas base.
 
-**Decisión:** Usar EPSG:3857 para **balance entre precisión y compatibilidad**.
+**Decisión:** Usar EPSG:3857 para equilibrar **precisión y compatibilidad** con los mapas base.
 
 ### Elección de Visualizaciones
 
@@ -316,9 +315,9 @@ print(sample_radios[['RADIO_ID', 'h3_hexagons']].head())
 
 ## Extra: Mapas Interactivos con Folium
 
-Aunque GeoPandas es excelente para visualizaciones estáticas, a veces necesitamos mapas interactivos para explorar datos con mayor detalle. **Folium** es una librería de Python que facilita la creación de mapas interactivos basados en Leaflet.js.
+GeoPandas alcanza para los mapas estáticos. Para inspeccionar puntos y hacer zoom usé **Folium**, que genera mapas de Leaflet.js desde Python.
 
-### ¿Por qué usar Folium?
+### Qué aporta Folium
 
 - **Interactividad:** Zoom, paneo y popups con información detallada.
 - **Mapas base:** Fácil acceso a OpenStreetMap, Stamen, CartoDB, etc.
@@ -326,7 +325,7 @@ Aunque GeoPandas es excelente para visualizaciones estáticas, a veces necesitam
 
 ### Ejemplo: Mapa de Calor y Marcadores
 
-A continuación, mostramos cómo crear un mapa interactivo que visualice la densidad de puntos (simulados) y permita inspeccionar detalles individuales.
+El ejemplo dibuja puntos simulados y permite inspeccionar cada uno sin saturar la vista.
 
 ```python
 import folium
@@ -357,12 +356,10 @@ m
 
 ![Vista Previa Mapa Interactivo](/images/practica12/folium_preview.png)
 
-**Pie de figura:** Esta imagen es una representación estática de lo que sería el mapa interactivo. En la versión HTML real, podrías hacer zoom para ver calles específicas y hacer clic en cada marcador para ver la categoría y otros datos del punto. Los mapas de calor (heatmap) son especialmente útiles para identificar "zonas calientes" de actividad o densidad poblacional sin saturar el mapa con miles de puntos individuales.
+**Lectura:** La imagen es una captura estática del mapa. La versión HTML permite acercarse y abrir cada marcador; el heatmap resume densidad sin dibujar miles de puntos encima.
 
-## Conclusión
+## Qué queda para otra vuelta
 
-El análisis geoespacial con GeoPandas permite trabajar con datos geográficos con la misma facilidad que pandas, realizando cálculos espaciales precisos mediante el manejo correcto de CRS. Los joins espaciales facilitan la combinación de datos de diferentes fuentes basándose en relaciones geométricas, mientras que las visualizaciones coropléticas y mapas interactivos comunican efectivamente patrones espaciales complejos. Las grillas hexagonales (H3) ofrecen una solución escalable para análisis de grandes volúmenes de datos geoespaciales, manteniendo uniformidad y eficiencia computacional.
-
-**Próximos pasos:** Implementar análisis de autocorrelación espacial (Moran's I) para detectar clustering de variables demográficas. Explorar técnicas de interpolación espacial (Kriging, IDW) para estimar valores en áreas sin datos. Integrar datos temporales para análisis espacio-temporales de evolución urbana. Aplicar machine learning espacial para predicción de variables demográficas en áreas no censadas. Desarrollar dashboards interactivos con Plotly Dash o Streamlit que permitan exploración dinámica de múltiples variables geoespaciales simultáneamente.
+El CRS correcto es la condición para que las áreas y distancias tengan sentido. Con eso resuelto, los joins, agregados y mapas responden preguntas distintas sin mezclar escalas. La siguiente versión debería añadir autocorrelación espacial con Moran's I, datos de varios momentos y un dashboard para explorar barrio, comuna y radio.
 
 ---

@@ -1,22 +1,21 @@
 ---
-title: "Encoding Avanzado y Target Encoding"
-description: "Técnicas avanzadas de encoding para variables categóricas: Target Encoding, Leave-One-Out Encoding, y otras estrategias para manejar variables categóricas de alta cardinalidad."
+title: "Cómo codificar categorías sin perder información"
+description: "Comparación de Label, One-Hot, Target, Leave-One-Out, Binary y CatBoost Encoding sobre Adult Income, con atención al leakage y a la cardinalidad."
 ---
 
-# Encoding Avanzado y Target Encoding: Manejo de Variables Categóricas de Alta Cardinalidad
+# Codificar categorías sin inventar un orden
 
 _El código y análisis presentado en este documento refleja el trabajo del autor._
 
-## Objetivos de Aprendizaje
+## Qué quería comparar
 
-- **Comprender diferencias** entre Label Encoding, One-Hot Encoding y Target Encoding
-- **Evaluar impacto** de diferentes encodings en precisión, complejidad y dimensionalidad
-- **Diseñar pipelines modulares** con branching usando ColumnTransformer
-- **Analizar importancia de features** y valores SHAP para explicabilidad
-- **Prevenir data leakage** mediante cross-validation en Target Encoding
-- **Explorar técnicas adicionales** como Frequency Encoding, Leave-One-Out, Binary Encoding
+- Ver qué supone cada encoding para una categoría.
+- Medir precisión, número de columnas y tiempo.
+- Separar el tratamiento de columnas de baja y media cardinalidad.
+- Comprobar la importancia con Random Forest y SHAP.
+- Ajustar Target Encoding sin que el target se filtre al test.
 
-## Contexto de Negocio
+## La pregunta
 
 **Problema:** Predecir si el ingreso anual de una persona supera los $50K basándose en datos del censo de EE.UU.
 
@@ -25,9 +24,9 @@ _El código y análisis presentado en este documento refleja el trabajo del auto
 - `native-country`: 42 valores posibles
 - `education`: 16 valores posibles
 
-**Objetivo:** Comparar diferentes técnicas de encoding para maximizar la precisión del modelo de clasificación.
+**Objetivo:** comparar los encodings con el mismo modelo y la misma partición.
 
-**Restricción:** One-Hot Encoding genera más de 100 columnas → problema de curse of dimensionality.
+**Restricción:** One-Hot genera más de 100 columnas y aumenta la dimensión del problema.
 
 **Valor de negocio:**
 - Segmentación de clientes para productos financieros
@@ -53,7 +52,7 @@ _El código y análisis presentado en este documento refleja el trabajo del auto
 - `sex`: Sexo (2 categorías)
 - `native-country`: País de origen (42 categorías)
 
-## Proceso de Análisis
+## Recorrido
 
 ### 1. Setup y Carga de Datos
 
@@ -102,14 +101,14 @@ print(f"  <=50K: {(df['target']==0).sum():,} ({(df['target']==0).mean():.1%})")
 print(f"  >50K:  {(df['target']==1).sum():,} ({(df['target']==1).mean():.1%})")
 ```
 
-**Decisiones tomadas:**
+**Decisiones de limpieza:**
 - **Eliminar espacios en blanco:** Consistencia en categorías
 - **Eliminar NaN:** Dataset tiene pocos valores faltantes, eliminación simple es apropiada
 - **Target binario:** Transformar income a 0/1 para clasificación binaria
 
 ### 2. Análisis de Cardinalidad
 
-Clasificamos variables categóricas según su cardinalidad para decidir qué encoding aplicar:
+Separé las columnas por número de categorías antes de elegir un encoding:
 
 ```python
 def classify_cardinality(df, categorical_cols):
@@ -154,11 +153,11 @@ print(f"  {high_card_cols}")
 
 ![Cardinalidad de Variables Categóricas](/images/practica9/CardinalidadVariablesCategóricas%20(1).png)
 
-**Pie de figura:** Este gráfico muestra la cardinalidad de cada variable categórica. Lo que me llamó la atención es que `native-country` tiene 42 categorías, lo cual podría generar 41 columnas adicionales con One-Hot. La conclusión es que necesitamos técnicas alternativas para variables de media y alta cardinalidad.
+**Lectura:** `native-country` tiene 42 categorías; One-Hot añadiría 41 columnas para esa variable. La cifra explica por qué conviene comparar una representación más compacta.
 
 ### 3. Experimento 1: Label Encoding
 
-Label Encoding asigna un número entero a cada categoría. Es simple pero introduce orden artificial.
+Label Encoding asigna un entero a cada categoría. Es fácil de aplicar, pero ese número puede parecer un orden que la variable no tiene.
 
 ```python
 def experiment_label_encoding(df, categorical_cols, numeric_cols, target_col='target'):
@@ -230,7 +229,7 @@ results_label, model_label = experiment_label_encoding(
 - Puede sesgar modelos lineales o árboles que interpretan el orden
 - Ejemplo problemático: Private=1, Self-emp=2 (no hay orden natural)
 
-**Conclusión:** Útil solo en modelos insensibles al orden artificial (Random Forest, Gradient Boosting).
+**Conclusión:** Tiene sentido en modelos que no interpreten ese entero como una distancia, como Random Forest o Gradient Boosting.
 
 ### 4. Experimento 2: One-Hot Encoding (Baja Cardinalidad)
 
@@ -385,7 +384,7 @@ results_target, model_target = experiment_target_encoding(
 - `smoothing=10.0`: Balance entre usar información de la categoría y la media global
 - **Razonamiento:** Valores más altos de smoothing protegen contra overfitting pero pierden señal específica
 
-**Conclusión:** Técnica potente para variables con >30 categorías y datasets grandes, pero requiere cuidado para prevenir leakage.
+**Conclusión:** Reduce columnas en variables con >30 categorías, pero solo es fiable si se ajusta sin mirar el target de validación.
 
 ### 6. Pipeline con Branching (Mixto)
 
@@ -496,7 +495,7 @@ results_pipeline, pipeline_branched = experiment_branched_pipeline(
 
 ![Comparación de Encodings](/images/practica9/ComparaciónEncodings%20(1).png)
 
-**Pie de figura:** Este gráfico compara Accuracy, AUC y F1-Score entre diferentes métodos de encoding. Lo que me llamó la atención es que Label Encoding tiene el mejor AUC (0.91) pero el Pipeline Branched ofrece mejor balance. La conclusión es que para producción, el Pipeline Branched es preferible por su robustez y modularidad.
+**Lectura:** Label Encoding consigue el mejor AUC (0.91), mientras que el Pipeline Branched queda más equilibrado entre Accuracy, AUC y F1. La elección depende de qué métrica y qué mantenimiento importen.
 
 ### 7. Análisis de Feature Importance y SHAP
 
@@ -549,18 +548,18 @@ print(importance_df.head(10))
 - **One-Hot Encoded:** 23.4%
 - **Target Encoded:** Residual (sin alta cardinalidad real en este dataset)
 
-**Insights:**
+**Lecturas:**
 - Las variables socioeconómicas (edad, educación, horas trabajadas) dominan el modelo
 - Las categóricas aportan contexto (estado civil, sexo, relación familiar)
 - Los gráficos SHAP confirman interacciones no lineales (ej: edad × horas trabajadas)
 
 ![Feature Importance](/images/practica9/ImportanciaFeatures%20(1).png)
 
-**Pie de figura:** Este gráfico muestra la importancia de features según Random Forest. Lo que me llamó la atención es que las variables numéricas dominan (76.6%), especialmente fnlwgt y age. La conclusión es que aunque las categóricas aportan valor, las numéricas siguen siendo los predictores más fuertes.
+**Lectura:** Las variables numéricas concentran 76.6% de la importancia; `fnlwgt` y `age` encabezan el ranking. Las categóricas aportan, pero no son la señal principal en este modelo.
 
 ![Distribución de Features](/images/practica9/DistribuciónFeatures%20(1).png)
 
-**Pie de figura:** Este gráfico muestra el análisis SHAP de las features. Lo que me llamó la atención son las interacciones no lineales visibles, especialmente entre edad y otras variables. La conclusión es que SHAP revela patrones complejos que la importancia simple no captura.
+**Lectura:** SHAP deja ver interacciones no lineales, en especial alrededor de `age`, que no aparecen en un ranking único de importancia.
 
 ### 8. Técnicas Adicionales: Investigación Libre
 
@@ -653,14 +652,14 @@ for smoothing in smoothing_values:
 | **Dimensionalidad** | Target Encoding redujo 94 → 6 | Target Encoding |
 | **Balance global** | Pipeline Branched mantiene equilibrio | Pipeline Branched |
 
-**Conclusión:**
-- **Target Encoding** es la opción más eficiente en entornos productivos y datasets de gran escala
-- **Pipeline Branched** constituye la arquitectura recomendada por su modularidad, reproducibilidad y robustez metodológica
-- **Label Encoding**, pese a su precisión, debe evitarse cuando las categorías carecen de orden natural
+**Lectura:**
+- **Target Encoding** usa menos columnas en datasets grandes, siempre que el ajuste respete la validación.
+- **Pipeline Branched** separa el tratamiento de cada grupo de columnas y deja el flujo más fácil de revisar.
+- **Label Encoding** no conviene cuando las categorías no tienen un orden natural.
 
 ### 10. Extensión: Aplicación en Ames Housing
 
-Para demostrar generalización, aplicamos las técnicas al dataset Ames Housing (transformado a clasificación binaria):
+Para comprobar si el resultado se repetía, llevé las técnicas a Ames Housing, convertido en un problema binario:
 
 ```python
 # Cargar Ames Housing
@@ -699,9 +698,9 @@ print(f"Ames Housing Accuracy: {accuracy_ames:.4f}")
 - **Accuracy:** 0.78-0.82 (dependiendo de features seleccionadas)
 - **Validación:** Las conclusiones del Adult Income se confirman en otro dominio
 
-**Aprendizaje:** Las técnicas de encoding son generalizables a diferentes tipos de problemas y datasets.
+**Aprendizaje:** El procedimiento se puede trasladar a otro dominio, pero el encoding ganador debe medirse de nuevo.
 
-**¿Por qué elegí Ames Housing?**
+**Por qué elegí Ames Housing:**
 - Diferente dominio (bienes raíces vs demografía)
 - Permite validar que las técnicas funcionan en distintos contextos
 - Demuestra que el Pipeline Branched es transferible
@@ -745,7 +744,7 @@ X_train['occupation_encoded'] = X_train['occupation'].map(mean_target_train)
 X_test['occupation_encoded'] = X_test['occupation'].map(mean_target_train).fillna(y_train.mean())
 ```
 
-## Análisis Crítico y Decisiones
+## Decisiones y límites
 
 ### Decisiones de Hiperparámetros
 
@@ -796,7 +795,7 @@ X_test['occupation_encoded'] = X_test['occupation'].map(mean_target_train).filln
 
 **Observaciones clave:**
 1. **Label Encoding tiene mejor AUC** pero introduce sesgos ordinales
-2. **Target Encoding reduce dimensionalidad** significativamente (94 → 6)
+2. **Target Encoding reduce mucho la dimensionalidad** (94 → 6)
 3. **Pipeline Branched** ofrece mejor balance entre precisión y robustez
 
 ## Garantías de Reproducibilidad
@@ -817,9 +816,9 @@ X_test['occupation_encoded'] = X_test['occupation'].map(mean_target_train).filln
 
 ## Extra: Comparación de CatBoost Encoding vs Target Encoding
 
-Para profundizar en las técnicas de encoding avanzadas, comparé **CatBoost Encoding** con **Target Encoding**, evaluando su performance en diferentes tipos de modelos de machine learning.
+Como prueba adicional comparé **CatBoost Encoding** con **Target Encoding** en dos modelos.
 
-### ¿Por qué lo elegí?
+### Qué quería saber
 
 Elegí comparar CatBoost Encoding con Target Encoding porque:
 
@@ -829,7 +828,7 @@ Elegí comparar CatBoost Encoding con Target Encoding porque:
 4. Es una técnica mencionada en literatura pero no explorada en la práctica principal
 5. Permite validar si la elección de encoding debe depender del modelo final
 
-### ¿Qué esperaba encontrar?
+### Hipótesis
 
 Esperaba encontrar:
 
@@ -850,7 +849,7 @@ Comparamos Accuracy y AUC-ROC para cada combinación de encoding y modelo.
 
 ![Comparación de Encodings](/images/practica9/practica9_encoding_comparison.png)
 
-**Pie de figura:** Este gráfico compara Accuracy (izquierda) y ROC AUC (derecha) para diferentes combinaciones de encoding y modelo. Lo que me llamó la atención es que Gradient Boosting con ambos encodings logra el mejor performance, y que CatBoost Encoding tiene una ligera ventaja con Gradient Boosting. La conclusión es que la elección de encoding puede depender del modelo final, pero la diferencia es sutil.
+**Lectura:** Gradient Boosting obtiene los mejores valores con ambos encodings; la diferencia a favor de CatBoost es ligera. El modelo final pesa tanto como el encoding.
 
 ### Resultados
 
@@ -867,7 +866,7 @@ Comparamos Accuracy y AUC-ROC para cada combinación de encoding y modelo.
 - **Accuracy:** GB + Target Encoding (0.8565)
 - **AUC:** GB + Target Encoding (0.9129)
 
-### ¿Qué aprendí?
+### Qué quedó de la comparación
 
 1. **Diferencias entre encodings:** CatBoost Encoding y Target Encoding tienen performance muy similar (diferencia de 0.0020 en accuracy para Random Forest). Ambos encodings funcionan bien, pero la diferencia es sutil.
 
@@ -875,13 +874,13 @@ Comparamos Accuracy y AUC-ROC para cada combinación de encoding y modelo.
 
 3. **CatBoost Encoding específico para boosting:** CatBoost Encoding funciona ligeramente mejor con Gradient Boosting, aunque la diferencia es mínima. Esto confirma que encodings específicos para el modelo pueden ayudar, pero no siempre.
 
-4. **Target Encoding más versátil:** Target Encoding funciona bien tanto con Random Forest como con Gradient Boosting. Es más general y no requiere ajustes específicos del modelo. Para producción, Target Encoding puede ser más robusto.
+4. **Target Encoding más versátil:** funciona con Random Forest y Gradient Boosting, así que deja más margen si el modelo cambia.
 
 5. **Recomendaciones:** Usar CatBoost Encoding si estás usando modelos de boosting (XGBoost, CatBoost, LightGBM). Usar Target Encoding si necesitas flexibilidad entre diferentes tipos de modelos. Ambos son superiores a One-Hot para variables de alta cardinalidad. La diferencia es sutil, así que la elección puede basarse en otros factores (simplicidad, mantenimiento).
 
-## Conclusiones y Próximos Pasos
+## Qué probaría después
 
-### Conclusiones Principales
+### Lo que elegiría hoy
 
 1. **La etapa de codificación es determinante:** La correcta elección del encoding influye no solo en la precisión, sino también en la interpretabilidad y el costo computacional
 

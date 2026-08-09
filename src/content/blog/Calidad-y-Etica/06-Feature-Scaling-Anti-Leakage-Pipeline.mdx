@@ -1,35 +1,32 @@
 ---
-title: "Escalado inteligente y pipelines anti-leakage: Optimizando modelos con preprocessing robusto"
-description: "Exploración avanzada de técnicas de feature scaling y prevención de data leakage en pipelines de machine learning usando el dataset Ames Housing."
+title: "Escalado y pipelines sin data leakage"
+description: "Comparación de scalers y transformadores con Ames Housing, incluyendo el split correcto para que el preprocesamiento no contamine la validación."
 ---
 
 
-## Objetivos de Aprendizaje
+## Qué quería medir
 
-- **Identificar features problemáticas** que requieren escalado en datasets reales
-- **Experimentar con diferentes scalers** (MinMaxScaler, StandardScaler, RobustScaler)
-- **Descubrir el impacto del escalado** en algoritmos basados en distancia vs. tree-based
-- **Comparar pipelines** con y sin data leakage para evidenciar diferencias
-- **Desarrollar estrategias robustas** de preprocessing basadas en evidencia empírica
+- Ver qué columnas tienen escalas que pueden dominar el modelo.
+- Comparar `MinMaxScaler`, `StandardScaler` y `RobustScaler`.
+- Medir la diferencia entre modelos basados en distancia y árboles.
+- Mostrar qué cambia cuando el escalado se ajusta antes del split.
+- Dejar el preprocesamiento dentro de un pipeline reproducible.
 
-## Contexto de Negocio
+## El problema
 
-El dataset **Ames Housing** presenta un desafío real de escalado: variables con rangos extremadamente diferentes que pueden sesgar algoritmos de machine learning. Como data scientists, debemos:
+En **Ames Housing**, una superficie puede estar medida en cientos de miles mientras que una calificación queda en un rango corto. Si el algoritmo usa distancias, esa diferencia puede hacer que una columna pese demasiado.
 
-- **Identificar automáticamente** features con escalas problemáticas
-- **Seleccionar el scaler apropiado** según características de los datos
-- **Prevenir data leakage** en pipelines de producción
-- **Evaluar el impacto** del escalado en diferentes tipos de algoritmos
+La revisión busca identificar esas columnas, elegir un scaler con una razón clara y evitar que el conjunto de validación enseñe sus estadísticas al entrenamiento.
 
-### Relevancia del Problema
+### Dónde se nota
 
-En modelos de predicción inmobiliaria, el escalado inadecuado puede:
+Un escalado mal puesto puede:
 - **Sesgar algoritmos basados en distancia** (KNN, SVM) hacia features con mayor escala
 - **Afectar la convergencia** de algoritmos de optimización
 - **Introducir data leakage** si se escala incorrectamente
 - **Reducir la interpretabilidad** del modelo
 
-## Proceso de Análisis
+## Recorrido
 
 ### 1. Configuración del Entorno
 
@@ -114,7 +111,7 @@ plt.tight_layout()
 
 ![Histogramas de Distribuciones](/images/practica6/histogramas.png)
 
-**Pie de figura:** Este gráfico muestra las distribuciones de las features numéricas del dataset Ames Housing antes del escalado. Lo que me llamó la atención es la enorme diferencia en escalas: `Lot Area` tiene valores que van desde 1,300 hasta 215,245, mientras que `Overall Qual` solo va de 1 a 10, lo que representa un ratio de más de 165:1. La conclusión es que estas diferencias de escala distorsionarían significativamente algoritmos basados en distancia (como KNN o SVM), donde features con mayor escala dominarían el cálculo de distancias, haciendo que features con menor escala pero potencialmente más informativas tengan menos peso en el modelo.
+**Lectura:** `Lot Area` va de 1,300 a 215,245 y `Overall Qual` de 1 a 10. El ratio supera 165:1. KNN y SVM pueden dejar que `Lot Area` domine la distancia aunque `Overall Qual` sea útil.
 
 ### 4. Preparación de Datos y Split Anti-Leakage
 
@@ -237,7 +234,7 @@ print(f"R² SIN leakage: {r2_without_leakage:.4f}")
 print(f"Diferencia: {r2_with_leakage - r2_without_leakage:.4f}")
 ```
 
-### 7. Pipeline de Producción Robusto
+### 7. Pipeline para producción
 
 ```python
 from sklearn.compose import ColumnTransformer
@@ -297,33 +294,33 @@ print(f"MAE: ${test_mae:,.2f}")
 
 ### 8. Investigación de Transformadores Avanzados
 
-Para completar el análisis, se exploró el comportamiento de transformadores más avanzados:
+Para ver qué ocurre con distribuciones más torcidas, comparé algunos transformadores adicionales:
 
 ![Yeo-Johnson PowerTransformer](/images/practica6/YeoJohnson.png)
 
-**Pie de figura:** Este gráfico muestra el efecto del transformador Yeo-Johnson en la distribución de las features. Lo que me llamó la atención es cómo Yeo-Johnson normaliza las distribuciones sin requerir valores estrictamente positivos (a diferencia de Box-Cox), lo cual es útil para datos que pueden tener ceros o valores negativos. La conclusión es que Yeo-Johnson es especialmente valioso para features como `SalePrice` donde queremos normalizar la distribución pero no podemos usar transformaciones logarítmicas directas debido a la presencia de valores en cero o cercanos a cero.
+**Lectura:** Yeo-Johnson puede trabajar con ceros y negativos, a diferencia de Box-Cox. Es una opción para `SalePrice` cuando una transformación log directa no es válida.
 
 ![QuantileTransformer](/images/practica6/QuantileTransformer.png)
 
-**Pie de figura:** Este gráfico muestra el efecto del QuantileTransformer, que mapea las distribuciones a una distribución uniforme y luego a una normal. Lo que me llamó la atención es cómo este transformador puede manejar distribuciones extremadamente sesgadas y convertirlas en distribuciones normales, independientemente de la forma original. La conclusión es que QuantileTransformer es muy robusto pero puede ser computacionalmente costoso y puede crear artefactos si hay muchos valores duplicados, por lo que es mejor usarlo cuando otros métodos fallan o cuando necesitamos distribuciones estrictamente normales para ciertos algoritmos.
+**Lectura:** `QuantileTransformer` lleva primero la distribución a una uniforme y luego a una normal. Puede corregir sesgos fuertes, pero cuesta más y puede crear artefactos con muchos valores repetidos.
 
 ![MaxAbsScaler](/images/practica6/MaxAbsScaler.png)
 
-**Pie de figura:** Este gráfico muestra el efecto del MaxAbsScaler, que escala cada feature dividiendo por su valor absoluto máximo, resultando en valores en el rango [-1, 1]. Lo que me llamó la atención es que este scaler preserva la información de signo (importante para features que pueden tener valores negativos) y es robusto ante outliers ya que solo usa el máximo absoluto, no la desviación estándar. La conclusión es que MaxAbsScaler es útil cuando tenemos features dispersas (con muchos ceros) y queremos un escalado que no se vea afectado por outliers, aunque no centra los datos en cero como StandardScaler.
+**Lectura:** `MaxAbsScaler` divide por el máximo absoluto y deja cada columna en [-1, 1]. Conserva el signo y funciona bien con datos dispersos, pero no centra las columnas en cero.
 
 ![Normalizer L2](/images/practica6/NormalizerL2.png)
 
-**Pie de figura:** Este gráfico muestra el efecto del Normalizer L2, que normaliza cada fila (muestra) en lugar de cada columna (feature), escalando cada muestra para que tenga norma L2 igual a 1. Lo que me llamó la atención es que este enfoque es fundamentalmente diferente: normaliza muestras en lugar de features, lo cual es útil para algoritmos que miden distancias entre muestras completas. La conclusión es que Normalizer es apropiado para casos específicos como análisis de texto o imágenes donde queremos comparar documentos/imágenes completas, pero generalmente no es el enfoque correcto para la mayoría de problemas de regresión donde queremos escalar features individuales.
+**Lectura:** `Normalizer` trabaja fila por fila y deja cada muestra con norma L2 igual a 1. Sirve cuando se comparan vectores completos, por ejemplo en texto o imágenes; no sustituye al escalado por columna en una regresión común.
 
 ![FunctionTransformer (Log)](/images/practica6/FunctionTransformer.png)
 
-**Pie de figura:** Este gráfico muestra el efecto de una transformación logarítmica usando FunctionTransformer. Lo que me llamó la atención es cómo la transformación log comprime los valores grandes y expande los valores pequeños, reduciendo la asimetría (skewness) de distribuciones sesgadas a la derecha. La conclusión es que las transformaciones logarítmicas son especialmente útiles para features como `SalePrice` o `Lot Area` que tienen distribuciones exponenciales, pero requieren que todos los valores sean estrictamente positivos, lo cual puede ser una limitación en algunos datasets.
+**Lectura:** La transformación log comprime valores grandes y reduce la asimetría hacia la derecha. Solo puede aplicarse cuando los valores son estrictamente positivos, así que `SalePrice` y `Lot Area` requieren ese chequeo.
 
 ![Comparación de Transformación Logarítmica](/images/practica6/comparacionlogs.png)
 
-**Pie de figura:** Este gráfico compara las distribuciones antes y después de aplicar transformaciones logarítmicas. Lo que me llamó la atención es la mejora significativa en la normalidad de las distribuciones después de la transformación log, especialmente para `SalePrice` que pasa de una distribución fuertemente sesgada a la derecha a una distribución más simétrica. La conclusión es que las transformaciones logarítmicas pueden ser muy efectivas como preprocesamiento antes del escalado, especialmente cuando seguimos con StandardScaler, ya que este último asume distribuciones aproximadamente normales para funcionar óptimamente.
+**Lectura:** Después del log, `SalePrice` queda más simétrica. La combinación puede ayudar antes de `StandardScaler`, pero conviene verificar la forma de cada columna en lugar de aplicarla por rutina.
 
-## Hallazgos Clave
+## Lo que cambió según el scaler
 
 ### Análisis de Escalas
 
@@ -345,7 +342,7 @@ Para completar el análisis, se exploró el comportamiento de transformadores m�
 2. **StandardScaler**: Ideal para distribuciones normales
 3. **MinMaxScaler**: Útil cuando se necesita rango específico [0,1]
 
-## Consideraciones Éticas y de Calidad
+## Calidad del experimento
 
 ### Prevención de Data Leakage
 
@@ -359,7 +356,7 @@ Para completar el análisis, se exploró el comportamiento de transformadores m�
 - **Monitorear drift**: Verificar si las escalas cambian en producción
 - **Interpretabilidad**: Considerar impacto del escalado en explicabilidad
 
-### Robustez en Producción
+### Comportamiento en producción
 
 - **Manejo de outliers**: RobustScaler más resistente a valores extremos
 - **Datos faltantes**: Pipeline debe manejar NaN gracefully
@@ -378,10 +375,8 @@ Para completar el análisis, se exploró el comportamiento de transformadores m�
 - **matplotlib/seaborn**: Visualizaciones
 - **Pipeline**: Automatización anti-leakage
 
-## Conclusión
+## Qué probaría después
 
-El escalado de features es crucial para el rendimiento de muchos algoritmos de machine learning, pero debe implementarse cuidadosamente para evitar data leakage. La experimentación sistemática reveló que RobustScaler ofrece la mejor combinación de robustez y rendimiento para el dataset Ames Housing, especialmente en presencia de outliers. Los pipelines automatizados garantizan reproducibilidad y previenen errores comunes en producción. Los hallazgos clave incluyen: algoritmos basados en distancia (KNN, SVM) mejoran significativamente con escalado, mientras que tree-based models (Random Forest) son relativamente insensibles al escalado; RobustScaler es superior a StandardScaler cuando hay outliers, y la prevención de data leakage mediante split antes de escalar es crítica para obtener métricas de validación confiables.
-
-**Próximos pasos:** Realizar una búsqueda sistemática de hiperparámetros (GridSearchCV) para optimizar los valores de `n_neighbors` en KNN, `C` y `gamma` en SVM, y `n_estimators` en Random Forest, evaluando el impacto del escalado en cada combinación. Implementar validación cruzada estratificada para asegurar que las métricas reportadas sean representativas del rendimiento real. Explorar técnicas de escalado adaptativo que aprendan a ajustarse automáticamente a las características de cada feature (por ejemplo, usando transformaciones log antes de StandardScaler para features sesgadas). Desarrollar un framework de monitoreo que detecte drift en las escalas de features en producción y alerte cuando sea necesario re-entrenar los scalers. Comparar el impacto de diferentes estrategias de escalado en modelos de ensemble que combinen múltiples algoritmos.
+La regla que queda es sencilla: separar primero, ajustar el scaler después y evaluar cada algoritmo con el mismo protocolo. En Ames Housing, `RobustScaler` es el candidato cuando los outliers pesan; los árboles apenas dependen del escalado. El siguiente experimento sería una búsqueda con `GridSearchCV` para `n_neighbors`, `C`, `gamma` y `n_estimators`, seguida de una validación cruzada y un monitor de drift.
 
 ---

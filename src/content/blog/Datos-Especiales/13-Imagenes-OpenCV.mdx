@@ -1,37 +1,36 @@
 ---
-title: "Preprocesamiento de Imágenes con OpenCV"
-description: "Pipeline completo de procesamiento de imágenes: espacios de color, mejora de contraste, detección de características y extracción de descriptores usando OpenCV y scikit-image."
+title: "Qué hago con una imagen antes de analizarla"
+description: "Recorrido por el preprocesamiento de imágenes con OpenCV: canales de color, contraste, filtros, esquinas y descriptores."
 ---
 
-# Preprocesamiento de Imágenes con OpenCV
+# Preprocesamiento de imágenes con OpenCV
 
-## Objetivos de Aprendizaje
+## Qué quería comprobar
 
-- **Comprender la representación matricial** de imágenes digitales
-- **Dominar los espacios de color** (RGB, HSV, CIE Lab) y sus aplicaciones
-- **Implementar técnicas de mejora de contraste** (ecualización global vs CLAHE adaptativo)
-- **Aplicar filtros de suavizado** para reducción de ruido
-- **Detectar y describir características** (corners, keypoints) con Harris, Shi-Tomasi, ORB/SIFT
-- **Evaluar métricas de calidad** usando histogramas y repetibilidad de features
+- Leer una imagen como matriz y comprobar su rango y canales.
+- Elegir RGB, HSV o Lab según la pregunta.
+- Comparar ecualización global con CLAHE.
+- Quitar ruido sin borrar los bordes.
+- Detectar esquinas y comparar ORB con SIFT.
 
-## Contexto de Negocio
+## El punto de partida
 
-El preprocesamiento de imágenes es fundamental en aplicaciones de **visión por computadora**, desde sistemas de **reconocimiento facial** hasta **vehículos autónomos** y **análisis médico**. 
+Antes de clasificar o detectar objetos hay que saber qué imagen recibió el modelo. El mismo paso sirve para **visión por computadora**, **reconocimiento facial**, **vehículos autónomos** o **análisis médico**, pero los parámetros no son intercambiables.
 
-Como ingeniero de datos trabajando con imágenes, necesitas:
+En esta práctica revisé cómo:
 - **Normalizar y limpiar** datos visuales antes del análisis
 - **Extraer características robustas** para tareas de clasificación y detección
 - **Mejorar la calidad visual** para facilitar el procesamiento posterior
 - **Optimizar el rendimiento** de modelos de machine learning
 
-### Dataset de Ejemplo
+### Las imágenes de prueba
 
 - **Fuente:** Imágenes clásicas de scikit-image
 - **Registros:** ~7 imágenes de prueba
 - **Formatos:** PNG, color (RGB) y escala de grises
 - **Aplicación:** Demostración de técnicas de preprocesamiento
 
-## Proceso de Análisis
+## Recorrido
 
 ### 1. Preparación del Entorno
 
@@ -86,7 +85,7 @@ for name, img in samples_sk.items():
 
 ### 3. Representación Matricial
 
-Una imagen digital es una **matriz de píxeles** donde cada valor representa intensidad o color.
+Una imagen digital es una **matriz de píxeles**: cada valor representa intensidad o color.
 
 ```python
 def read_image_bgr(path):
@@ -110,14 +109,14 @@ print(f"H, W, C: {height} {width} {channels}")
 print(f"dtype: {dtype} rango: ({min_val}, {max_val})")
 ```
 
-**Resultados:**
+**Al cargar una imagen:**
 - Formato típico: `uint8` (0-255)
 - Dimensión: `[altura, ancho, canales]`
 - OpenCV usa **BGR** por defecto, no RGB
 
 ### 4. Espacios de Color
 
-#### 4.1 ¿Por qué cambiar de espacio de color?
+#### 4.1 Qué resuelve cada espacio
 
 Diferentes espacios de color facilitan distintas tareas:
 - **RGB**: Visualización natural, canales correlacionados
@@ -144,7 +143,7 @@ plt.tight_layout()
 
 ### 5. Análisis de Histogramas
 
-Los histogramas muestran la **distribución de intensidades** en la imagen.
+Un histograma muestra cómo se reparten las **intensidades** de la imagen.
 
 ```python
 def plot_histogram(img, title="Histograma"):
@@ -173,7 +172,7 @@ plot_histogram(img_gray, "Histograma - Escala de Grises")
 
 #### 6.1 Ecualización de Histograma (Global)
 
-Redistribuye las intensidades para usar todo el rango dinámico.
+La ecualización global reparte las intensidades por todo el rango disponible.
 
 ```python
 # Ecualización global
@@ -188,12 +187,12 @@ axes[1].set_title('Ecualizada')
 plt.tight_layout()
 ```
 
-**Ventajas:** Mejora el contraste global
-**Desventajas:** Puede sobre-amplificar ruido, no considera contexto local
+**Ventaja:** mejora el contraste global.
+**Límite:** puede amplificar ruido y no mira el contexto local.
 
 #### 6.2 CLAHE (Adaptive Histogram Equalization)
 
-Mejora el contraste localmente usando ventanas (tiles).
+CLAHE mejora el contraste por ventanas (tiles), no con una única transformación para toda la imagen.
 
 ```python
 # CLAHE
@@ -213,11 +212,11 @@ plt.tight_layout()
 
 ![Mejora de Contraste](/images/practica13/p13_contrast.png)
 
-**Decisión:** CLAHE generalmente produce mejores resultados porque **preserva detalles locales** sin sobre-amplificar ruido.
+**Decisión:** en estas imágenes preferí CLAHE porque **preserva detalles locales** sin amplificar tanto el ruido.
 
 ### 7. Filtros de Suavizado
 
-Reducen ruido y preparan la imagen para detección de características.
+Los filtros reducen ruido antes de buscar características.
 
 ```python
 # Gaussian Blur
@@ -244,7 +243,7 @@ plt.tight_layout()
 
 ![Filtros de Suavizado](/images/practica13/p13_filters.png)
 
-**Recomendación:** 
+**Elección rápida:**
 - **Gaussian**: Suavizado general
 - **Median**: Ruido impulsivo
 - **Bilateral**: Cuando se necesita preservar bordes
@@ -253,7 +252,7 @@ plt.tight_layout()
 
 #### 8.1 Detector de Esquinas Harris
 
-Detecta puntos donde hay cambios de intensidad en múltiples direcciones.
+Harris marca puntos donde la intensidad cambia en varias direcciones.
 
 ```python
 # Harris Corner Detection
@@ -272,7 +271,7 @@ plt.axis('off')
 
 #### 8.2 Shi-Tomasi (Good Features to Track)
 
-Mejora del detector Harris, selecciona las N mejores esquinas.
+Shi-Tomasi parte de Harris y se queda con las N esquinas más prometedoras.
 
 ```python
 # Shi-Tomasi
@@ -301,7 +300,7 @@ plt.axis('off')
 
 #### 9.1 ORB (Oriented FAST and Rotated BRIEF)
 
-Detector y descriptor rápido, libre de patentes, robusto a rotación.
+ORB es un detector y descriptor rápido, libre de patentes y resistente a la rotación.
 
 ```python
 # ORB
@@ -331,7 +330,7 @@ print(f"Cada descriptor: 256 bits binarios")
 
 #### 9.2 SIFT (Scale-Invariant Feature Transform)
 
-Más robusto, mejor para matching preciso (requiere opencv-contrib).
+SIFT suele acertar mejor en matching preciso, a cambio de más tiempo y de `opencv-contrib`.
 
 ```python
 # SIFT (si está disponible)
@@ -354,7 +353,7 @@ except:
 
 ### 10. Matching de Características
 
-Comparar características entre dos imágenes.
+El matching compara los descriptores de dos imágenes.
 
 ```python
 # Cargar segunda imagen (rotada/escalada)
@@ -383,7 +382,7 @@ plt.title(f'Top 50 Matches - {len(matches)} total')
 plt.axis('off')
 ```
 
-## Análisis Crítico y Decisiones
+## Decisiones que tomé
 
 ### Elección de Espacio de Color
 
@@ -396,7 +395,7 @@ plt.axis('off')
 
 ### Ecualización Global vs CLAHE
 
-**CLAHE es superior porque:**
+**En estas pruebas CLAHE funcionó mejor porque:**
 - Adapta el contraste localmente
 - Reduce sobre-amplificación de ruido
 - Preserva detalles en regiones oscuras y claras simultáneamente
@@ -416,10 +415,8 @@ plt.axis('off')
 - **ORB** para aplicaciones en tiempo real
 - **SIFT** cuando se necesita máxima robustez
 
-## Conclusión
+## Qué probaría después
 
-El preprocesamiento de imágenes con OpenCV permite extraer información valiosa de datos visuales mediante técnicas de detección de bordes, segmentación y reconocimiento de patrones. Las transformaciones de espacios de color (RGB, HSV, Lab) facilitan tareas específicas como segmentación por color y análisis perceptual. La mejora de contraste mediante CLAHE adaptativo preserva detalles locales mejor que la ecualización global. Los detectores de características (Harris, Shi-Tomasi, ORB, SIFT) y sus descriptores son fundamentales para aplicaciones de matching, tracking y reconocimiento de objetos en visión por computadora.
-
-**Próximos pasos:** Implementar detección de objetos con YOLO o Faster R-CNN para aplicaciones en tiempo real. Explorar técnicas de deep learning con CNNs (Convolutional Neural Networks) para clasificación y segmentación semántica de imágenes. Aplicar técnicas de aumento de datos (data augmentation) para mejorar robustez de modelos de visión. Investigar métodos de super-resolución para mejorar calidad de imágenes de baja resolución. Desarrollar pipelines de procesamiento de video para análisis de secuencias temporales y detección de movimiento.
+La elección depende de la tarea: HSV ayuda a separar color, Lab a comparar tonos, CLAHE a recuperar detalle local y ORB o SIFT a encontrar puntos repetibles. Después probaría YOLO o una CNN con un conjunto de imágenes separado, y mediría qué preprocesamiento mejora el resultado en vez de asumir que uno sirve para todo.
 
 ---

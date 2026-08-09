@@ -1,55 +1,55 @@
 ---
-title: "Integrando 3 millones de viajes: Análisis de patrones urbanos en NYC mediante joins de datos"
-description: "Análisis exploratorio de datos integrando múltiples fuentes con técnicas de joins en pandas"
+title: "Tres millones de viajes, tres fuentes y varios joins"
+description: "Análisis de los taxis amarillos de NYC: cómo unir viajes, zonas y eventos para leer demanda, tarifas y cobertura."
 
 ---
 
 [Jupyter Notebook original](../EDA-y-Fuentes-Jupyters/04-EDA-Multi-fuentes-y-Joins-Jupyter.mdx)
 
-## Introducción
+## La pregunta
 
-En este proyecto realizamos un análisis exploratorio de datos (EDA) avanzado integrando múltiples fuentes de información utilizando técnicas de joins en pandas. El objetivo principal fue analizar datos de taxis de Nueva York, combinando información de viajes, zonas geográficas y un calendario de eventos para obtener insights más completos y valiosos.
+Un archivo de viajes dice cuánto se movieron los taxis, pero no explica dónde ocurrió cada viaje ni si ese día había un evento. Por eso uní tres fuentes con pandas: viajes, zonas geográficas y calendario.
 
-Este análisis se basa en el procesamiento de aproximadamente **3 millones de registros** de viajes de taxis amarillos en Nueva York durante enero de 2023. La escala y complejidad del dataset nos permitió aplicar técnicas avanzadas de manipulación de datos, optimización de memoria y análisis estadístico para extraer patrones significativos.
+La base principal contiene aproximadamente **3 millones de registros** de taxis amarillos de Nueva York durante enero de 2023. El tamaño obliga a cuidar tipos, memoria y claves antes de empezar a agrupar.
 
-## Contexto de Negocio
+## Qué representa cada fuente
 
-La comisión de taxis de NYC necesita análisis en tiempo real de más de 3 millones de viajes mensuales para comprender patrones metropolitanos y tomar decisiones basadas en datos. Este proyecto integra:
+El análisis junta:
 
 - **Datos oficiales de viajes de taxis de NYC (enero 2023)**: Contiene información detallada sobre cada viaje, incluyendo ubicaciones de recogida y destino, tiempos, distancias, tarifas, propinas y métodos de pago.
 - **Información de zonas geográficas completas**: Mapa completo de las 265 zonas oficiales de taxi en los cinco distritos (boroughs) de NYC.
 - **Calendario de eventos especiales**: Registro de eventos importantes que podrían afectar el tráfico y demanda de taxis en la ciudad.
 
-### Relevancia del Problema
+### Para qué sirve la unión
 
-El sector de transporte en NYC representa una parte fundamental de la economía y movilidad urbana de la ciudad. Con más de 3 millones de viajes mensuales solo en taxis amarillos, la capacidad de analizar estos patrones permite:
+Con los viajes solos se ve el volumen. Al añadir zona y calendario se puede:
 
-1. **Optimización operativa**: Distribución eficiente de vehículos según demanda geográfica y temporal.
-2. **Planificación urbana**: Identificación de zonas con alta/baja cobertura de servicio.
-3. **Impacto económico**: Evaluación del efecto de eventos especiales en la demanda y rentabilidad.
+1. **Mover vehículos donde hacen falta**: leer la demanda por zona y hora.
+2. **Detectar cobertura desigual**: comparar los boroughs con la misma métrica.
+3. **Medir días distintos**: contrastar viajes, distancia y tarifa cuando hay eventos.
 
-## Objetivos del Análisis
+## Qué tenía que resolver
 
-### Objetivos Técnicos
+### En los datos
 
-- **Integrar datos de múltiples fuentes**: Combinar datasets con diferentes estructuras y formatos.
-- **Dominar los diferentes tipos de joins con pandas**: Aplicar `inner`, `left`, `right` y `outer` joins según las necesidades analíticas.
-- **Optimizar procesamiento de datos masivos**: Implementar técnicas eficientes para manejar ~3M de registros.
-- **Realizar análisis agregados con `groupby`**: Extraer patrones mediante agrupaciones multidimensionales.
-- **Automatizar pipelines con Prefect**: Crear flujos de trabajo reproducibles y escalables.
+- Unir tablas con estructuras y formatos distintos.
+- Elegir `inner`, `left`, `right` u `outer` según la pregunta, no por costumbre.
+- Procesar ~3M de filas sin cargar copias innecesarias en memoria.
+- Resumir el resultado con `groupby`.
+- Dejar una ejecución repetible con Prefect.
 
-### Objetivos de Negocio
+### En la lectura
 
-- **Identificar patrones de comportamiento por zonas geográficas**: Detectar áreas de alta/baja demanda y sus características.
-- **Analizar el impacto de eventos especiales**: Cuantificar el efecto de eventos en el volumen y características de los viajes.
-- **Evaluar métricas de rentabilidad por área**: Calcular revenue por kilómetro, tarifas promedio y patrones de propina.
-- **Crear reportes consolidados de datos integrados**: Generar dashboards y análisis accionables para toma de decisiones.
+- Comparar demanda entre zonas.
+- Ver qué cambia en días normales y especiales.
+- Calcular tarifa media, revenue por kilómetro y propina.
+- Dejar un reporte que se pueda volver a ejecutar.
 
-## Metodología
+## Cómo se armó el análisis
 
 ### 1. Carga y Preparación de Datos
 
-Utilizamos tres fuentes de datos diferentes, cada una con su propio formato:
+Partí de tres archivos, cada uno con un formato distinto:
 
 - **Datos de Viajes**: Formato Parquet (~ 3 millones de registros)
 - **Datos de Zonas**: Formato CSV (lookup table)
@@ -109,7 +109,7 @@ print(f"Eventos calendario: {calendar.shape[0]} filas")
 
 ### 2. Normalización y Limpieza
 
-Para asegurar la integridad de los joins, realizamos una serie de transformaciones y optimizaciones:
+Antes de unir nada normalicé fechas, nombres y tipos. También quité columnas que no entraban en el análisis para no duplicar memoria.
 
 ```python
 # 1. Estandarizar nombres de columnas
@@ -140,7 +140,7 @@ print(f"Ahorro de memoria: {savings:.1f}%")
 
 #### Análisis de Calidad de Datos
 
-Realizamos un análisis exhaustivo de los datos faltantes:
+Los faltantes quedaron resumidos así:
 
 | Dataset  | Columna         | Valores Nulos           | Estrategia             |
 | -------- | --------------- | ----------------------- | ---------------------- |
@@ -150,11 +150,11 @@ Realizamos un análisis exhaustivo de los datos faltantes:
 | Zones    | Todas           | 0                       | N/A                    |
 | Calendar | Todas           | 0                       | N/A                    |
 
-La optimización de tipos de datos nos permitió reducir el consumo de memoria en aproximadamente un 40%, fundamental para el procesamiento eficiente de los 3 millones de registros.
+Cambiar tipos y limpiar columnas redujo el consumo de memoria aproximadamente un 40%. En una tabla de 3 millones de filas, esa diferencia permite trabajar sin intercambiar datos al disco.
 
 ### 3. Integración de Datos mediante Joins
 
-Implementamos dos joins secuenciales para enriquecer progresivamente nuestro dataset:
+Hice dos joins, en este orden:
 
 #### Join 1: Viajes + Zonas (INNER JOIN)
 
@@ -172,7 +172,7 @@ print(f"Registros después del join: {len(trips_with_zones)}")
 print(f"Nuevas columnas añadidas: {[col for col in trips_with_zones.columns if col not in trips.columns]}")
 ```
 
-Este join nos permitió enriquecer cada viaje con información geográfica detallada sobre su destino, incluyendo el borough (distrito) y la zona específica. Utilizamos un INNER JOIN para garantizar que todos los registros tengan información válida de ubicación.
+El primer `INNER JOIN` añade borough y zona. Al exigir coincidencia, deja fuera viajes sin una ubicación reconocida y mantiene una tabla geográfica consistente.
 
 **Verificación del Join:**
 
@@ -200,9 +200,9 @@ print("DISTRIBUCIÓN DE DÍAS ESPECIALES:")
 print(trips_complete['is_special_day'].value_counts())
 ```
 
-Este segundo join utilizó un LEFT JOIN para preservar todos los viajes del dataset integrado anterior, añadiendo la dimensión temporal de eventos especiales. Para cada viaje, ahora sabemos si ocurrió durante un día con eventos especiales en la ciudad.
+El segundo `LEFT JOIN` añade el calendario sin perder viajes. Si una fecha no aparece en el calendario, el viaje sigue ahí y queda como día normal.
 
-#### Diferencias entre JOIN Types y Su Aplicación
+#### Por qué cada join tiene un lugar
 
 | Tipo de Join | Comportamiento                                            | Uso en este Análisis                                                                   |
 | ------------ | --------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -213,7 +213,7 @@ Este segundo join utilizó un LEFT JOIN para preservar todos los viajes del data
 
 ### 4. Análisis de Datos Integrados
 
-Una vez integradas las tres fuentes de datos, realizamos varios análisis multidimensionales:
+Con las tres fuentes juntas calculé cuatro vistas: borough, tipo de día, hora y correlaciones. Para los gráficos usé una muestra; los agregados se calcularon sobre la tabla completa.
 
 #### 4.1 Análisis Agregado por Borough
 
@@ -295,7 +295,7 @@ corr_pairs.sort(key=lambda x: abs(x[2]), reverse=True)
 
 #### 4.5 Técnicas para Datasets Grandes
 
-Para manejar eficientemente los 3 millones de registros, implementamos:
+Para trabajar con los 3 millones de registros, medí el costo de cada paso y tomé una muestra solo para los gráficos:
 
 ```python
 # Sampling estratégico para visualizaciones
@@ -318,7 +318,7 @@ join_stats = {
 
 ### Patrones por Zona Geográfica
 
-Tras analizar los datos agregados por borough, encontramos patrones claros de distribución geográfica:
+El agregado por borough queda así:
 
 | Borough       | # Viajes  | % Market Share | Tarifa Promedio | Revenue/km | Tasa Propina |
 | ------------- | --------- | -------------- | --------------- | ---------- | ------------ |
@@ -329,19 +329,19 @@ Tras analizar los datos agregados por borough, encontramos patrones claros de di
 | Staten Island | 21,457    | 0.7%           | $35.64          | $2.56      | 12.8%        |
 | EWR           | 5,712     | 0.2%           | $89.12          | $2.31      | 16.2%        |
 
-**Hallazgos principales:**
+**Lectura:**
 
-- **Manhattan** concentra el 71.8% de todos los viajes de taxis, presenta las tarifas más eficientes ($5.24 por km) y genera la mayor tasa de propinas (18.2% sobre tarifa base).
+- **Manhattan** concentra el 71.8% de los viajes, tiene $5.24 por km y la tasa de propina más alta (18.2% sobre la tarifa base).
 
-- **Staten Island** y **Bronx** muestran una actividad extremadamente baja (menos del 4% combinado), lo que sugiere una brecha importante en la cobertura de servicio.
+- **Staten Island** y **Bronx** suman menos del 4% de la actividad. Es una señal para revisar cobertura, no una explicación de por qué ocurre.
 
-- Los viajes al aeropuerto (EWR) tienen la tarifa promedio más alta ($89.12) pero un revenue por km relativamente bajo ($2.31), reflejando la naturaleza de estos viajes largos.
+- Los viajes a EWR tienen la tarifa media más alta ($89.12) y el revenue por km más bajo ($2.31), algo coherente con recorridos largos.
 
-- Las propinas son consistentemente más generosas en Manhattan (18.2%), seguido por viajes al aeropuerto (16.2%), mientras que son notablemente inferiores en Staten Island (12.8%).
+- La tasa de propina es mayor en Manhattan (18.2%), seguida por EWR (16.2%); Staten Island queda en 12.8%.
 
 ### Impacto de Eventos Especiales
 
-Al comparar días normales versus días con eventos especiales, encontramos:
+La comparación entre días normales y días con eventos especiales da:
 
 | Tipo de Día      | # Viajes  | Distancia Promedio | Tarifa Promedio |
 | ---------------- | --------- | ------------------ | --------------- |
@@ -349,15 +349,15 @@ Al comparar días normales versus días con eventos especiales, encontramos:
 | Día Especial     | 171,824   | 3.28 millas        | $24.37          |
 | **Diferencia %** | **+6.1%** | **+7.2%**          | **+10.1%**      |
 
-**Hallazgos principales:**
+**Lectura:**
 
-- En días con eventos especiales se registra un **incremento del 10.1%** en la tarifa promedio.
-- La distancia promedio de viaje aumenta un **7.2%** durante eventos especiales.
-- Los eventos generan un **aumento del 6.1%** en el volumen de viajes diarios.
+- La tarifa media sube **10.1%** en días con eventos.
+- La distancia media sube **7.2%**.
+- El volumen diario sube **6.1%**.
 
 ### Análisis Temporal
 
-El análisis por hora del día reveló patrones claros de demanda:
+Por hora, la demanda se concentra en la tarde:
 
 **Horas pico por número de viajes:**
 
@@ -373,7 +373,7 @@ El análisis por hora del día reveló patrones claros de demanda:
 
 ### Correlaciones Destacadas
 
-La matriz de correlación entre variables numéricas reveló relaciones importantes:
+La matriz de correlación sirve para poner esas cifras en contexto:
 
 | Variables                    | Correlación | Interpretación                  |
 | ---------------------------- | ----------- | ------------------------------- |
@@ -382,19 +382,19 @@ La matriz de correlación entre variables numéricas reveló relaciones importan
 | tip_amount - total_amount    | 0.611       | Correlación moderada positiva   |
 | tip_amount - trip_distance   | 0.482       | Correlación moderada positiva   |
 
-**Hallazgos principales:**
+**Lectura:**
 
-- Como es lógico, existe una correlación muy fuerte entre tarifa base y monto total.
-- La distancia del viaje es un predictor fuerte del costo total.
-- El monto de propina tiene correlación moderada con la distancia y el costo total.
+- `fare_amount` y `total_amount` casi se mueven juntos.
+- `trip_distance` también se relaciona con el costo total.
+- La propina tiene una relación moderada con el total y con la distancia. Son asociaciones, no un modelo causal.
 
-## Extra: Implementación de Flujo de Trabajo con Prefect
+## Una ejecución repetible con Prefect
 
-Como trabajo adicional, implementé un pipeline automatizado usando Prefect para procesar los datos de forma escalable. Elegí Prefect porque necesitaba una herramienta que permitiera manejar errores de red intermitentes (común al descargar datasets grandes desde URLs públicas), monitorear el progreso de cada paso, y poder programar ejecuciones periódicas sin necesidad de infraestructura compleja. 
+Además del notebook dejé un flujo de Prefect. Lo elegí para reintentar descargas, ver el progreso de cada paso y poder repetir el análisis con otro mes sin rehacerlo a mano.
 
-**¿Qué esperaba encontrar?** Esperaba que la automatización me permitiera re-ejecutar el análisis completo con nuevos datos mensuales de forma confiable, identificar cuellos de botella en el procesamiento (especialmente en los joins de 3M de registros), y tener trazabilidad completa de cada ejecución mediante logs estructurados.
+**Qué quería resolver:** repetir la carga con datos mensuales, localizar el cuello de botella de los joins de 3M de registros y conservar un log de cada ejecución.
 
-**¿Qué aprendí?** Prefect simplificó significativamente el manejo de errores transitorios (como timeouts de red) mediante reintentos automáticos configurados con `retries=2`. Descubrí que el logging estructurado con `get_run_logger()` es invaluable para debugging en producción, ya que cada task registra su inicio, fin y posibles errores con timestamps. También aprendí que la separación en tasks independientes permite paralelizar ciertas operaciones (como cargar trips y zones simultáneamente) y facilita el testing individual de cada componente. Sin embargo, para datasets tan grandes (3M de registros), el procesamiento en memoria sigue siendo un cuello de botella que requeriría soluciones como Dask o Spark para escalar horizontalmente.
+**Qué aprendí:** los reintentos con `retries=2` cubren los timeouts de red; `get_run_logger()` deja cada task con inicio, fin y error; y separar tareas facilita probarlas y cargar trips y zones en paralelo. La memoria sigue siendo el límite para 3M de filas; para crecer habría que evaluar Dask o Spark.
 
 ```python
 # Instalación de Prefect
@@ -475,38 +475,38 @@ def pipeline_taxi_simple():
     return resultados
 ```
 
-### Ventajas de la Automatización con Prefect
+### Qué aporta el flujo
 
-La implementación con Prefect ofrece varias ventajas técnicas:
+El flujo resuelve cinco tareas concretas:
 
-1. **Reintentos Automáticos**: Si la carga de datos falla temporalmente (por problemas de red, por ejemplo), Prefect reintentará la operación automáticamente con un delay configurable (`retry_delay_seconds=3`). Esto es crítico cuando se trabaja con datasets públicos que pueden tener interrupciones temporales.
+1. **Reintentos automáticos**: una descarga temporalmente fallida vuelve a intentar con `retry_delay_seconds=3`.
 
-2. **Monitoreo y Logging**: Cada paso del proceso es registrado con timestamps y detalles de ejecución mediante `get_run_logger()`. Esto permite identificar exactamente dónde y cuándo ocurren problemas en producción.
+2. **Monitoreo y logging**: `get_run_logger()` deja claro dónde y cuándo falla un paso.
 
-3. **Programación**: El pipeline puede programarse para ejecutarse periódicamente (diario, semanal, etc.) usando Prefect Cloud o un servidor local, asegurando que los análisis estén siempre actualizados con los datos más recientes.
+3. **Programación**: el pipeline puede correr a diario o semanalmente con Prefect Cloud o un servidor local.
 
-4. **Escalabilidad Potencial**: Los tasks pueden distribuirse en múltiples máquinas usando Prefect's executors (Dask, Ray, etc.), aunque para este análisis inicial trabajamos en memoria.
+4. **Escalabilidad**: los tasks pueden distribuirse con ejecutores como Dask o Ray; este análisis todavía corre en memoria.
 
-5. **Manejo de Errores Robusto**: Si un paso falla, el flujo puede manejar la excepción y continuar o notificar según se configure, evitando que un error menor en un task detenga todo el pipeline.
+5. **Manejo de errores**: una excepción puede detener, reintentar o notificar según la configuración, sin ocultar el paso que falló.
 
-Esta implementación permite automatizar completamente el proceso de análisis y asegurar que los hallazgos estén siempre actualizados con los datos más recientes, mientras que el logging estructurado facilita el debugging y la auditoría de ejecuciones.
+Con esto el análisis se puede repetir y cada ejecución queda auditada en los logs.
 
-## Conclusiones y Recomendaciones
+## Decisiones que salen del análisis
 
-### Insights Clave sobre la Metodología de Joins
+### Sobre la metodología
 
-1. **Ventajas del Enfoque Multi-fuente**: La integración de datos de viajes, zonas y calendario nos permitió obtener insights que serían imposibles de detectar con datasets aislados. Por ejemplo, el impacto cuantificado de eventos especiales en patrones de viaje.
+1. **La unión añade contexto**: viajes, zonas y calendario permiten medir el cambio de los eventos, algo que cada archivo por separado no puede mostrar.
 
-2. **Importancia del Tipo de Join**: La elección entre INNER JOIN y LEFT JOIN fue crítica:
+2. **El tipo de join cambia la población**:
 
    - INNER JOIN para trips + zones garantizó datos geográficos completos
    - LEFT JOIN para trips_with_zones + calendar preservó todos los viajes aunque no hubiera eventos
 
-3. **Optimización para Big Data**: Las técnicas de optimización de tipos de datos y limpieza estratégica redujeron el uso de memoria en un 40%, crucial para procesar 3M de registros eficientemente.
+3. **La memoria cuenta**: ajustar tipos y limpiar columnas redujo el uso en un 40% y dejó el análisis de 3M de filas dentro de un flujo manejable.
 
-4. **Valor de la Automatización**: La implementación con Prefect demuestra cómo este análisis puede ser ejecutado periódicamente de forma robusta y escalable.
+4. **La automatización evita trabajo repetido**: Prefect permite volver a correr el mismo recorrido y revisar qué ocurrió.
 
-### Oportunidades de Negocio Identificadas
+### Dónde mirar primero
 
 1. **Planificación Estratégica de Flota**:
 
@@ -531,7 +531,7 @@ Esta implementación permite automatizar completamente el proceso de análisis y
    - Recompensar a conductores que cubren áreas menos populares
    - Programa de lealtad para usuarios frecuentes en Manhattan (71.8% del mercado)
 
-### Consideraciones Técnicas para Futuros Análisis
+### Qué falta para una siguiente versión
 
 1. **Escalabilidad de la Solución**:
 
@@ -556,13 +556,11 @@ Esta implementación permite automatizar completamente el proceso de análisis y
    - Datos limitados a enero 2023 (falta análisis estacional)
    - No incorpora datos de satisfacción de clientes o conductores
 
-## Conclusión y Próximos Pasos
+## Próxima versión
 
-El análisis de múltiples fuentes de datos mediante joins reveló insights valiosos sobre patrones de movilidad urbana en NYC. La integración de datos de viajes, zonas geográficas y calendario de eventos permitió identificar relaciones complejas que serían invisibles analizando cada fuente por separado. Los hallazgos principales incluyen: la concentración del 71.8% de viajes en Manhattan refleja la estructura económica de la ciudad, el impacto del 10.1% en tarifas durante eventos especiales muestra oportunidades de pricing dinámico, y la brecha de cobertura en Staten Island y Bronx (menos del 4% combinado) señala una necesidad crítica de expansión de servicio.
+Los resultados de enero son una foto, no una serie. Manhattan concentra el 71.8% de los viajes; los eventos elevan la tarifa un 10.1%; Staten Island y Bronx quedan por debajo del 4% combinado. Repetiría el pipeline durante varios meses, sumaría taxis verdes y ridesharing y cruzaría la demanda con clima, tráfico y eventos deportivos. Con esas fuentes recién tendría sentido entrenar un modelo de demanda o montar un dashboard en tiempo real.
 
-**Próximos pasos:** Extender el análisis a múltiples meses para identificar patrones estacionales y validar si los hallazgos de enero se mantienen a lo largo del año. Integrar datos de taxis verdes y servicios de ridesharing (Uber, Lyft) para obtener una visión completa del mercado de transporte. Implementar un modelo predictivo de demanda usando las features temporales y geográficas identificadas para optimizar distribución de flota. Desarrollar un dashboard interactivo con visualizaciones geoespaciales que permita explorar dinámicamente los patrones por hora, día y zona. Integrar datos externos (clima, eventos deportivos, conciertos) para enriquecer el análisis de factores que influyen en la demanda de transporte.
-
-## Respuestas a Preguntas Clave
+## Preguntas que conviene dejar documentadas
 
 ### 1. ¿Qué diferencia hay entre un LEFT JOIN y un INNER JOIN?
 
@@ -599,20 +597,20 @@ Para resolver estos problemas, implementamos la normalización de formatos (trip
 
 ### 4. ¿Cuál es la ventaja de integrar múltiples fuentes de datos?
 
-La integración de múltiples fuentes nos proporcionó:
+Al unir las tablas aparecen cuatro cosas que no estaban en los archivos originales:
 
 - **Contexto enriquecido**: No solo vimos los viajes, sino también su dimensión geográfica y temporal
 - **Nuevas dimensiones analíticas**: Pudimos analizar el impacto de eventos especiales y características geográficas
-- **Insights más profundos**: Descubrimos patrones que serían invisibles en datasets aislados
+- **Más contexto**: aparecen patrones que no estaban en ningún archivo aislado
 - **Visión holística**: Comprendimos cómo diferentes factores (ubicación, eventos, hora) interactúan entre sí
 
-### 5. ¿Qué insights de negocio obtuvimos del análisis integrado?
+### 5. ¿Qué decisiones permite discutir?
 
 **Patrones por Zona:**
 
 - Manhattan domina el mercado con 71.8% de los viajes y el mayor revenue/km
 - Staten Island y Bronx muestran una severa brecha de cobertura (menos del 4% combinado)
-- Las propinas varían significativamente por zona, siendo Manhattan la más generosa (18.2%)
+- Las propinas cambian por zona; Manhattan queda primera (18.2%)
 
 **Impacto en Calendario:**
 
@@ -623,4 +621,3 @@ La integración de múltiples fuentes nos proporcionó:
 
 - La franja 5-7 PM concentra más de 124,000 viajes por hora
 - Las horas valle (3-5 AM) tienen menos del 20% de la actividad de las horas pico
-

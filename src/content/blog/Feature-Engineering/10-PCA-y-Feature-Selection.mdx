@@ -1,22 +1,21 @@
 ---
-title: "PCA y Feature Selection"
-description: "Análisis de Componentes Principales (PCA) y técnicas de selección de features para reducir dimensionalidad, mejorar interpretabilidad y prevenir overfitting en modelos de machine learning."
+title: "PCA o selección de variables"
+description: "Comparación de PCA y selección de features sobre Ames Housing: cuánta información se conserva, qué tan explicable queda el modelo y qué pasa con el leakage."
 ---
 
-# PCA y Feature Selection: Reducción Dimensional y Selección de Features
+# PCA o selección de variables: dos formas de reducir una tabla
 
 
-## Objetivos de Aprendizaje
+## Qué quería comparar
 
-- **Implementar PCA** y analizar componentes principales para reducción dimensional
-- **Aplicar Feature Selection** con múltiples métodos (Filter, Wrapper, Embedded)
-- **Comparar PCA vs Feature Selection** en términos de performance e interpretabilidad
-- **Evaluar trade-offs** entre reducción dimensional y retención de información
-- **Prevenir data leakage** en procesos de selección de features
+- Aplicar PCA y leer su varianza acumulada.
+- Seleccionar columnas con métodos filter, wrapper y embedded.
+- Medir qué se gana o se pierde en rendimiento e interpretación.
+- Mantener el split separado de cualquier decisión de selección.
 
-## Contexto de Negocio
+## La pregunta
 
-El dataset **Ames Housing** contiene información sobre propiedades inmobiliarias con ~80 características. Como data scientist en una empresa de bienes raíces, necesitamos:
+**Ames Housing** trae ~80 características por casa. La pregunta es si hace falta conservarlas todas para predecir `SalePrice`.
 
 - **Identificar qué características realmente importan** para predecir el precio de venta
 - **Reducir la complejidad del modelo** para que sea más rápido y mantenible
@@ -34,7 +33,7 @@ El dataset **Ames Housing** contiene información sobre propiedades inmobiliaria
   - **Categóricas:** Neighborhood, HouseStyle, RoofStyle, Exterior, Foundation (~40 categóricas)
   - **Numéricas discretas:** BedroomAbvGr, FullBath, Fireplaces, GarageCars
 
-## Proceso de Análisis
+## Recorrido
 
 ### 1. Preparación y Carga de Datos
 
@@ -85,12 +84,12 @@ def quick_load_and_preprocess_ames(filepath='train.csv'):
 X, y, feature_names = quick_load_and_preprocess_ames('AmesHousing.csv')
 ```
 
-**Decisiones tomadas:**
+**Decisiones de preparación:**
 - **Imputación con mediana** para numéricas: robusta ante outliers
 - **Imputación con moda** para categóricas: mantiene consistencia con categorías frecuentes
 - **Label encoding** en lugar de one-hot: reduce dimensionalidad inicial (81 features vs ~200+ con one-hot)
 
-### 2. Análisis Exploratorio: ¿Por qué reducir dimensionalidad?
+### 2. Por qué reducir la tabla
 
 Con 81 features, enfrentamos varios problemas:
 
@@ -99,15 +98,13 @@ Con 81 features, enfrentamos varios problemas:
 3. **Interpretabilidad:** Difícil explicar qué features importan
 4. **Redundancia:** Muchas features pueden estar correlacionadas
 
-**Pregunta reflexiva:** ¿Con 80+ features, esperarías que todas sean igualmente importantes para predecir precio?
-
-**Respuesta:** No. Muchas features pueden aportar información redundante o ruido, afectando la capacidad del modelo para generalizar. Además, algunas features pueden estar altamente correlacionadas (por ejemplo, GarageArea y GarageCars).
+Con 80+ columnas es razonable esperar información repetida y ruido. `GarageArea` y `GarageCars`, por ejemplo, describen parte de la misma propiedad.
 
 ### 3. PCA - Análisis de Componentes Principales
 
-#### 3.1 Estandarización (Crítico para PCA)
+#### 3.1 Estandarización: el requisito de PCA
 
-PCA es sensible a la escala de las variables. **SIEMPRE** debemos estandarizar antes de aplicar PCA.
+PCA es sensible a la escala. Hay que estandarizar antes de ajustar los componentes.
 
 ```python
 from sklearn.preprocessing import StandardScaler
@@ -119,7 +116,7 @@ print(f"Mean después de scaling: {X_scaled.mean():.6f} (esperado: ~0)")
 print(f"Std después de scaling: {X_scaled.std():.6f} (esperado: ~1)")
 ```
 
-**¿Por qué PCA requiere estandarización?** PCA se basa en la varianza de cada feature. Si las variables están en distintas escalas (por ejemplo, metros cuadrados vs número de baños), las de valores más grandes dominarían los componentes principales simplemente por su magnitud numérica, no por su relevancia real.
+PCA usa la varianza de cada columna. Si una variable está en metros cuadrados y otra en número de baños, la primera podría dominar por su magnitud, no por su señal.
 
 #### 3.2 Aplicar PCA Completo
 
@@ -150,7 +147,7 @@ print(f"PC3: {explained_variance[2]:.3%}")
 
 ![Scree Plot de PCA](/images/practica10/scree_plot.png)
 
-**Pie de figura:** Este gráfico muestra la varianza explicada por cada componente principal (izquierda) y la varianza acumulada (derecha). Lo que me llamó la atención es que se necesitan 39 componentes para alcanzar el 80% de varianza, lo que indica alta diversidad de información en el dataset. La conclusión es que podemos reducir de 81 a 39 features manteniendo el 80% de la información, una reducción del 51.9%.
+**Lectura:** hacen falta 39 componentes para llegar al 80% de varianza. La tabla puede bajar de 81 a 39 columnas y conservar el 80% de la información, una reducción de 51.9%.
 
 ```python
 n_components_80 = np.argmax(cumulative_variance >= 0.80) + 1
@@ -436,9 +433,9 @@ for method_name, (X_method, y_method) in methods.items():
 3. Elegir el conjunto que logre el mejor equilibrio entre rendimiento e interpretabilidad
 4. Para negocio: preferir features originales (MI, F-test) sobre componentes de PCA
 
-### 8. Análisis Extras: Feature Selection con Otro Dataset
+### 8. La misma prueba en otro dataset
 
-Para demostrar la generalización de las técnicas, aplicamos feature selection al dataset **Adult Income** (clasificación binaria).
+Para comprobar si el resultado era exclusivo de viviendas, llevé la selección al dataset **Adult Income** (clasificación binaria).
 
 **Dataset:** Adult Income (48K registros, 14 features)
 - **Target:** Income >50K (clasificación binaria)
@@ -456,24 +453,24 @@ Para demostrar la generalización de las técnicas, aplicamos feature selection 
 - **RF Importance:** 8 features, AUC: 0.893
 - **Lasso:** 7 features (coeficientes no-cero), AUC: 0.891
 
-**Aprendizaje:** Los métodos de feature selection son consistentes entre datasets. Mutual Information sigue siendo efectivo para clasificación, y Lasso es útil para reducir dimensionalidad automáticamente.
+**Aprendizaje:** los métodos se comportan de forma parecida en este segundo dataset; MI funciona bien para clasificación y Lasso deja una selección compacta.
 
-**¿Por qué elegí este dataset?** 
+**Por qué lo elegí:**
 - Diferente tipo de problema (clasificación vs regresión)
 - Permite validar que las técnicas funcionan en distintos contextos
-- Demuestra que MI es robusto para ambos tipos de problemas
+- Permite comprobar si MI mantiene el resultado en ambos tipos de problema
 
 ### 9. Visualizaciones y Análisis
 
 **Análisis comparativo de métodos:**
 
-Los resultados muestran que Mutual Information logra el mejor performance incluso mejorando al modelo original, lo cual es inusual y demuestra que la selección inteligente de features puede eliminar ruido y mejorar el modelo, no solo reducir dimensionalidad. 
+MI obtiene el mejor resultado y supera al modelo original en esta comparación. La selección quitó columnas que añadían ruido, no solo dimensiones.
 
 **Comparación de importancias:**
 
-Se observa que Overall Qual, Gr Liv Area y Garage Area son consistentemente importantes en todos los métodos. Esto valida la intuición de que tamaño y calidad son los factores más determinantes en el precio de una propiedad.
+`Overall Qual`, `Gr Liv Area` y `Garage Area` aparecen entre las variables importantes en varios métodos. En este dataset, tamaño y calidad son las señales más estables.
 
-## Análisis Crítico y Decisiones
+## Decisiones y límites
 
 ### Clasificación de Métodos
 
@@ -543,9 +540,9 @@ Se observa que Overall Qual, Gr Liv Area y Garage Area son consistentemente impo
 
 ## Extra: Reducción Dimensional No-Lineal con t-SNE y UMAP
 
-Para explorar técnicas de reducción dimensional no-lineales como alternativa a PCA, comparé **t-SNE** y **UMAP** en el contexto de visualización y modelado.
+Como contraste visual comparé **t-SNE** y **UMAP** con PCA.
 
-### ¿Por qué lo elegí?
+### Qué quería ver
 
 Elegí explorar t-SNE y UMAP porque:
 
@@ -555,7 +552,7 @@ Elegí explorar t-SNE y UMAP porque:
 4. t-SNE es excelente para visualización pero lento; UMAP es más rápido y escalable
 5. Es una técnica mencionada en "próximos pasos" de la práctica principal
 
-### ¿Qué esperaba encontrar?
+### Hipótesis
 
 Esperaba encontrar:
 
@@ -580,7 +577,7 @@ Evaluamos cada técnica en:
 
 ![Reducción Dimensional](/images/practica10/practica10_dimensionality_reduction.png)
 
-**Pie de figura:** Este gráfico muestra las visualizaciones 2D de PCA, t-SNE y UMAP (si disponible). Lo que me llamó la atención es que t-SNE y UMAP revelan clusters más claros que PCA, preservando mejor la estructura local. La conclusión es que para visualización, las técnicas no-lineales son superiores, pero para modelado, PCA mantiene mejor la varianza global.
+**Lectura:** t-SNE y UMAP dibujan grupos más claros que PCA en 2D, porque priorizan estructura local. Para modelar, PCA conserva mejor la varianza global.
 
 ### Resultados
 
@@ -595,7 +592,7 @@ Evaluamos cada técnica en:
 - PCA pierde 90.7% de performance vs original (R²: 0.8239 → 0.0767)
 - Esta pérdida es aceptable si reduces de 20 a 2 dimensiones
 
-### ¿Qué aprendí?
+### Qué quedó de la comparación
 
 1. **Diferencias entre técnicas lineales y no-lineales:** PCA mantiene varianza global pero puede perder estructura local. PCA pierde 90.7% de performance vs original, lo cual es aceptable para una reducción tan drástica (20 → 2 dimensiones).
 
@@ -609,16 +606,16 @@ Evaluamos cada técnica en:
    - **INTERPRETABILIDAD:** PCA (componentes lineales explicables)
    - **VELOCIDAD:** PCA > UMAP > t-SNE
 
-5. **Insights específicos:** Para datos con relaciones no-lineales, UMAP puede ser mejor que PCA. PCA sigue siendo la mejor opción cuando necesitas interpretabilidad. La pérdida de performance con PCA (90.7%) es aceptable si reduces de 20 a 2 dimensiones. Para producción, PCA es más robusto y predecible.
+5. **Una regla práctica:** UMAP puede ayudar con relaciones no lineales; PCA sigue siendo más fácil de explicar. La pérdida de performance con PCA (90.7%) solo es aceptable si el objetivo justifica bajar de 20 a 2 dimensiones.
 
 6. **Cuándo usar cada técnica:**
    - **PCA:** Datos lineales, necesidad de interpretabilidad, velocidad crítica
    - **t-SNE:** Solo visualización, exploración de clusters, datasets pequeños ( < 10K)
    - **UMAP:** Visualización + modelado, estructura no-lineal, datasets medianos/grandes
 
-## Conclusiones y Próximos Pasos
+## Qué probaría después
 
-### Conclusiones Principales
+### Lo que elegiría según el objetivo
 
 1. **Mutual Information es el mejor método** para este problema, logrando RMSE de $26,137 (mejor que el original) con solo 39 features (51.9% reducción)
 
@@ -631,7 +628,7 @@ Evaluamos cada técnica en:
 
 4. **Wrapper methods son lentos** y en este caso no mejoraron el performance. Solo 19 features resultaron insuficientes para este problema
 
-5. **Lasso es útil para reducir dimensionalidad automáticamente**, forzando a 0 features no importantes. Sin embargo, en este caso no mejoró significativamente sobre filter methods
+5. **Lasso puede reducir dimensionalidad automáticamente**, forzando a 0 features no importantes. En este caso no mejoró de forma clara sobre filter methods
 
 ### Próximos Pasos
 
@@ -661,4 +658,3 @@ Evaluamos cada técnica en:
 ---
 
 _Nota: Este análisis fue realizado con fines educativos utilizando el dataset Ames Housing de Kaggle._
-

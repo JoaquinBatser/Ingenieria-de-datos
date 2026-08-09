@@ -1,22 +1,20 @@
 ---
-title: "Audio como Dato: Procesamiento y Análisis"
-description: "Pipeline completo de procesamiento de audio digital: carga de señales, análisis temporal y frecuencial, extracción de características (MFCCs, espectrogramas) y aplicaciones de machine learning con librosa."
+title: "Cómo leer un archivo de audio"
+description: "Recorrido por señales de audio con librosa: forma de onda, FFT, espectrogramas, MFCCs y un pipeline sencillo para clasificación."
 ---
 
-# Audio como Dato: Procesamiento y Análisis
+# Audio como dato: del archivo a las features
 
-## Objetivos de Aprendizaje
+## Qué quería sacar de la señal
 
-- **Comprender la representación digital** de señales de audio
-- **Dominar los conceptos fundamentales**: sampling rate, duración, amplitud
-- **Visualizar señales** en dominio temporal y frecuencial
-- **Extraer características** relevantes para machine learning (MFCCs, Spectral Features)
-- **Aplicar transformadas** de Fourier para análisis espectral
-- **Implementar pipelines** de clasificación de audio
+- Entender qué significan sampling rate, duración, amplitud y canales.
+- Mirar la señal en el tiempo y en frecuencia.
+- Convertirla en MFCCs y otras features que un modelo pueda usar.
+- Comparar una clasificación sencilla con algunas lecturas de tempo y pitch.
 
-## Contexto de Negocio
+## Por qué convertir sonido en números
 
-El procesamiento de audio es crucial en múltiples industrias:
+La misma señal aparece en tareas distintas:
 - **Asistentes de voz** (Alexa, Siri, Google Assistant)
 - **Sistemas de reconocimiento de voz** (transcripción automática)
 - **Análisis de sentimientos** por voz en call centers
@@ -24,19 +22,19 @@ El procesamiento de audio es crucial en múltiples industrias:
 - **Detección de anomalías** en audio industrial
 - **Aplicaciones médicas** (análisis de sonidos cardíacos, respiratorios)
 
-Como ingeniero de datos trabajando con audio, necesitas:
+Para trabajar con ella hay que:
 - **Cargar y normalizar** archivos de audio en diversos formatos
-- **Extraer features robustas** para entrenamiento de modelos
+- **Extraer features estables** para entrenar modelos
 - **Analizar patrones** temporales y frecuenciales
 - **Optimizar el rendimiento** de sistemas de clasificación
 
-### Dataset de Ejemplo
+### La muestra
 
 Trabajaremos con audio de diferentes fuentes:
 - **Formato:** WAV, MP3
 - **Aplicación:** Clasificación de género musical, reconocimiento de voz
 
-## Proceso de Análisis
+## Recorrido
 
 ### 1. Preparación del Entorno
 
@@ -69,14 +67,14 @@ print(f"librosa: {librosa.__version__}")
 
 #### 2.1 Conceptos Básicos
 
-Un audio digital se representa como una **secuencia de muestras** (samples) tomadas a intervalos regulares:
+Un audio digital es una **secuencia de muestras** tomadas a intervalos regulares:
 
 - **Sampling Rate (sr)**: Frecuencia de muestreo (Hz) - típicamente 22050, 44100, 48000 Hz
 - **Duración**: Tiempo total del audio (segundos)
 - **Amplitud**: Intensidad de la señal en cada muestra
 - **Canales**: Mono (1) o Estéreo (2)
 
-**Teorema de Nyquist:** Para capturar una frecuencia `f`, necesitamos `sr ≥ 2f`.
+**Teorema de Nyquist:** para capturar una frecuencia `f`, necesitamos `sr ≥ 2f`.
 
 ```python
 # Ejemplo: generar tono puro
@@ -109,11 +107,11 @@ print(f"Tipo de dato: {y.dtype}")
 print(f"Rango: [{y.min():.3f}, {y.max():.3f}]")
 ```
 
-**Nota:** `librosa.load()` por defecto remuestrea a 22050 Hz y convierte a mono.
+**Nota:** `librosa.load()` remuestrea por defecto a 22050 Hz y convierte la señal a mono.
 
 ### 4. Visualización: Forma de Onda (Waveform)
 
-La forma de onda muestra la **amplitud en función del tiempo**.
+La forma de onda pone la **amplitud en función del tiempo**.
 
 ```python
 # Plotear waveform
@@ -128,7 +126,7 @@ plt.show()
 
 ![Forma de Onda](/images/practica14/p14_waveform.png)
 
-**Interpretación:**
+**Cómo leerla:**
 - **Eje X**: Tiempo
 - **Eje Y**: Amplitud normalizada (típicamente -1 a 1)
 - **Zonas densas**: Mayor actividad sonora (ej: voz, música)
@@ -136,7 +134,7 @@ plt.show()
 
 ### 5. Análisis Frecuencial: Transformada de Fourier
 
-La **FFT (Fast Fourier Transform)** descompone la señal en sus componentes frecuenciales.
+La **FFT (Fast Fourier Transform)** separa la señal en componentes de frecuencia.
 
 ```python
 # Calcular FFT
@@ -160,14 +158,14 @@ plt.show()
 
 ![Espectro de Frecuencia](/images/practica14/p14_fft.png)
 
-**Interpretación:**
+**Cómo leerla:**
 - **Picos**: Frecuencias dominantes en la señal
 - **Voz humana**: Concentrada en 80-300 Hz (fundamental) + armónicos
 - **Música**: Distribución más amplia según instrumentos
 
 ### 6. Espectrograma
 
-Un espectrograma muestra cómo evoluciona el **contenido frecuencial a lo largo del tiempo**.
+Un espectrograma muestra cómo cambia el **contenido frecuencial con el tiempo**.
 
 ```python
 # Calcular espectrograma (STFT - Short-Time Fourier Transform)
@@ -192,11 +190,11 @@ plt.show()
 - **Eje Y**: Frecuencia
 - **Color**: Intensidad (dB)
 
-**Aplicación:** Visualizar formantes de voz, patrones rítmicos, identificar instrumentos.
+**Para qué sirve:** ver formantes de voz, patrones rítmicos o la entrada de un instrumento.
 
 ### 7. Espectrograma Mel
 
-La escala **Mel** ajusta las frecuencias según la percepción humana (más resolución en bajas frecuencias).
+La escala **Mel** agrupa las frecuencias de una forma más cercana a la percepción humana y conserva más detalle en las bajas.
 
 ```python
 # Mel-spectrogram
@@ -216,13 +214,13 @@ plt.show()
 
 ![Mel-Espectrograma](/images/practica14/p14_melspectrogram.png)
 
-**Ventaja:** Mejor representación para modelos de machine learning que buscan simular percepción humana.
+**Ventaja:** suele ser una entrada práctica para modelos que necesitan una representación parecida a la percepción humana.
 
 ### 8. Extracción de Características
 
 #### 8.1 MFCCs (Mel-Frequency Cepstral Coefficients)
 
-Los **MFCCs** son la característica más popular para tareas de clasificación de audio.
+Los **MFCCs** resumen la forma espectral de una señal y suelen funcionar bien como entrada para una primera clasificación.
 
 ```python
 # Calcular MFCCs
@@ -285,7 +283,7 @@ plt.show()
 
 ![Características Espectrales](/images/practica14/p14_spectral_features.png)
 
-**Interpretación:**
+**Cómo leerlas:**
 - **ZCR**: Alto para sonidos sin tono (percusión), bajo para tonos puros
 - **Spectral Centroid**: "Brillo" del sonido (~donde está el centro de energía)
 - **Spectral Rolloff**: Indica presencia de altas frecuencias
@@ -467,21 +465,21 @@ plt.tight_layout()
 
 ### Normalización de Features
 
-**Crítico:** Las features de audio tienen escalas muy diferentes (ej: ZCR ~0.1, spectral centroid ~2000).
+**Escalas:** las features de audio viven en rangos distintos (por ejemplo, ZCR ~0.1 y spectral centroid ~2000).
 
-**Solución:** Siempre aplicar `StandardScaler` antes de entrenar modelos.
+**Solución:** ajustar `StandardScaler` con el conjunto de entrenamiento y reutilizarlo en validación y prueba.
 
-## Conclusiones
+## Qué queda de esta primera pasada
 
-El procesamiento de audio con librosa permite:
+Con librosa pude:
 
 1. **Cargar y manipular** señales de audio en diversos formatos
 2. **Visualizar** tanto en dominio temporal como frecuencial
-3. **Extraer características robustas** (MFCCs, spectral features) para ML
+3. **Extraer características estables** (MFCCs, spectral features) para ML
 4. **Implementar pipelines completos** de clasificación
 5. **Analizar patrones musicales** (tempo, pitch, armonía)
 
-**Aplicaciones prácticas:**
+**Aplicaciones que se abren:**
 - Reconocimiento automático de voz (ASR)
 - Clasificación de género musical
 - Detección de emociones por voz
@@ -686,11 +684,11 @@ El procesamiento de audio con librosa permite:
 - Detección de anomalías en audio industrial
 
 **Pipeline típico ML:**
-1. Carga de- **Pipeline:** Preprocesamiento → Extracción de Features → Modelo ML → Predicción
+1. Carga de audio → preprocesamiento → extracción de features → modelo → predicción
 
 ## Extra: Data Augmentation para Audio
 
-En Deep Learning para audio, a menudo tenemos datasets pequeños. **Data Augmentation** es una técnica crítica para aumentar artificialmente el tamaño del dataset y mejorar la robustez del modelo, generando nuevas muestras a partir de las existentes.
+En audio es común empezar con pocos ejemplos. **Data Augmentation** permite generar variaciones controladas para que el modelo no memorice una única voz o interpretación.
 
 ### Técnicas Comunes
 
@@ -727,17 +725,15 @@ y_noise = y + noise
 - **Time Stretch:** La señal dura menos tiempo, pero las frecuencias se mantienen.
 - **Pitch Shift:** La duración es igual, pero toda la señal se desplaza hacia arriba en frecuencia.
 
-Estas transformaciones permiten que el modelo aprenda que una palabra dicha rápido o lento, o por una voz grave o aguda, sigue siendo la misma palabra.
+Con estas variaciones, una palabra rápida, lenta, grave o aguda puede conservar la misma etiqueta.
 
 **Recursos adicionales:**
 - Dataset GTZAN (clasificación de géneros)
 - LibriSpeech (reconocimiento de voz)
 - ESC-50 (clasificación de sonidos ambientales)
 
-## Conclusión
+## Siguiente experimento
 
-El procesamiento de audio con librerías como Librosa permite extraer características temporales y espectrales fundamentales para análisis de señales sonoras. Las transformadas de Fourier (FFT, STFT) revelan la composición frecuencial del audio, mientras que los espectrogramas y mel-espectrogramas proporcionan representaciones visuales útiles para machine learning. Los MFCCs (Mel-Frequency Cepstral Coefficients) son features robustas ampliamente utilizadas en reconocimiento de voz y clasificación de audio, capturando información espectral compacta y discriminativa. Las técnicas de aumento de datos (pitch shifting, time stretching, adición de ruido) mejoran significativamente la generalización de modelos de audio al simular variaciones naturales en las señales.
-
-**Próximos pasos:** Implementar clasificación de audio con redes neuronales convolucionales (CNNs) sobre espectrogramas para aprovechar patrones espaciales. Explorar arquitecturas especializadas como WaveNet o Tacotron para síntesis de voz de alta calidad. Aplicar técnicas de separación de fuentes (source separation) para aislar instrumentos o voces en mezclas de audio complejas. Investigar modelos de atención (attention mechanisms) y transformers para tareas de speech-to-text y audio captioning. Desarrollar sistemas de detección de eventos sonoros para aplicaciones de monitoreo ambiental, seguridad o análisis de salud mediante sonidos corporales.
+La señal cambia de forma según la representación: waveform para el tiempo, FFT para sus frecuencias, espectrogramas para ver ambas y MFCCs para alimentar un modelo pequeño. Probaría una CNN sobre espectrogramas y compararía su resultado con el pipeline de MFCCs; después mediría separación de fuentes y detección de eventos con datos etiquetados.
 
 ---

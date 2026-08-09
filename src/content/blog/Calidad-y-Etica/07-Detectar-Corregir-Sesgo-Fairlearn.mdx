@@ -1,35 +1,35 @@
 ---
-title: "Detectando y corrigiendo sesgo algorítmico: Fairlearn aplicado a casos reales de discriminación"
-description: "Análisis completo de sesgo en modelos de machine learning usando Fairlearn. Casos de estudio: Boston Housing (sesgo racial) y Titanic (sesgo de género/clase)."
+title: "Medir el sesgo antes de corregirlo"
+description: "Dos ejercicios con Fairlearn sobre Boston Housing y Titanic: cómo medir diferencias entre grupos y decidir cuándo una corrección tiene sentido."
 ---
 
 
-## Objetivos de Aprendizaje
+## Qué quería aprender
 
-- **Detectar sesgo histórico** en datasets reales (Boston Housing, Titanic)
-- **Analizar el impacto** del sesgo en predicciones de modelos
-- **Comparar estrategias** de detección vs. corrección automática
-- **Evaluar cuándo detectar** vs. cuándo intentar corregir sesgo
-- **Desarrollar criterios éticos** para deployment responsable de modelos
+- Detectar sesgo histórico en dos datasets muy distintos.
+- Medir cuánto llega ese sesgo a las predicciones.
+- Comparar un reporte de detección con una mitigación automática.
+- Decidir cuándo corregir es razonable y cuándo solo corresponde documentar.
+- Dejar criterios para no desplegar un modelo a ciegas.
 
-## Contexto de Negocio
+## Por qué separar los casos
 
-El sesgo algorítmico es uno de los problemas más críticos en machine learning moderno. Modelos aparentemente "objetivos" pueden perpetuar y amplificar discriminación histórica, afectando decisiones en:
+Un modelo aprende de lo que encuentra en sus datos. Si esos datos reflejan una desigualdad, la predicción puede repetirla o hacerla más difícil de detectar. El mismo tratamiento no sirve para todos los contextos:
 
 - **Préstamos hipotecarios**: Discriminación racial en valuaciones inmobiliarias
 - **Seguros de vida**: Sesgos de género y clase social
 - **Contratación**: Perpetuación de desigualdades históricas
 - **Sistema judicial**: Sesgos en predicción de reincidencia
 
-### Relevancia del Problema
+### Qué puede salir mal
 
-Los algoritmos entrenados con datos históricos pueden:
+Un algoritmo entrenado con datos históricos puede:
 - **Perpetuar discriminación** sistemática del pasado
 - **Amplificar sesgos** existentes en los datos
 - **Crear nuevas formas** de discriminación indirecta
 - **Afectar grupos vulnerables** de manera desproporcionada
 
-## Proceso de Análisis
+## Recorrido
 
 ### 1. Configuración del Entorno
 
@@ -62,9 +62,9 @@ sns.set_palette("husl")
 np.random.seed(42)
 ```
 
-## Parte I: Boston Housing - Detectar Sesgo Racial Histórico
+## Parte I: Boston Housing
 
-### ¿Por qué sklearn removió `load_boston()`?
+### Por qué ya no está `load_boston()`
 
 El dataset Boston Housing fue removido de scikit-learn debido al **sesgo racial explícito** en la variable `B`, que representa la proporción de población afroamericana por área.
 
@@ -94,7 +94,7 @@ print(f"✅ Boston Housing cargado: {boston_df.shape}")
 print(f"Variable racial Bk decodificada (proporción afroamericana)")
 ```
 
-### 2. Análisis Exploratorio del Sesgo
+### 2. Mirar el sesgo antes del modelo
 
 ```python
 # Crear grupos raciales para análisis
@@ -146,7 +146,7 @@ plt.show()
 
 ![Análisis de Sesgo por Grupo Racial](/images/practica7/boxplot.png)
 
-**Pie de figura:** Este gráfico muestra la distribución de precios de vivienda (MEDV) por grupo racial en el dataset Boston Housing. Lo que me llamó la atención es la marcada diferencia en las medianas de precio entre grupos: las áreas con mayor proporción de población afroamericana tienen precios significativamente menores, lo cual refleja discriminación histórica en el mercado inmobiliario. La conclusión es que este sesgo no es un artefacto estadístico sino una realidad histórica que está codificada en los datos, y usar estos datos sin reconocer este sesgo perpetuaría y amplificaría la discriminación en modelos de machine learning.
+**Lectura:** Las medianas de `MEDV` cambian entre los grupos definidos por la proporción de población afroamericana. El gráfico no prueba por sí solo una causa, pero sí deja claro que el modelo recibiría una señal histórica que no se puede tratar como neutral.
 
 ### 3. Cuantificar Sesgo en Predicciones
 
@@ -213,7 +213,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Parte II: Titanic - Detectar y Corregir Sesgo de Género/Clase
+## Parte II: Titanic
 
 ### 1. Cargar y Preparar Dataset Titanic
 
@@ -404,33 +404,33 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Análisis Crítico y Consideraciones Éticas
+## Qué significa el resultado
 
-### Hallazgos Clave
+### Señales que aparecieron
 
 #### Boston Housing
-1. **Sesgo racial sistemático**: Áreas con mayor proporción afroamericana tienen valuaciones significativamente menores
+1. **Sesgo racial sistemático**: las áreas con mayor proporción afroamericana tienen valuaciones menores
 2. **Correlaciones problemáticas**: Variables socioeconómicas correlacionadas con raza perpetúan discriminación
 3. **Impacto en predicciones**: Modelos reproducen y amplifican sesgos históricos
 
 #### Titanic
 1. **Sesgo de género evidente**: Mujeres con 74% vs. hombres con 19% de supervivencia
 2. **Interseccionalidad**: El sesgo se amplifica al combinar género y clase social
-3. **Corrección parcial**: Fairlearn reduce pero no elimina completamente el sesgo
+3. **Corrección parcial**: Fairlearn reduce el sesgo, pero no lo elimina
 
-### Cuándo Detectar vs. Corregir
+### Cuándo medir y cuándo mitigar
 
-#### Solo Detección (Boston Housing)
+#### Solo detección: Boston Housing
 - **Sesgo histórico profundo**: Datos reflejan discriminación sistemática
 - **Contexto legal**: Usar raza explícitamente es ilegal en muchos contextos
 - **Transparencia**: Documentar y reportar sesgos sin intentar "corregir" automáticamente
 
-#### Detección + Corrección (Titanic)
+#### Detección y corrección: Titanic
 - **Sesgo contextual**: Protocolo "mujeres y niños primero" puede ser aceptable
 - **Métricas claras**: Objetivos de equidad bien definidos
 - **Trade-offs aceptables**: Pequeña pérdida de precisión por ganancia en equidad
 
-### Criterios para Deployment Responsable
+### Antes de desplegar
 
 1. **Auditoría continua**: Monitorear métricas de equidad en producción
 2. **Documentación transparente**: Registrar decisiones y limitaciones
@@ -463,10 +463,8 @@ plt.show()
 - **pandas/numpy**: Manipulación de datos
 - **matplotlib/seaborn**: Visualizaciones
 
-## Conclusión
+## Qué queda pendiente
 
-La detección y corrección de sesgo algorítmico requiere un enfoque multifacético que combine análisis técnico riguroso con consideraciones éticas profundas. Los casos de Boston Housing y Titanic demuestran que no existe una solución única: algunas situaciones requieren solo detección y transparencia, mientras que otras permiten corrección automática. La clave está en desarrollar criterios claros para cada contexto y mantener la supervisión humana en decisiones críticas. Los hallazgos clave incluyen: la detección de sesgo requiere métricas específicas (Demographic Parity, Equalized Odds) que van más allá de métricas agregadas como accuracy, la corrección automática con Fairlearn puede reducir pero no eliminar completamente el sesgo, y la decisión de detectar vs. corregir debe basarse en consideraciones éticas y legales, no solo técnicas.
-
-**Próximos pasos:** Explorar otras métricas de equidad como Calibration (que el modelo sea igualmente confiable para todos los grupos) y Individual Fairness (tratamiento similar para individuos similares) para tener una visión más completa del sesgo. Implementar análisis de sesgo interseccional que considere múltiples características protegidas simultáneamente (género + raza + clase social) para identificar formas complejas de discriminación. Desarrollar un framework de auditoría continua que monitoree métricas de equidad en producción y alerte cuando se detecten desviaciones. Investigar métodos de mitigación de sesgo que preserven mejor la utilidad del modelo mientras maximizan la equidad, como técnicas de aprendizaje adversario o reweighting adaptativo. Integrar consideraciones de equidad desde el diseño inicial del modelo en lugar de intentar corregir sesgos después del entrenamiento.
+No hay una métrica única que resuelva el problema. Boston Housing pide detenerse en la detección y explicar el sesgo; Titanic permite probar una mitigación, pero Fairlearn no lo elimina por completo. La siguiente revisión debería comparar Calibration e Individual Fairness, medir intersecciones de género, raza y clase, y dejar una auditoría continua antes de usar un modelo en decisiones reales.
 
 ---

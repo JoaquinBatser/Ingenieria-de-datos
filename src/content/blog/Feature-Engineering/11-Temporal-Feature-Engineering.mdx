@@ -1,24 +1,23 @@
 ---
-title: "Temporal Feature Engineering con Pandas"
-description: "Técnicas avanzadas de feature engineering temporal: lag features, rolling windows, expanding windows, RFM analysis, y validación temporal robusta para prevenir data leakage."
+title: "Features temporales con pandas"
+description: "Cómo construir lags, ventanas móviles, RFM y variables cíclicas con Online Retail, validando siempre con el tiempo correcto."
 ---
 
-# Temporal Feature Engineering con Pandas: Análisis de Comportamiento de Usuarios en E-commerce
+# Qué compran los usuarios cuando miro el tiempo
 
 
-## Objetivos de Aprendizaje
+## Qué quería medir
 
-- **Implementar lag features** usando `.shift()` para capturar comportamiento histórico
-- **Crear rolling y expanding windows** para capturar tendencias temporales
-- **Aplicar RFM analysis** (Recency, Frequency, Monetary) para segmentación de usuarios
-- **Implementar time window aggregations** (7d, 30d, 90d) para detectar cambios en actividad
-- **Prevenir data leakage** mediante validación temporal robusta
-- **Crear features cíclicas** (sin/cos encoding) para variables temporales
-- **Integrar variables externas** (indicadores económicos) con forward fill
+- Guardar la historia de cada usuario con `.shift()`.
+- Resumir tendencias recientes con rolling y expanding windows.
+- Construir RFM y ventanas de 7d, 30d y 90d.
+- Validar siempre hacia adelante para no usar el futuro.
+- Representar horas y días con sin/cos.
+- Añadir indicadores externos usando solo información ya conocida.
 
-## Contexto de Negocio
+## La pregunta
 
-El dataset **Online Retail** contiene transacciones de e-commerce del Reino Unido (2010-2011). Como analista de datos en una empresa de e-commerce, necesitamos:
+**Online Retail** contiene transacciones del Reino Unido entre 2010 y 2011. Quise saber si la historia de compras ayuda a anticipar una recompra y a separar usuarios que están perdiendo actividad.
 
 - **Predecir probabilidad de recompra** basada en comportamiento histórico
 - **Identificar usuarios en riesgo de churn** mediante análisis temporal
@@ -43,7 +42,7 @@ El dataset **Online Retail** contiene transacciones de e-commerce del Reino Unid
 - `UnitPrice`: Precio unitario
 - `Country`: País de origen
 
-## Proceso de Análisis
+## Recorrido
 
 ### 1. Preparación y Carga de Datos
 
@@ -87,7 +86,7 @@ df = df[df['UnitPrice'] > 0]
 print(f"Filas después de limpieza: {len(df):,} (de {len(df_raw):,})")
 ```
 
-**Decisiones tomadas:**
+**Decisiones de limpieza:**
 - **Eliminar CustomerID nulos:** No podemos hacer análisis temporal sin ID de usuario
 - **Eliminar cancelaciones:** Las transacciones canceladas (InvoiceNo con 'C') distorsionan el análisis
 - **Eliminar cantidades/precios ≤ 0:** Valores inválidos que pueden ser errores de datos
@@ -123,11 +122,11 @@ df = df.sort_values(['user_id', 'order_date']).reset_index(drop=True)
 
 ![Distribución Temporal de Ventas](/images/practica11/ventas_temporal.png)
 
-**Pie de figura:** Este gráfico muestra la distribución de órdenes por semana y días entre órdenes. Lo que me llamó la atención es la alta variabilidad en días entre órdenes (mediana: ~36 días), indicando patrones de compra irregulares. La conclusión es que necesitamos features temporales que capturen esta variabilidad, como rolling windows y lags.
+**Lectura:** los días entre órdenes varían mucho y la mediana ronda ~36 días. Esa dispersión justifica guardar lags y ventanas, no solo un promedio global.
 
 ### 2. Agregación a Nivel de Orden
 
-Para poder calcular features temporales, necesitamos agregar los datos a nivel de orden (una fila por factura).
+Para calcular historia por cliente primero convertí las líneas en una fila por factura.
 
 ```python
 # Extraer features temporales de order_date
@@ -174,7 +173,7 @@ orders_df['days_since_prior_lag_2'] = orders_df.groupby('user_id')['days_since_p
 orders_df['days_since_prior_lag_3'] = orders_df.groupby('user_id')['days_since_prior_order'].shift(3)
 ```
 
-**¿Por qué .groupby() + .shift() previene data leakage?**
+**Por qué `.groupby()` + `.shift()` evita leakage:**
 
 - `.groupby('user_id')` asegura que solo usamos datos del mismo usuario
 - `.shift(1)` toma el valor de la fila anterior dentro de cada grupo
@@ -194,7 +193,7 @@ orders_df['days_since_prior_lag_3'] = orders_df.groupby('user_id')['days_since_p
 
 ### 4. Rolling Window Features
 
-Las ventanas móviles capturan tendencias recientes calculando estadísticas sobre los últimos N eventos.
+Las ventanas móviles resumen los últimos N eventos y dejan fuera la orden actual.
 
 ```python
 # ⚠️ CRÍTICO: Usar .shift(1) ANTES de .rolling() para excluir el evento actual
@@ -217,13 +216,13 @@ orders_df['rolling_cart_std_3'] = (
 
 ![Rolling Mean vs Cart Size](/images/practica11/rollingmean_vs_cartsize.png)
 
-**Pie de figura:** Este gráfico compara el cart size actual con el rolling mean de las últimas 3 órdenes. Lo que me llamó la atención es cómo el rolling mean suaviza las variaciones y captura tendencias. La conclusión es que estas features ayudan a detectar cambios en el comportamiento de compra del usuario.
+**Lectura:** el rolling mean de las últimas 3 órdenes suaviza el cart size actual. La diferencia entre ambos muestra cambios recientes sin mirar la compra que se quiere predecir.
 
 **Ventaja clave:** `.shift(1)` antes de `.rolling()` previene data leakage automáticamente, excluyendo la orden actual del cálculo.
 
 ### 5. Expanding Window Features
 
-Las ventanas expandibles calculan estadísticas desde el inicio hasta "ahora" (acumulado histórico).
+Las ventanas expandibles acumulan la historia disponible hasta “ahora”.
 
 ```python
 # Expanding mean de days_since_prior_order (promedio histórico)
@@ -281,18 +280,18 @@ orders_df['monetary_total'] = orders_df['expanding_total_spent']
 
 ![Distribuciones RFM](/images/practica11/distributions.png)
 
-**Pie de figura:** Este gráfico muestra las distribuciones de Recency, Frequency y Monetary. Lo que me llamó la atención es la alta variabilidad en Monetary (gasto promedio), con algunos usuarios gastando mucho más que otros. La conclusión es que estas tres dimensiones capturan diferentes aspectos del comportamiento del usuario y son complementarias.
+**Lectura:** `Monetary` tiene una cola larga: algunos usuarios gastan mucho más que otros. `Recency`, `Frequency` y `Monetary` aportan señales distintas.
 
 **Correlación RFM:**
 - Recency vs Frequency: 0.021 (baja correlación)
 - Recency vs Monetary: 0.263 (correlación moderada)
 - Frequency vs Monetary: -0.326 (correlación negativa moderada)
 
-**Insight:** RFM captura diferentes dimensiones del comportamiento del usuario, lo que las hace complementarias para predicción.
+**Lectura:** RFM separa cuánto hace que compró alguien, con qué frecuencia y cuánto gasta; las tres medidas se complementan.
 
 ### 7. Time Window Aggregations (7d, 30d, 90d)
 
-Las time windows capturan comportamiento reciente vs mediano plazo. Son críticas para detectar cambios en actividad.
+Las ventanas de tiempo comparan actividad reciente y de mediano plazo.
 
 ```python
 def calculate_time_windows_for_user(user_data):
@@ -344,11 +343,11 @@ orders_df = orders_df.groupby('user_id', group_keys=False).apply(calculate_time_
 - **Spend 30d promedio:** $922.79
 - **Spend 90d promedio:** $2,392.72
 
-**Insight:** Comparar ventanas detecta usuarios 'activándose' (7d > 30d/3) o 'durmiendo' (7d = 0 pero 90d > 0).
+**Lectura:** comparar ventanas ayuda a encontrar usuarios que se están activando (7d > 30d/3) o quedando inactivos (7d = 0 pero 90d > 0).
 
 ### 8. Product Diversity Features
 
-Las métricas de diversidad capturan qué tan variado es el comportamiento de compra.
+Las métricas de diversidad indican si el usuario repite siempre lo mismo o explora productos distintos.
 
 ```python
 # Calcular métricas de diversidad
@@ -420,7 +419,7 @@ orders_df['month_cos'] = np.cos(2 * np.pi * (orders_df['month'] - 1) / 12)
 
 ![Encoding Cíclico](/images/practica11/encoding.png)
 
-**Pie de figura:** Este gráfico muestra el encoding cíclico de hora del día y día de semana en el espacio sin/cos. Lo que me llamó la atención es cómo las 23h están 'cerca' de las 0h en el espacio sin/cos, preservando la continuidad temporal. La conclusión es que este encoding permite al modelo capturar mejor los patrones temporales que tienen naturaleza circular.
+**Lectura:** en el espacio sin/cos, las 23h quedan cerca de las 0h y el domingo cerca del lunes. Esa continuidad evita que el modelo trate el reloj como una línea con extremos alejados.
 
 **Ventaja del encoding cíclico:**
 - Las 23h están 'cerca' de las 0h en el espacio sin/cos
@@ -429,7 +428,7 @@ orders_df['month_cos'] = np.cos(2 * np.pi * (orders_df['month'] - 1) / 12)
 
 ### 10. Economic Indicators (Simulados)
 
-Las variables externas proporcionan contexto macro que afecta el comportamiento del consumidor.
+Las variables externas añaden contexto macro, siempre que se rellenen solo con datos ya publicados.
 
 ```python
 # Crear GDP/unemployment data mensual para el período del dataset
@@ -644,7 +643,7 @@ print(f"Improvement: {(full_auc_mean - base_auc_mean):.4f} ({((full_auc_mean - b
 - **Full Model (con temporal):** AUC = 0.7204 ± 0.0763
 - **Improvement:** +0.0580 (+8.7%)
 
-**Conclusión:** Las temporal features mejoran significativamente el performance del modelo, aumentando el AUC en 8.7 puntos porcentuales.
+**Lectura:** el modelo con variables temporales alcanza un AUC 8.7 puntos porcentuales mayor en esta validación.
 
 ### 13. Feature Importance Analysis
 
@@ -696,15 +695,15 @@ feature_importance = analyze_feature_importance(full_model, available_features, 
 - **Base:** 0.0899
 - **Economic:** 0.0654
 
-**Insights:**
+**Lecturas:**
 1. **Diversity features son las más importantes:** Product diversity ratio y unique products capturan patrones de comportamiento de compra
 2. **RFM sigue siendo relevante:** Recency es la segunda feature más importante
 3. **Time windows son valiosas:** Spend_90d captura comportamiento reciente
 4. **Economic indicators tienen menor impacto:** Posiblemente porque son simulados y mensuales (baja resolución)
 
-### 14. Análisis Extras: Aplicación a Dataset de Churn
+### 14. Otra prueba: churn
 
-Para demostrar la generalización de las técnicas, aplicamos temporal feature engineering a un problema de **churn prediction** en telecomunicaciones.
+Para comprobar si el patrón se repetía, llevé las mismas ideas a **churn prediction** en telecomunicaciones.
 
 **Dataset:** Telco Customer Churn (7,043 clientes, 21 features)
 - **Target:** Churn (clasificación binaria)
@@ -723,7 +722,7 @@ Para demostrar la generalización de las técnicas, aplicamos temporal feature e
 
 **Aprendizaje:** Las temporal features son efectivas también en problemas de churn, especialmente features de recency y frecuencia de interacciones.
 
-**¿Por qué elegí este dataset?**
+**Por qué lo elegí:**
 - Diferente dominio (telecomunicaciones vs e-commerce)
 - Permite validar que las técnicas funcionan en distintos contextos
 - Demuestra que RFM y time windows son universales para comportamiento de clientes
@@ -782,9 +781,9 @@ print("\n✅ Si todo es SÍ, probablemente no hay leakage!")
 - **No features sospechosas** en top 5
 - **Temporal consistency:** ✅ Todos los folds tienen train max < val min
 
-**Conclusión:** No hay evidencia clara de data leakage. Las comprobaciones indican que el modelo está usando correctamente solo información histórica.
+**Lectura:** no apareció evidencia clara de data leakage; los folds respetan el orden temporal y las features principales usan historia.
 
-## Análisis Crítico y Decisiones
+## Decisiones y límites
 
 ### Decisiones de Hiperparámetros
 
@@ -857,9 +856,9 @@ print("\n✅ Si todo es SÍ, probablemente no hay leakage!")
 
 ## Extra: Análisis de Fourier y Seasonal Decomposition
 
-Para profundizar en el análisis temporal, exploré técnicas avanzadas de procesamiento de señales: **Análisis de Fourier** (FFT) y **Seasonal Decomposition** para capturar patrones periódicos complejos que las features manuales podrían no detectar.
+Como extensión probé **Fourier** (FFT) y **Seasonal Decomposition** para buscar ciclos que los lags manuales no capturan.
 
-### ¿Por qué lo elegí?
+### Qué quería saber
 
 Elegí explorar Fourier y Seasonal Decomposition porque:
 
@@ -869,7 +868,7 @@ Elegí explorar Fourier y Seasonal Decomposition porque:
 4. Son técnicas mencionadas en "próximos pasos" de la práctica principal
 5. Permiten validar si el análisis espectral mejora el performance del modelo
 
-### ¿Qué esperaba encontrar?
+### Hipótesis
 
 Esperaba encontrar:
 
@@ -891,11 +890,11 @@ Utilizamos **Time Series Cross-Validation** para validación realista.
 
 ![Análisis Temporal](/images/practica11/practica11_temporal_analysis.png)
 
-**Pie de figura:** Este gráfico muestra el análisis espectral (arriba) y la descomposición estacional (abajo). Lo que me llamó la atención es que FFT detecta claramente la frecuencia semanal (1/7) y mensual (1/30), y la descomposición separa claramente tendencia, estacionalidad y residual. La conclusión es que estas técnicas revelan patrones que no son obvios visualmente.
+**Lectura:** FFT marca las frecuencias semanal (1/7) y mensual (1/30); la descomposición separa tendencia, estacionalidad y residual.
 
 ![Comparación de Modelos](/images/practica11/practica11_model_comparison.png)
 
-**Pie de figura:** Este gráfico compara el AUC de diferentes conjuntos de features temporales usando Time Series Cross-Validation. Lo que me llamó la atención es que la combinación de features manuales + Fourier mejora ligeramente sobre solo features manuales (+1.14%). La conclusión es que Fourier features son complementarias y añaden valor, aunque la mejora es modesta.
+**Lectura:** sumar Fourier a las features manuales mejora el AUC en +1.14% en esta validación. La ganancia es pequeña, pero la señal es complementaria.
 
 ### Resultados
 
@@ -911,7 +910,7 @@ Utilizamos **Time Series Cross-Validation** para validación realista.
 - Mejora de +1.14% en AUC vs solo features manuales
 - Frecuencias dominantes detectadas: 0.0000 (DC), 0.1430 (semanal), -0.1430 (semanal), -0.0330 (mensual), 0.0330 (mensual)
 
-### ¿Qué aprendí?
+### Qué quedó de la extensión
 
 1. **Fourier features capturan patrones periódicos:** Mejora de +1.14% en AUC con features de Fourier. Fourier detecta automáticamente frecuencias dominantes (semanal, mensual). Las features de Fourier son complementarias a las features manuales.
 
@@ -925,15 +924,15 @@ Utilizamos **Time Series Cross-Validation** para validación realista.
    - **Seasonal decomposition:** Cuando necesitas separar tendencia de estacionalidad
    - **Combinación:** Siempre que sea computacionalmente factible
 
-5. **Insights específicos:** El análisis espectral revela periodicidades que no son obvias visualmente. La frecuencia semanal (1/7) es claramente visible en el power spectrum. La frecuencia mensual (1/30) también es detectada pero con menor potencia. Time Series Cross-Validation es crítico para validación realista.
+5. **Una señal adicional:** el espectro hace visibles ciclos semanales (1/7) y mensuales (1/30) que no se ven en una tabla de lags. Time Series Cross-Validation sigue siendo la prueba que evita engañarse con el futuro.
 
 6. **Recomendaciones:** Para producción: empezar con features manuales, luego añadir Fourier si hay patrones periódicos. Usar seasonal decomposition para análisis exploratorio y debugging. Fourier es especialmente valioso cuando hay múltiples frecuencias superpuestas. La combinación de técnicas manuales + espectrales da mejor performance.
 
-## Conclusiones y Próximos Pasos
+## Qué probaría después
 
-### Conclusiones Principales
+### Lo que se mantiene
 
-1. **Las temporal features mejoran significativamente el performance:** El modelo con temporal features logra AUC de 0.7204 vs 0.6625 sin temporal features (+8.7% improvement)
+1. **Las temporal features cambian la métrica:** el modelo llega a AUC 0.7204 frente a 0.6625 sin ellas (+8.7% improvement).
 
 2. **Diversity features son las más importantes:** Product diversity ratio y unique products capturan patrones de comportamiento de compra que son altamente predictivos
 
@@ -989,4 +988,3 @@ Utilizamos **Time Series Cross-Validation** para validación realista.
 ---
 
 _Nota: Este análisis fue realizado con fines educativos utilizando el dataset Online Retail de Kaggle._
-
