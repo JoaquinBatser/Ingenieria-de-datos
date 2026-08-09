@@ -1,0 +1,387 @@
+---
+title: "Escalado inteligente y pipelines anti-leakage: Optimizando modelos con preprocessing robusto"
+description: "Exploración avanzada de técnicas de feature scaling y prevención de data leakage en pipelines de machine learning usando el dataset Ames Housing."
+---
+
+
+## Objetivos de Aprendizaje
+
+- **Identificar features problemáticas** que requieren escalado en datasets reales
+- **Experimentar con diferentes scalers** (MinMaxScaler, StandardScaler, RobustScaler)
+- **Descubrir el impacto del escalado** en algoritmos basados en distancia vs. tree-based
+- **Comparar pipelines** con y sin data leakage para evidenciar diferencias
+- **Desarrollar estrategias robustas** de preprocessing basadas en evidencia empírica
+
+## Contexto de Negocio
+
+El dataset **Ames Housing** presenta un desafío real de escalado: variables con rangos extremadamente diferentes que pueden sesgar algoritmos de machine learning. Como data scientists, debemos:
+
+- **Identificar automáticamente** features con escalas problemáticas
+- **Seleccionar el scaler apropiado** según características de los datos
+- **Prevenir data leakage** en pipelines de producción
+- **Evaluar el impacto** del escalado en diferentes tipos de algoritmos
+
+### Relevancia del Problema
+
+En modelos de predicción inmobiliaria, el escalado inadecuado puede:
+- **Sesgar algoritmos basados en distancia** (KNN, SVM) hacia features con mayor escala
+- **Afectar la convergencia** de algoritmos de optimización
+- **Introducir data leakage** si se escala incorrectamente
+- **Reducir la interpretabilidad** del modelo
+
+## Proceso de Análisis
+
+### 1. Configuración del Entorno
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.neighbors import KNeighborsRegressor  
+from sklearn.svm import SVR
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, r2_score
+import warnings
+warnings.filterwarnings('ignore')
+
+# Configurar visualizaciones
+plt.style.use('seaborn-v0_8')
+sns.set_palette("husl")
+plt.rcParams['figure.figsize'] = (14, 8)
+plt.rcParams['font.size'] = 11
+```
+
+### 2. Exploración de Escalas Problemáticas
+
+```python
+# Cargar dataset Ames Housing
+df_raw = pd.read_csv('AmesHousing.csv')
+
+# Identificar columnas numéricas
+numeric_cols = df_raw.select_dtypes(include=[np.number]).columns.tolist()
+
+# Seleccionar features con escalas problemáticas
+selected_features = [
+    'SalePrice', 'Lot Area', 'Overall Qual', 'Year Built', '1st Flr SF', 'Gr Liv Area'
+]
+
+# Analizar escalas
+scale_analysis = {}
+for col in selected_features:
+    col_min = df_raw[col].min()
+    col_max = df_raw[col].max()
+    ratio = col_max / col_min if col_min != 0 else np.inf
+    scale_analysis[col] = {
+        'min': col_min,
+        'max': col_max,
+        'ratio': ratio
+    }
+
+scale_df = pd.DataFrame(scale_analysis).T
+print("📈 Análisis de escalas:")
+print(scale_df.sort_values(by='ratio', ascending=False))
+```
+
+### 3. Visualización del Problema de Escalas
+
+```python
+# Visualizar distribuciones
+plt.figure(figsize=(16, 12))
+for i, col in enumerate(selected_features):
+    plt.subplot(3, len(selected_features)//3 + 1, i+1) 
+    sns.boxplot(x=df_raw[col])
+    plt.title(f'Boxplot de {col}')
+    plt.xlabel(col)
+    plt.grid(True)
+plt.tight_layout()
+
+# Histogramas con KDE
+plt.figure(figsize=(16, 12))
+for i, col in enumerate(selected_features):
+    plt.subplot(3, len(selected_features)//3 + 1, i+1) 
+    sns.histplot(df_raw[col], bins=30, kde=True)
+    plt.title(f'Distribución de {col}')
+    plt.xlabel(col)
+    plt.ylabel('Frecuencia')
+    plt.grid(True)
+plt.tight_layout()
+```
+
+![Histogramas de Distribuciones](/images/practica6/histogramas.png)
+
+**Pie de figura:** Este gráfico muestra las distribuciones de las features numéricas del dataset Ames Housing antes del escalado. Lo que me llamó la atención es la enorme diferencia en escalas: `Lot Area` tiene valores que van desde 1,300 hasta 215,245, mientras que `Overall Qual` solo va de 1 a 10, lo que representa un ratio de más de 165:1. La conclusión es que estas diferencias de escala distorsionarían significativamente algoritmos basados en distancia (como KNN o SVM), donde features con mayor escala dominarían el cálculo de distancias, haciendo que features con menor escala pero potencialmente más informativas tengan menos peso en el modelo.
+
+### 4. Preparación de Datos y Split Anti-Leakage
+
+```python
+# Definir target y features
+target_col = 'SalePrice'
+feature_cols = ['Lot Area', 'Overall Qual', 'Year Built', '1st Flr SF', 'Gr Liv Area']
+
+# Limpiar datos
+df_clean = df_raw[feature_cols + [target_col]].dropna()
+
+# Split ANTES de cualquier transformación (crítico para evitar leakage)
+X = df_clean[feature_cols]
+y = df_clean[target_col]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+X_train, X_val, y_train, y_val = train_test_split(
+    X_train, y_train, test_size=0.25, random_state=42
+)
+
+print(f"Train: {X_train.shape}, Validation: {X_val.shape}, Test: {X_test.shape}")
+```
+
+### 5. Experimentación con Diferentes Scalers
+
+```python
+# Configurar scalers
+scalers = {
+    'MinMax': MinMaxScaler(),
+    'Standard': StandardScaler(),
+    'Robust': RobustScaler(),
+    'None': None
+}
+
+# Algoritmos a probar
+# Decisiones de hiperparámetros:
+# - Random Forest: n_estimators=100 es un buen balance entre rendimiento y tiempo de entrenamiento
+# - K-NN: n_neighbors=5 es un valor estándar que funciona bien para la mayoría de datasets
+# - SVM: C=100 y kernel='rbf' permiten flexibilidad en el ajuste; kernel RBF es versátil para datos no lineales
+algorithms = {
+    'Linear Regression': LinearRegression(),
+    'Random Forest': RandomForestRegressor(n_estimators=100, random_state=42),
+    'K-NN': KNeighborsRegressor(n_neighbors=5),
+    'SVM': SVR(kernel='rbf', C=100)
+}
+
+# Experimentar combinaciones
+results = {}
+for scaler_name, scaler in scalers.items():
+    for algo_name, algorithm in algorithms.items():
+        if scaler is None:
+            # Sin escalado
+            pipeline = Pipeline([('model', algorithm)])
+        else:
+            # Con escalado
+            pipeline = Pipeline([
+                ('scaler', scaler),
+                ('model', algorithm)
+            ])
+        
+        # Entrenar y evaluar
+        pipeline.fit(X_train, y_train)
+        y_pred = pipeline.predict(X_val)
+        
+        r2 = r2_score(y_val, y_pred)
+        mae = mean_absolute_error(y_val, y_pred)
+        
+        results[f"{scaler_name}_{algo_name}"] = {
+            'R2': r2,
+            'MAE': mae
+        }
+
+# Convertir a DataFrame para análisis
+results_df = pd.DataFrame(results).T
+results_df[['Scaler', 'Algorithm']] = results_df.index.str.split('_', expand=True)
+print("📊 Resultados de experimentación:")
+print(results_df.pivot(index='Algorithm', columns='Scaler', values='R2'))
+```
+
+### 6. Análisis de Data Leakage
+
+```python
+# Escenario CON leakage (INCORRECTO)
+def pipeline_with_leakage(X_train, X_val, y_train, y_val):
+    # ERRO: Escalar todo el dataset junto
+    scaler = StandardScaler()
+    X_all_scaled = scaler.fit_transform(pd.concat([X_train, X_val]))
+    
+    X_train_scaled = X_all_scaled[:len(X_train)]
+    X_val_scaled = X_all_scaled[len(X_train):]
+    
+    model = LinearRegression()
+    model.fit(X_train_scaled, y_train)
+    y_pred = model.predict(X_val_scaled)
+    
+    return r2_score(y_val, y_pred)
+
+# Escenario SIN leakage (CORRECTO)
+def pipeline_without_leakage(X_train, X_val, y_train, y_val):
+    # CORRECTO: Fit solo en train, transform en ambos
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_val_scaled = scaler.transform(X_val)
+    
+    model = LinearRegression()
+    model.fit(X_train_scaled, y_train)
+    y_pred = model.predict(X_val_scaled)
+    
+    return r2_score(y_val, y_pred)
+
+# Comparar resultados
+r2_with_leakage = pipeline_with_leakage(X_train, X_val, y_train, y_val)
+r2_without_leakage = pipeline_without_leakage(X_train, X_val, y_train, y_val)
+
+print(f"R² CON leakage: {r2_with_leakage:.4f}")
+print(f"R² SIN leakage: {r2_without_leakage:.4f}")
+print(f"Diferencia: {r2_with_leakage - r2_without_leakage:.4f}")
+```
+
+### 7. Pipeline de Producción Robusto
+
+```python
+from sklearn.compose import ColumnTransformer
+
+def create_production_pipeline(numeric_features, categorical_features=None):
+    """Crear pipeline robusto para producción"""
+    
+    # Transformador numérico
+    # Elegí RobustScaler sobre StandardScaler porque los datos inmobiliarios tienen outliers legítimos
+    # (propiedades de lujo, lotes muy grandes). RobustScaler usa mediana e IQR en lugar de media y desviación
+    # estándar, lo que lo hace resistente a valores extremos que podrían distorsionar el escalado.
+    numeric_transformer = Pipeline(steps=[
+        ('scaler', RobustScaler())  # Robusto a outliers
+    ])
+    
+    # Transformador categórico (si aplicable)
+    if categorical_features:
+        from sklearn.preprocessing import OneHotEncoder
+        categorical_transformer = Pipeline(steps=[
+            ('onehot', OneHotEncoder(handle_unknown='ignore'))
+        ])
+        
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', numeric_transformer, numeric_features),
+                ('cat', categorical_transformer, categorical_features)
+            ]
+        )
+    else:
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', numeric_transformer, numeric_features)
+            ]
+        )
+    
+    # Pipeline completo
+    pipeline = Pipeline(steps=[
+        ('preprocessor', preprocessor),
+        ('regressor', RandomForestRegressor(n_estimators=100, random_state=42))
+    ])
+    
+    return pipeline
+
+# Crear y entrenar pipeline de producción
+production_pipeline = create_production_pipeline(feature_cols)
+production_pipeline.fit(X_train, y_train)
+
+# Evaluar en conjunto de prueba
+y_test_pred = production_pipeline.predict(X_test)
+test_r2 = r2_score(y_test, y_test_pred)
+test_mae = mean_absolute_error(y_test, y_test_pred)
+
+print(f"📈 Resultados en test set:")
+print(f"R²: {test_r2:.4f}")
+print(f"MAE: ${test_mae:,.2f}")
+```
+
+### 8. Investigación de Transformadores Avanzados
+
+Para completar el análisis, se exploró el comportamiento de transformadores más avanzados:
+
+![Yeo-Johnson PowerTransformer](/images/practica6/YeoJohnson.png)
+
+**Pie de figura:** Este gráfico muestra el efecto del transformador Yeo-Johnson en la distribución de las features. Lo que me llamó la atención es cómo Yeo-Johnson normaliza las distribuciones sin requerir valores estrictamente positivos (a diferencia de Box-Cox), lo cual es útil para datos que pueden tener ceros o valores negativos. La conclusión es que Yeo-Johnson es especialmente valioso para features como `SalePrice` donde queremos normalizar la distribución pero no podemos usar transformaciones logarítmicas directas debido a la presencia de valores en cero o cercanos a cero.
+
+![QuantileTransformer](/images/practica6/QuantileTransformer.png)
+
+**Pie de figura:** Este gráfico muestra el efecto del QuantileTransformer, que mapea las distribuciones a una distribución uniforme y luego a una normal. Lo que me llamó la atención es cómo este transformador puede manejar distribuciones extremadamente sesgadas y convertirlas en distribuciones normales, independientemente de la forma original. La conclusión es que QuantileTransformer es muy robusto pero puede ser computacionalmente costoso y puede crear artefactos si hay muchos valores duplicados, por lo que es mejor usarlo cuando otros métodos fallan o cuando necesitamos distribuciones estrictamente normales para ciertos algoritmos.
+
+![MaxAbsScaler](/images/practica6/MaxAbsScaler.png)
+
+**Pie de figura:** Este gráfico muestra el efecto del MaxAbsScaler, que escala cada feature dividiendo por su valor absoluto máximo, resultando en valores en el rango [-1, 1]. Lo que me llamó la atención es que este scaler preserva la información de signo (importante para features que pueden tener valores negativos) y es robusto ante outliers ya que solo usa el máximo absoluto, no la desviación estándar. La conclusión es que MaxAbsScaler es útil cuando tenemos features dispersas (con muchos ceros) y queremos un escalado que no se vea afectado por outliers, aunque no centra los datos en cero como StandardScaler.
+
+![Normalizer L2](/images/practica6/NormalizerL2.png)
+
+**Pie de figura:** Este gráfico muestra el efecto del Normalizer L2, que normaliza cada fila (muestra) en lugar de cada columna (feature), escalando cada muestra para que tenga norma L2 igual a 1. Lo que me llamó la atención es que este enfoque es fundamentalmente diferente: normaliza muestras en lugar de features, lo cual es útil para algoritmos que miden distancias entre muestras completas. La conclusión es que Normalizer es apropiado para casos específicos como análisis de texto o imágenes donde queremos comparar documentos/imágenes completas, pero generalmente no es el enfoque correcto para la mayoría de problemas de regresión donde queremos escalar features individuales.
+
+![FunctionTransformer (Log)](/images/practica6/FunctionTransformer.png)
+
+**Pie de figura:** Este gráfico muestra el efecto de una transformación logarítmica usando FunctionTransformer. Lo que me llamó la atención es cómo la transformación log comprime los valores grandes y expande los valores pequeños, reduciendo la asimetría (skewness) de distribuciones sesgadas a la derecha. La conclusión es que las transformaciones logarítmicas son especialmente útiles para features como `SalePrice` o `Lot Area` que tienen distribuciones exponenciales, pero requieren que todos los valores sean estrictamente positivos, lo cual puede ser una limitación en algunos datasets.
+
+![Comparación de Transformación Logarítmica](/images/practica6/comparacionlogs.png)
+
+**Pie de figura:** Este gráfico compara las distribuciones antes y después de aplicar transformaciones logarítmicas. Lo que me llamó la atención es la mejora significativa en la normalidad de las distribuciones después de la transformación log, especialmente para `SalePrice` que pasa de una distribución fuertemente sesgada a la derecha a una distribución más simétrica. La conclusión es que las transformaciones logarítmicas pueden ser muy efectivas como preprocesamiento antes del escalado, especialmente cuando seguimos con StandardScaler, ya que este último asume distribuciones aproximadamente normales para funcionar óptimamente.
+
+## Hallazgos Clave
+
+### Análisis de Escalas
+
+| Variable     | Rango (min–max) | Ratio | ¿Problemática? | Razón |
+|-------------|-----------------|-------|----------------|-------|
+| Lot Area    | 1,300–215,245   | 165.6 | **Sí**         | Rango extremo, outliers dominan |
+| SalePrice   | 12,789–755,000  | 59.0  | **Sí**         | Alta variabilidad afecta distancias |
+| Overall Qual| 1–10            | 10.0  | No             | Escala controlada |
+
+### Impacto por Algoritmo
+
+1. **Algoritmos basados en distancia** (KNN, SVM): Mejora significativa con escalado
+2. **Tree-based models** (Random Forest): Poco impacto del escalado
+3. **Modelos lineales**: Beneficio moderado, especialmente con outliers
+
+### Mejores Prácticas Identificadas
+
+1. **RobustScaler**: Mejor opción para datos con outliers
+2. **StandardScaler**: Ideal para distribuciones normales
+3. **MinMaxScaler**: Útil cuando se necesita rango específico [0,1]
+
+## Consideraciones Éticas y de Calidad
+
+### Prevención de Data Leakage
+
+- **Fit solo en training set**: Nunca ajustar transformaciones en validation/test
+- **Pipeline automático**: Usar sklearn Pipeline para garantizar orden correcto
+- **Validación cruzada**: Aplicar escalado dentro de cada fold
+
+### Transparencia del Modelo
+
+- **Documentar decisiones**: Registrar por qué se eligió cada scaler
+- **Monitorear drift**: Verificar si las escalas cambian en producción
+- **Interpretabilidad**: Considerar impacto del escalado en explicabilidad
+
+### Robustez en Producción
+
+- **Manejo de outliers**: RobustScaler más resistente a valores extremos
+- **Datos faltantes**: Pipeline debe manejar NaN gracefully
+- **Escalado inverso**: Capacidad de des-escalar predicciones si necesario
+
+## Recursos Adicionales
+
+### Enlaces Útiles
+- [Scikit-learn Preprocessing](https://scikit-learn.org/stable/modules/preprocessing.html)
+- [Feature Engineering for Machine Learning](https://www.oreilly.com/library/view/feature-engineering-for/9781491953235/)
+- [Kaggle Feature Scaling Guide](https://www.kaggle.com/learn/feature-engineering)
+
+### Herramientas Utilizadas
+- **scikit-learn**: Scalers y pipelines
+- **pandas/numpy**: Manipulación de datos
+- **matplotlib/seaborn**: Visualizaciones
+- **Pipeline**: Automatización anti-leakage
+
+## Conclusión
+
+El escalado de features es crucial para el rendimiento de muchos algoritmos de machine learning, pero debe implementarse cuidadosamente para evitar data leakage. La experimentación sistemática reveló que RobustScaler ofrece la mejor combinación de robustez y rendimiento para el dataset Ames Housing, especialmente en presencia de outliers. Los pipelines automatizados garantizan reproducibilidad y previenen errores comunes en producción. Los hallazgos clave incluyen: algoritmos basados en distancia (KNN, SVM) mejoran significativamente con escalado, mientras que tree-based models (Random Forest) son relativamente insensibles al escalado; RobustScaler es superior a StandardScaler cuando hay outliers, y la prevención de data leakage mediante split antes de escalar es crítica para obtener métricas de validación confiables.
+
+**Próximos pasos:** Realizar una búsqueda sistemática de hiperparámetros (GridSearchCV) para optimizar los valores de `n_neighbors` en KNN, `C` y `gamma` en SVM, y `n_estimators` en Random Forest, evaluando el impacto del escalado en cada combinación. Implementar validación cruzada estratificada para asegurar que las métricas reportadas sean representativas del rendimiento real. Explorar técnicas de escalado adaptativo que aprendan a ajustarse automáticamente a las características de cada feature (por ejemplo, usando transformaciones log antes de StandardScaler para features sesgadas). Desarrollar un framework de monitoreo que detecte drift en las escalas de features en producción y alerte cuando sea necesario re-entrenar los scalers. Comparar el impacto de diferentes estrategias de escalado en modelos de ensemble que combinen múltiples algoritmos.
+
+---

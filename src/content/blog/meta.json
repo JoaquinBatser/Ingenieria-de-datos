@@ -1,0 +1,17 @@
+{
+    "pages": [
+        "index",
+        "---UT1---",
+        "EDA-y-Fuentes",
+        "EDA-y-Fuentes-Jupyters",
+        "---UT2---",
+        "Calidad-y-Etica",
+        "---UT3---",
+        "Feature-Engineering",
+        "---UT4---",
+        "Datos-Especiales",
+        "---UT5---",
+        "Pipelines-ETL",
+        "..."
+    ]
+}

@@ -1,0 +1,161 @@
+---
+title: "Cómo publiqué el portfolio con Vercel"
+description: "Registro del cambio de GitHub Pages y MkDocs a Next.js, Fumadocs y Vercel: estructura, despliegue y rutina para publicar nuevas prácticas."
+---
+
+## El stack que quedó
+
+El sitio terminó apoyándose en estas piezas:
+
+- **Next.js 15.5.2**: Framework de React para aplicaciones web modernas
+- **Fumadocs**: Sistema de documentación especializado para crear portafolios técnicos
+- **Vercel**: Plataforma de deployment optimizada para Next.js
+- **TypeScript**: Tipos para mantener el código bajo control
+- **Tailwind CSS**: Framework de CSS para estilos responsivos
+
+## Qué quedó funcionando
+
+Al cerrar la migración tenía:
+
+- Un repositorio personal creado y configurado con fumadocs  
+- Deployment automático configurado con Vercel  
+- Sitio online en: `https://portfolio-ia-joaquin.vercel.app`  
+- Estructura de documentación organizada por secciones  
+- Sistema de navegación automático entre prácticas  
+
+## Cómo está ordenado
+
+### Estructura de Archivos
+
+```
+portfolio-ia/
+├── app/                    # Aplicación Next.js
+│   ├── (home)/            # Página principal
+│   ├── docs/              # Layout de documentación
+│   └── api/search/        # API de búsqueda
+├── content/docs/          # Contenido en MDX
+│   ├── EDA y Fuentes/     # Prácticas de análisis
+│   └── Calidad y Etica/   # Prácticas de calidad
+├── components/            # Componentes React
+├── lib/                   # Configuración y utilidades
+└── public/images/         # Recursos estáticos
+```
+
+### Fumadocs frente a MkDocs
+
+| Característica     | Fumadocs                  | MkDocs                     |
+| ------------------ | ------------------------- | -------------------------- |
+| **Framework Base** | Next.js + React           | Python + Jinja2            |
+| **Interactividad** | Componentes React nativos | Limitada                   |
+| **Performance**    | SSG + ISR optimizado      | Generación estática básica |
+| **Búsqueda**       | API integrada con Next.js | Plugin externo requerido   |
+| **Deployment**     | Vercel (automático)       | GitHub Pages (manual)      |
+| **Customización**  | JSX/TSX completo          | Templates limitados        |
+
+## El despliegue, paso a paso
+
+### 1. Configuración del Repositorio
+
+```bash
+# Crear proyecto desde template de fumadocs
+npx create-fumadocs-app@latest portfolio-ia
+
+# Configurar dependencias
+npm install
+```
+
+### 2. Configuración de Vercel
+
+Vercel se encarga del despliegue después de conectar el repositorio:
+
+1. **Conectar el repositorio**: Vincular GitHub con Vercel.
+2. **Despliegue automático**: Cada push a `main` publica una nueva versión.
+3. **Previsualizaciones**: Cada PR recibe una URL propia.
+4. **Dominio**: Se puede asociar una URL personalizada.
+
+### 3. Configuración de Contenido
+
+La estructura de las páginas sale de `source.config.ts`:
+
+```typescript
+export const source = loader({
+  baseUrl: '/docs',
+  rootDir: 'content/docs',
+  source: {
+    files: 'content/docs/**/*.mdx'
+  }
+});
+```
+
+## Qué encuentra quien entra
+
+### Portada
+
+- **Información personal**: Joaquín Batser - Estudiante de IA
+- **Objetivo del curso**: Desarrollo de habilidades en análisis de datos y machine learning
+- **Links profesionales**: GitHub, LinkedIn
+
+### Secciones
+
+#### EDA y Fuentes de Datos
+- [Exploración del Dataset Iris](./01-Exploracion-del-Dataset-Iris)
+- [Análisis Netflix con Pandas](./03-EDA-Netflix-Dataset-con-pandas)
+- [EDA Multi-fuentes y Joins](./04-EDA-Multi-fuentes-y-Joins)
+
+#### Calidad y Ética
+- Prácticas de validación de datos
+- Consideraciones éticas en IA
+
+### Navegación y componentes
+
+Fumadocs genera automáticamente:
+- Sidebar con estructura jerárquica
+- Breadcrumbs de navegación
+- Links entre secciones relacionadas
+- Búsqueda full-text integrada
+
+También deja disponibles:
+- Tabs para organizar contenido
+- Code blocks con syntax highlighting
+- Imágenes optimizadas con Next.js Image
+
+## La rutina de publicación
+
+### Cada cambio sigue este recorrido
+
+1. **Editar**: Modificar un archivo `.mdx` en `content/docs/`.
+2. **Probar**: Ejecutar `npm run dev` y revisar la página localmente.
+3. **Guardar**: Hacer commit y push a GitHub.
+4. **Publicar**: Vercel despliega automáticamente.
+
+### Lo que ahorro con este flujo
+
+- **Tiempo de deploy**: ~30 segundos vs ~2-3 minutos de GitHub Actions
+- **Preview automático**: URL única para cada PR
+- **Rollback instantáneo**: Revertir a cualquier deployment anterior
+- **Analytics integradas**: Métricas de performance y usuarios
+
+## Métricas que estoy siguiendo
+
+El panel de Vercel muestra:
+
+- **Core Web Vitals**: LCP, FID, CLS optimizados
+- **Loading Speed**: ~200ms tiempo de respuesta
+- **SEO Score**: 95+ en Lighthouse
+- **Accessibility**: Cumple WCAG 2.1 AA
+
+## Enlaces Importantes
+
+- **Sitio en producción**: [https://portfolio-ia-joaquin.vercel.app](https://portfolio-ia-joaquin.vercel.app)
+- **Repositorio**: [GitHub - portfolio-ia](https://github.com/JoaquinBatser/portfolio-ia)
+- **Dashboard Vercel**: Panel de control para deployments
+
+## Qué haría después
+
+El cambio dejó el contenido en MDX, las previsualizaciones ligadas a cada PR y los despliegues en manos de Vercel. En la práctica, publicar una práctica nueva ya no requiere mantener un workflow separado.
+
+Las siguientes tareas son concretas: añadir búsqueda full-text con Algolia, medir visitas con Vercel Analytics, probar una visualización D3.js embebida, optimizar imágenes con `next/image` y asociar un dominio propio.
+
+---
+
+*Última actualización: 13 de septiembre de 2025*

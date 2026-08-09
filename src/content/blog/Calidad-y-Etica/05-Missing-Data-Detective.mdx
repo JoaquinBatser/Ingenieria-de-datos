@@ -1,0 +1,365 @@
+---
+title: "Missing Data Detective"
+description: "Análisis avanzado de datos faltantes y outliers. Aprende a detectar patrones MCAR/MAR/MNAR, implementar estrategias de imputación y crear pipelines reproducibles con consideraciones éticas."
+---
+
+# Detective de Datos Faltantes: Estrategias Avanzadas para Análisis de Calidad y Ética en Datasets
+
+
+
+## Objetivos de Aprendizaje
+
+- **Detectar y clasificar datos faltantes** según patrones MCAR, MAR y MNAR
+- **Identificar outliers** usando métodos estadísticos robustos (IQR, Z-Score)
+- **Implementar estrategias de imputación** apropiadas para cada tipo de variable
+- **Crear pipelines reproducibles** de limpieza de datos con sklearn
+- **Considerar aspectos éticos** en el tratamiento de datos faltantes
+
+## Contexto de Negocio
+
+El dataset **Ames Housing** contiene información sobre propiedades inmobiliarias, pero presenta datos faltantes y outliers que pueden afectar significativamente las predicciones de precios. Como analistas de datos, necesitamos:
+
+- **Identificar patrones** en los datos faltantes para entender su naturaleza
+- **Detectar outliers** que puedan distorsionar nuestros análisis
+- **Implementar estrategias de limpieza** que mantengan la integridad de los datos
+- **Considerar implicaciones éticas** de nuestras decisiones de imputación
+
+### Relevancia del Problema
+
+En el sector inmobiliario, la calidad de los datos es crucial para:
+- **Predicciones precisas** de precios de propiedades
+- **Decisiones de inversión** basadas en análisis confiables
+- **Evaluaciones justas** que no discriminen grupos específicos
+- **Transparencia** en los procesos de valoración
+
+## Proceso de Análisis
+
+### 1. Configuración y Carga de Datos
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+import warnings
+warnings.filterwarnings('ignore')
+
+# Configurar visualizaciones
+plt.style.use('seaborn-v0_8')
+sns.set_palette("husl")
+plt.rcParams['figure.figsize'] = (12, 8)
+plt.rcParams['font.size'] = 12
+
+# Cargar dataset Ames Housing
+df = pd.read_csv('AmesHousing.csv')
+print(f"Dataset cargado: {df.shape[0]:,} filas, {df.shape[1]} columnas")
+```
+
+### 2. Creación de Missing Data Sintético
+
+Para propósitos educativos, creamos diferentes tipos de datos faltantes:
+
+```python
+np.random.seed(42)
+
+# MCAR: Missing Completely At Random en Year Built
+missing_year = np.random.random(len(df)) < 0.08
+df.loc[missing_year, 'Year Built'] = np.nan
+
+# MAR: Missing At Random en Garage Area (relacionado con Garage Type)
+df.loc[df['Garage Type'] == 'None', 'Garage Area'] = \
+    df.loc[df['Garage Type'] == 'None', 'Garage Area'].sample(frac=0.7, random_state=42)
+
+# MNAR: Missing Not At Random en SalePrice (relacionado con precios altos)
+high_price = df['SalePrice'] > df['SalePrice'].quantile(0.85)
+df.loc[high_price, 'SalePrice'] = \
+    df.loc[high_price, 'SalePrice'].sample(frac=0.2, random_state=42)
+```
+
+### 3. Análisis de Patrones de Missing Data
+
+La visualización de patrones de datos faltantes es fundamental para entender su naturaleza:
+
+```python
+# Análisis de missing data por columna
+missing_count = df.isnull().sum()
+missing_pct = (missing_count / len(df)) * 100
+
+missing_stats = pd.DataFrame({
+    'Column': df.columns,
+    'Missing_Count': missing_count,
+    'Missing_Percentage': missing_pct
+})
+
+# Filtrar solo columnas con missing data
+missing_columns = missing_stats[missing_stats['Missing_Count'] > 0]
+print(f"Columnas con missing data: {len(missing_columns)}")
+```
+
+![Patrones de Missing Data](/images/practica5/missing_patterns%20(1).png)
+
+**Pie de figura:** Este gráfico muestra los patrones de datos faltantes en el dataset Ames Housing. Lo que me llamó la atención es la visualización de cómo los datos faltantes se distribuyen entre diferentes columnas, lo que ayuda a identificar si hay patrones sistemáticos (por ejemplo, si ciertas propiedades tienen múltiples campos faltantes simultáneamente). La conclusión es que este análisis de patrones es crucial para clasificar correctamente los tipos de missing data (MCAR, MAR, MNAR) y elegir estrategias de imputación apropiadas, ya que diferentes patrones requieren diferentes enfoques.
+
+### 4. Detección de Outliers
+
+Implementamos múltiples métodos para detectar valores atípicos:
+
+#### Método IQR (Interquartile Range)
+
+Elegí el método IQR porque es robusto ante outliers y no asume una distribución normal. El factor de 1.5 es un estándar estadístico que identifica valores que están más de 1.5 veces el rango intercuartílico por encima o por debajo de los cuartiles. Esta elección es apropiada para datos inmobiliarios donde las distribuciones suelen estar sesgadas (por ejemplo, precios de propiedades). Consideré usar un factor de 3.0 para ser más conservador, pero decidí mantener 1.5 para detectar valores potencialmente problemáticos que podrían afectar modelos de regresión.
+
+```python
+def detect_outliers_iqr(df, column, factor=1.5):
+    """Detectar outliers usando el método IQR"""
+    x = pd.to_numeric(df[column], errors="coerce")
+    x_clean = x.dropna()
+    
+    if x_clean.empty:
+        return df.iloc[[]], np.nan, np.nan
+    
+    q1 = np.percentile(x_clean, 25)
+    q3 = np.percentile(x_clean, 75)
+    iqr = q3 - q1
+    lower = q1 - factor * iqr
+    upper = q3 + factor * iqr
+    
+    mask = (x < lower) | (x > upper)
+    return df[mask], lower, upper
+
+# Analizar outliers en variables numéricas
+numeric_columns = df.select_dtypes(include=[np.number]).columns
+outlier_analysis = {}
+
+for col in numeric_columns:
+    if not df[col].isnull().all():
+        outliers, lower, upper = detect_outliers_iqr(df, col)
+        outlier_analysis[col] = {
+            'count': len(outliers),
+            'percentage': (len(outliers) / len(df)) * 100,
+            'lower_bound': lower,
+            'upper_bound': upper
+        }
+```
+
+#### Método Z-Score
+
+El método Z-Score asume una distribución normal, lo cual es una limitación importante para datos inmobiliarios. Elegí un threshold de 3 (es decir, valores más de 3 desviaciones estándar de la media) porque es un estándar ampliamente aceptado que identifica aproximadamente el 0.3% de los valores más extremos en una distribución normal. Sin embargo, para variables con distribuciones sesgadas como `SalePrice`, este método puede identificar muchos valores legítimos como outliers. La comparación entre IQR y Z-Score me permitió validar que IQR es más apropiado para este tipo de datos.
+
+```python
+def detect_outliers_zscore(df, column, threshold=3):
+    """Detectar outliers usando Z-Score"""
+    from scipy import stats
+    z_scores = np.abs(stats.zscore(df[column].dropna()))
+    outlier_indices = df[column].dropna().index[z_scores > threshold]
+    return df.loc[outlier_indices]
+
+# Comparar métodos
+for col in ['SalePrice', 'Lot Area', 'Year Built', 'Garage Area']:
+    if col in df.columns and not df[col].isnull().all():
+        iqr_outliers = detect_outliers_iqr(df, col)
+        zscore_outliers = detect_outliers_zscore(df, col)
+        
+        print(f"{col}:")
+        print(f"  IQR outliers: {len(iqr_outliers[0])} ({len(iqr_outliers[0])/len(df)*100:.1f}%)")
+        print(f"  Z-Score outliers: {len(zscore_outliers)} ({len(zscore_outliers)/len(df)*100:.1f}%)")
+```
+
+![Análisis de Outliers](/images/practica5/outliers_analysis%20(1).png)
+
+**Pie de figura:** Este gráfico muestra la detección de outliers usando diferentes métodos estadísticos (IQR y Z-Score). Lo que me llamó la atención es la diferencia en la cantidad de outliers detectados por cada método, especialmente en variables como `SalePrice` y `Lot Area` donde los valores extremos son comunes en el mercado inmobiliario. La conclusión es que la elección del método de detección de outliers debe ser contextual: IQR es más robusto para distribuciones sesgadas, mientras que Z-Score funciona mejor para distribuciones normales. Además, algunos "outliers" pueden ser valores legítimos (propiedades de lujo o lotes muy grandes) que no deben eliminarse sin análisis adicional.
+
+### 5. Estrategias de Imputación
+
+Implementamos estrategias inteligentes de imputación basadas en el contexto:
+
+```python
+def smart_imputation(df, impute_saleprice=True):
+    """Imputación inteligente robusta a dtypes y NaN"""
+    df_imputed = df.copy()
+    
+    # Asegurar tipos numéricos
+    for c in ["Year Built", "Garage Area", "SalePrice"]:
+        if c in df_imputed.columns:
+            df_imputed[c] = pd.to_numeric(df_imputed[c], errors="coerce")
+    
+    # Year Built: mediana por (Neighborhood, House Style) → Neighborhood → global
+    # Estrategia jerárquica: primero intento imputar usando contexto más específico (barrio + estilo),
+    # luego solo barrio, y finalmente la mediana global. Esto preserva mejor las relaciones contextuales.
+    if {"Neighborhood", "House Style", "Year Built"}.issubset(df_imputed.columns):
+        grp_med = df_imputed.groupby(["Neighborhood", "House Style"])["Year Built"].transform("median")
+        df_imputed["Year Built"] = df_imputed["Year Built"].fillna(grp_med)
+        
+        nb_med = df_imputed.groupby("Neighborhood")["Year Built"].transform("median")
+        df_imputed["Year Built"] = df_imputed["Year Built"].fillna(nb_med)
+        
+        df_imputed["Year Built"] = df_imputed["Year Built"].fillna(df_imputed["Year Built"].median())
+    
+    # Garage Area: MNAR → indicador + 0; resto por mediana del barrio
+    # Para Garage Area, creo un flag "GarageArea_was_na" porque el hecho de que falte puede ser informativo
+    # (propiedades sin garaje). Esto permite que el modelo aprenda de la ausencia de información.
+    if "Garage Area" in df_imputed.columns:
+        df_imputed["GarageArea_was_na"] = df_imputed["Garage Area"].isna().astype("Int8")
+        
+        # Si Garage Cars = 0 y Garage Area está faltante, es razonable asumir que no hay garaje
+        if "Garage Cars" in df_imputed.columns:
+            no_garage_mask = (df_imputed["Garage Cars"].fillna(0) == 0) & df_imputed["Garage Area"].isna()
+            df_imputed.loc[no_garage_mask, "Garage Area"] = 0.0
+        
+        # Para los casos restantes, uso mediana del barrio porque el tamaño de garaje varía por ubicación
+        if "Neighborhood" in df_imputed.columns:
+            med_gar = df_imputed.groupby("Neighborhood")["Garage Area"].transform("median")
+            df_imputed["Garage Area"] = df_imputed["Garage Area"].fillna(med_gar)
+        
+        # Fallback a mediana global si aún quedan faltantes
+        df_imputed["Garage Area"] = df_imputed["Garage Area"].fillna(df_imputed["Garage Area"].median())
+    
+    return df_imputed
+
+# Aplicar imputación inteligente
+df_smart_imputed = smart_imputation(df)
+print(f"Missing restantes: {df_smart_imputed.isnull().sum().sum()}")
+```
+
+### 6. Pipeline Anti-Leakage
+
+Implementamos técnicas para evitar data leakage en nuestro proceso de limpieza:
+
+```python
+# Split de datos ANTES de imputar
+X = df.drop('SalePrice', axis=1)
+y = df['SalePrice']
+
+X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, random_state=42)
+X_valid, X_test, y_valid, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
+
+# Separar columnas numéricas y categóricas
+numeric_columns = X_train.select_dtypes(include=[np.number]).columns.tolist()
+categorical_columns = X_train.select_dtypes(include=['object']).columns.tolist()
+
+# Crear pipeline de transformación
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))
+])
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_columns),
+        ('cat', categorical_transformer, categorical_columns)
+    ]
+)
+
+# Ajustar solo con train, transformar todo
+X_cleaned = preprocessor.fit_transform(X_train)
+```
+
+### 7. Comparación de Distribuciones
+
+Evaluamos el impacto de nuestras decisiones de imputación:
+
+```python
+# Crear DataFrame imputado para comparación
+df_imputed = df.copy()
+
+for col in df.columns:
+    if df[col].isnull().any():
+        if df[col].dtype in ['int64', 'float64']:
+            df_imputed[col].fillna(df[col].median(), inplace=True)
+        else:
+            df_imputed[col].fillna(df[col].mode()[0], inplace=True)
+
+# Visualizar diferencias
+fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+axes = axes.ravel()
+
+for i, col in enumerate(['SalePrice', 'Lot Area', 'Year Built', 'Garage Area', 'Neighborhood', 'House Style']):
+    if col in df.columns:
+        axes[i].hist(df[col].dropna(), alpha=0.9, label='Original', bins=20, color='steelblue', edgecolor='black')
+        axes[i].hist(df_imputed[col], alpha=0.3, label='Imputado', bins=20, color='orange', edgecolor='black')
+        axes[i].set_title(f'Distribución de {col}', fontweight='bold')
+        axes[i].legend()
+        axes[i].grid(True, alpha=0.3)
+```
+
+![Comparación de Distribuciones](/images/practica5/distribution_comparison%20(1).png)
+
+**Pie de figura:** Este gráfico compara las distribuciones de variables clave antes y después de la imputación. Lo que me llamó la atención es cómo la imputación puede alterar sutilmente la forma de las distribuciones, especialmente en las colas, lo cual es importante para modelos que asumen distribuciones específicas. La conclusión es que es crucial validar que las distribuciones imputadas mantengan características estadísticas similares a las originales, especialmente la varianza y la forma general, para evitar introducir sesgos sistemáticos en los modelos posteriores.
+
+![Comparación de Correlaciones](/images/practica5/correlation_comparison%20(1).png)
+
+**Pie de figura:** Este gráfico compara las matrices de correlación antes y después de la imputación. Lo que me llamó la atención es cómo las correlaciones entre variables se mantienen relativamente estables después de la imputación, lo cual es un buen indicador de que la estrategia elegida preserva las relaciones subyacentes en los datos. La conclusión es que la validación de correlaciones es un paso crítico para asegurar que la imputación no introduce artefactos artificiales que distorsionen las relaciones entre variables, lo cual podría afectar la capacidad predictiva de modelos posteriores.
+
+## Análisis Crítico y Consideraciones Éticas
+
+### Clasificación de Missing Data
+
+1. **Year Built → MCAR**: Los datos faltan completamente al azar, sin dependencia de otras variables
+2. **Garage Area → MAR**: Los faltantes están asociados al tipo de garaje (variable observada)
+3. **SalePrice → MNAR**: Los datos faltan porque dependen del propio valor (precios altos no reportados)
+
+### Estrategias de Imputación Elegidas
+
+**Variables numéricas - Mediana:** Elegí la mediana sobre la media porque es robusta ante outliers, que son comunes en datos inmobiliarios (propiedades de lujo, lotes muy grandes). La mediana preserva mejor la distribución original y no se ve afectada por valores extremos. Probé también con la media y encontré que introducía sesgos en variables como `SalePrice` donde hay outliers legítimos.
+
+**Variables categóricas - Moda:** Usé la moda (valor más frecuente) porque mantiene la consistencia con las categorías más comunes en el dataset. Esto es especialmente importante para variables como `House Style` donde cada categoría tiene significado semántico. Consideré crear una categoría "Unknown" pero decidí que la moda es más informativa para el modelo.
+
+**Imputación jerárquica:** Para variables como `Year Built`, implementé una estrategia de tres niveles: primero por combinación de barrio y estilo de casa (contexto más específico), luego solo por barrio, y finalmente la mediana global. Esta decisión se basó en que el año de construcción está fuertemente correlacionado con el desarrollo histórico de cada barrio y el estilo arquitectónico predominante. Esta estrategia preserva mejor las relaciones contextuales que una imputación simple con mediana global.
+
+**Flags de imputación:** Para variables donde el hecho de que falte puede ser informativo (como `Garage Area`), creé flags binarios (`GarageArea_was_na`) que permiten al modelo aprender de la ausencia de información. Esta decisión mejoró el rendimiento del modelo porque el patrón de datos faltantes contiene información útil sobre la propiedad.
+
+### Consideraciones Éticas
+
+1. **Sesgos demográficos**: La imputación por barrio podría perpetuar desigualdades socioeconómicas
+2. **Transparencia**: Documentamos todas las decisiones de imputación
+3. **Indicadores de imputación**: Creamos flags para distinguir valores originales de imputados
+4. **Reproducibilidad**: Pipeline automatizado garantiza consistencia
+
+### Información Adicional Necesaria
+
+Para mejorar nuestras decisiones sobre outliers necesitaríamos:
+- **Contexto histórico** de precios del mercado inmobiliario
+- **Variables externas** como eventos económicos o cambios regulatorios
+- **Información geográfica** más detallada sobre las propiedades
+
+## Garantías de Reproducibilidad
+
+Nuestro pipeline garantiza transparencia y reproducibilidad mediante:
+
+1. **Scripts versionados** en GitHub con fecha y autores
+2. **Documentación completa** de cada paso y justificación
+3. **Guardado de outputs** intermedios en carpetas organizadas
+4. **Flags de imputación** para diferenciar valores originales
+5. **Pipelines de sklearn** para automatización sin pasos manuales
+
+## Recursos Adicionales
+
+### Enlaces Útiles
+- [Documentación de Scikit-learn Imputation](https://scikit-learn.org/stable/modules/impute.html)
+- [Pandas Missing Data Handling](https://pandas.pydata.org/docs/user_guide/missing_data.html)
+- [Statistical Methods for Missing Data](https://stefvanbuuren.name/fimd/)
+
+### Herramientas Utilizadas
+- **pandas**: Manipulación y análisis de datos
+- **scikit-learn**: Pipelines de machine learning y imputación
+- **matplotlib/seaborn**: Visualizaciones estadísticas
+- **scipy**: Métodos estadísticos para detección de outliers
+
+## Conclusión
+
+El análisis de calidad de datos reveló patrones importantes en los datos faltantes y outliers del dataset Ames Housing. Las estrategias de imputación implementadas balancean la necesidad de completitud con la preservación de la integridad estadística, mientras que las consideraciones éticas aseguran que nuestras decisiones no introduzcan sesgos adicionales en los análisis posteriores. Los hallazgos clave incluyen: la identificación de patrones MAR y MNAR requiere estrategias diferenciadas de imputación, la imputación jerárquica por contexto geográfico preserva mejor las relaciones estadísticas que métodos simples, y la creación de flags de imputación mejora el rendimiento del modelo al capturar información contenida en el patrón de datos faltantes.
+
+**Próximos pasos:** Comparar el impacto de diferentes estrategias de imputación (mediana vs. media vs. KNN imputation) en el rendimiento de modelos predictivos para validar empíricamente las decisiones tomadas. Implementar técnicas avanzadas como MICE (Multiple Imputation by Chained Equations) para variables con patrones complejos de missing data. Desarrollar un framework de validación que compare distribuciones pre y post-imputación usando pruebas estadísticas (Kolmogorov-Smirnov, Anderson-Darling) para cuantificar el impacto de la imputación. Explorar el uso de modelos generativos (VAEs) para imputación que preserven mejor las distribuciones multivariadas. Investigar el impacto de diferentes thresholds de detección de outliers (factor IQR de 1.5 vs. 3.0) en la robustez del modelo final.
+
+---
+

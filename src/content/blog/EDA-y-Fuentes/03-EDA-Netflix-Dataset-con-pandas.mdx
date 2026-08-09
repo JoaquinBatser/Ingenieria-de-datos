@@ -1,0 +1,214 @@
+---
+title: "Decodificando el catálogo de Netflix: Insights estratégicos mediante análisis exploratorio"
+description: "Exploración completa del catálogo de Netflix mediante técnicas de visualización avanzadas con pandas, matplotlib y seaborn"
+---
+
+[Jupyter Notebook original](../EDA-y-Fuentes-Jupyters/03-EDA-Netflix-Dataset-con-pandas-Jupyter.mdx)
+## Objetivos de Aprendizaje
+
+- **Dominar técnicas de visualización** utilizando matplotlib y seaborn
+- **Explorar patrones y tendencias** en un conjunto de datos real de Netflix
+- **Limpiar y transformar datos** para análisis efectivo
+- **Interpretar visualizaciones** para extraer insights de negocio
+- **Crear dashboards informativos** con múltiples tipos de gráficos
+
+## Contexto de Negocio
+
+Netflix, como líder global en servicios de streaming, necesita entender en profundidad su catálogo para tomar decisiones estratégicas sobre adquisición y producción de contenido. Este análisis permite:
+
+- Identificar patrones en tipos de contenido (películas vs series)
+- Analizar distribuciones geográficas (países de origen)
+- Entender tendencias temporales en lanzamientos
+- Estudiar clasificaciones por audiencia (ratings)
+- Explorar géneros y duraciones
+
+El dataset utilizado contiene información sobre títulos disponibles en la plataforma, incluyendo detalles como tipo, país, fecha de lanzamiento, rating y género.
+
+## Proceso de Análisis
+
+### 1. Preparación y Carga de Datos
+
+```python
+# Importar librerías esenciales
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Configuración visual
+plt.style.use("classic")
+sns.set_palette("husl")
+plt.rcParams['figure.figsize'] = (10, 6)
+
+# Cargar dataset
+url = "https://raw.githubusercontent.com/swapnilg4u/Netflix-Data-Analysis/refs/heads/master/netflix_titles.csv"
+df = pd.read_csv(url)
+```
+
+### 2. Análisis de Datos Faltantes
+
+La identificación de valores nulos es crucial para entender la completitud de los datos. Elegí usar dos visualizaciones complementarias: un gráfico de barras para ver porcentajes por columna y un heatmap para identificar patrones de co-ocurrencia de datos faltantes. Esta decisión técnica me permitió no solo cuantificar el problema sino también entender si los faltantes son aleatorios o siguen algún patrón, lo cual es fundamental para decidir estrategias de imputación más adelante.
+
+```python
+# Detectar datos faltantes
+missing_data = df.isna().sum().sort_values(ascending=False)
+missing_percent = (df.isna().sum() / len(df) * 100).sort_values(ascending=False)
+
+# Visualizar con barras horizontales y heatmap
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+sns.barplot(x=missing_percent[missing_percent > 0].values,
+            y=missing_percent[missing_percent > 0].index,
+            palette='Reds_r')
+plt.title('Porcentaje de Datos Faltantes por Columna')
+```
+
+![Análisis de Datos Faltantes](/images/netflix/missing_data.png)
+
+**Pie de figura:** Este gráfico muestra el porcentaje de datos faltantes por columna en el dataset de Netflix. Lo que me llamó la atención es que la columna "director" tiene más del 30% de valores faltantes, seguida de "cast" y "country" con porcentajes significativos. La conclusión es que necesitamos estrategias específicas de manejo para estas columnas, ya que eliminar registros con directores faltantes reduciría significativamente el tamaño del dataset. Para "director", consideré usar "Unknown" como categoría, mientras que para "country" podría ser útil usar la moda del país más frecuente.
+
+![Heatmap de Datos Faltantes](/images/netflix/missing_heatmap.png)
+
+**Pie de figura:** Este heatmap muestra patrones de co-ocurrencia de datos faltantes entre columnas. Lo que me llamó la atención es que hay una correlación clara entre las columnas relacionadas con el reparto (director, cast, country) que faltan juntas, sugiriendo un patrón MAR (Missing At Random) relacionado con la antigüedad del contenido. La conclusión es que estos patrones no son aleatorios y pueden informar estrategias de imputación más inteligentes basadas en el año de lanzamiento.
+
+### 3. Distribución de Tipos de Contenido
+
+Una de las primeras preguntas a responder: ¿Cómo se distribuye el contenido entre películas y series? Elegí usar tanto un countplot como un pie chart porque el countplot muestra valores absolutos y el pie chart facilita la comparación de proporciones. Esta combinación es útil para presentar tanto números concretos como porcentajes relativos, lo cual es importante para decisiones estratégicas de contenido.
+
+```python
+# Calcular proporción de tipos
+type_counts = df['type'].value_counts()
+type_percent = df['type'].value_counts(normalize=True) * 100
+
+# Visualización con countplot y pie chart
+fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+
+# Countplot básico
+sns.countplot(data=df, x='type', ax=axes[0, 0], palette='Set2')
+axes[0, 0].set_title('Distribución: Movies vs TV Shows')
+
+# Pie chart
+axes[0, 1].pie(type_counts.values, labels=type_counts.index,
+               autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightcoral'])
+axes[0, 1].set_title('Proporción Movies vs TV Shows')
+```
+
+![Distribución de Tipos de Contenido](/images/netflix/content_types.png)
+
+**Pie de figura:** Este gráfico muestra la distribución entre películas y series de TV en el catálogo de Netflix. Lo que me llamó la atención es la marcada diferencia: aproximadamente 70% son películas y 30% son series, lo que contrasta con la percepción popular de que Netflix se enfoca más en series originales. La conclusión es que aunque Netflix invierte fuertemente en producción propia de series, el catálogo histórico aún está dominado por películas, lo que sugiere una estrategia de diversificación en curso.
+
+### 4. Análisis Temporal
+
+El análisis de tendencias a lo largo del tiempo revela patrones de crecimiento y cambios estratégicos. Decidí filtrar solo los años desde 2000 porque el contenido anterior a ese año es menos relevante para entender la estrategia actual de Netflix y además reduce el ruido visual. Usé un gráfico de línea con marcadores porque permite ver tanto la tendencia general como los valores específicos por año, lo cual es crucial para identificar puntos de inflexión en la estrategia de contenido.
+
+```python
+# Preparar datos temporales
+df['release_year'] = pd.to_numeric(df['release_year'], errors='coerce')
+yearly_releases = df['release_year'].value_counts().sort_index()
+recent_years = yearly_releases[yearly_releases.index >= 2000]
+
+# Línea temporal
+plt.plot(recent_years.index, recent_years.values,
+         marker='o', linewidth=2, markersize=4, color='darkblue')
+plt.title('Cantidad de Contenido por Año (2000-2021)')
+plt.grid(True, alpha=0.3)
+```
+
+![Tendencias Temporales](/images/netflix/temporal_trend.png)
+
+**Pie de figura:** Este gráfico muestra la cantidad de contenido agregado a Netflix por año desde 2000 hasta 2021. Lo que me llamó la atención es el crecimiento exponencial a partir de 2015, con un pico máximo en 2018-2020, seguido de una ligera caída en 2021. La conclusión es que este patrón refleja la estrategia agresiva de expansión de contenido de Netflix durante su fase de crecimiento internacional, posiblemente ajustada después por la pandemia y cambios en la estrategia de contenido original.
+
+### 5. Análisis Geográfico
+
+La distribución geográfica del contenido muestra mercados prioritarios y oportunidades. Un desafío técnico importante fue manejar las co-producciones: muchos títulos tienen múltiples países separados por comas. Usé `str.split()` y `explode()` para expandir estas entradas y contar cada país individualmente, lo cual da una visión más precisa de la distribución geográfica. Elegí barras horizontales para el top 15 porque facilitan la lectura de nombres largos de países y permiten comparar fácilmente las cantidades.
+
+```python
+# Preparar datos de países
+df_countries = df.dropna(subset=['country']).copy()
+countries_expanded = df_countries['country'].str.split(', ').explode()
+country_counts = countries_expanded.value_counts().head(20)
+
+# Top 15 países - barras horizontales
+top_15_countries = country_counts.head(15)
+sns.barplot(y=top_15_countries.index, x=top_15_countries.values,
+           palette='viridis')
+plt.title('Top 15 Países con Más Contenido')
+```
+
+![Distribución por Países](/images/netflix/countries_distribution.png)
+
+**Pie de figura:** Este gráfico muestra los top 15 países productores de contenido en Netflix. Lo que me llamó la atención es la dominancia absoluta de Estados Unidos (más del doble que el segundo país), seguido por India y Reino Unido, lo que refleja tanto la producción original como las adquisiciones estratégicas. La conclusión es que aunque Netflix tiene presencia global, su catálogo está fuertemente concentrado en producción anglosajona, con India emergiendo como mercado clave, probablemente debido a la población y el potencial de crecimiento en ese mercado.
+
+### 6. Análisis de Ratings
+
+Las clasificaciones por audiencia determinan el público objetivo:
+
+```python
+# Preparar datos de ratings
+rating_counts = df['rating'].value_counts().head(10)
+
+# Countplot de ratings
+sns.countplot(data=df, x='rating', order=rating_counts.index, palette='Set1')
+plt.title('Distribución de Ratings')
+plt.tick_params(axis='x', rotation=45)
+```
+
+![Análisis de Ratings](/images/netflix/ratings_analysis.png)
+
+**Pie de figura:** Este gráfico muestra la distribución de clasificaciones por audiencia (ratings) en el catálogo de Netflix. Lo que me llamó la atención es que TV-MA (contenido para adultos) y TV-14 (adolescentes) dominan claramente, con PG-13 en tercer lugar, mientras que hay muy poco contenido para audiencias infantiles (G, PG). La conclusión es que Netflix se posiciona principalmente para audiencias adultas y adolescentes, lo que puede limitar su alcance familiar y representa una oportunidad de diversificación hacia contenido infantil y familiar.
+
+## Visualizaciones Principales
+
+Las visualizaciones son fundamentales para entender patrones en los datos. A continuación se presentan los principales gráficos de este análisis:
+
+![Análisis de Géneros](/images/netflix/genres_analysis.png)
+
+**Pie de figura:** Este gráfico muestra la distribución de géneros en el catálogo de Netflix. Lo que me llamó la atención es la diversidad de géneros, con Dramas, Comedias y Documentales como los más frecuentes, pero también la presencia significativa de géneros internacionales y de nicho. La conclusión es que Netflix mantiene un catálogo diverso que apela a múltiples audiencias, con un balance entre entretenimiento general (comedia, drama) y contenido educativo/informativo (documentales), estrategia que maximiza la retención de suscripciones.
+
+## Insights Clave
+
+El análisis exploratorio reveló varios hallazgos importantes:
+
+1. **Crecimiento exponencial** de contenido desde 2015, con un fuerte impulso en 2018-2020
+2. **Predominio de películas** (70%) sobre series (30%) en el catálogo global
+3. **Concentración geográfica** en Estados Unidos, India y Reino Unido como principales productores
+4. **Co-producciones estratégicas** entre Estados Unidos y Reino Unido (185), y Estados Unidos y Canadá (137)
+5. **Cambio en el enfoque** desde películas hacia series de TV en la última década
+6. **Ratings dominantes**: TV-MA, TV-14 y PG-13, reflejando un enfoque en audiencias adultas y adolescentes
+7. **Géneros más populares**: Dramas, Comedias y Documentales
+
+## Recomendaciones Estratégicas
+
+Basado en los patrones observados, se sugieren las siguientes estrategias:
+
+1. **Diversificar el catálogo geográficamente**, aumentando producción en mercados emergentes
+2. **Equilibrar el portafolio** entre películas y series, priorizando series por su creciente popularidad
+3. **Desarrollar contenido familiar** para ampliar el alcance más allá del actual enfoque en contenido adulto
+4. **Aprovechar co-producciones internacionales** para reducir costos y ampliar audiencias
+5. **Invertir en géneros de alta demanda** como Dramas y Documentales
+
+## Limitaciones y Trabajo Futuro
+
+Este análisis presenta algunas limitaciones que podrían abordarse en futuras investigaciones:
+
+- **Falta de datos de audiencia** que permitirían correlacionar contenido con preferencias de usuarios
+- **Ausencia de métricas de rendimiento** como ratings de IMDb o Rotten Tomatoes
+- **Sin información de costos** para evaluar retorno de inversión por tipo de contenido
+- **Datos limitados de comportamiento del usuario** para entender patrones de visualización
+
+## Herramientas y Técnicas Utilizadas
+
+- **pandas**: Manipulación y análisis de datos
+- **matplotlib**: Visualizaciones básicas y personalizadas
+- **seaborn**: Visualizaciones estadísticas avanzadas
+- **ydata-profiling**: Generación de reportes EDA automatizados
+
+## Conclusión
+
+El análisis exploratorio del catálogo de Netflix proporciona información valiosa sobre la evolución y estado actual de la plataforma. Las visualizaciones revelan patrones claros en la estrategia de contenido, destacando la transición hacia un mayor enfoque en series de TV y la importancia de ciertos mercados geográficos. Los hallazgos principales incluyen: el crecimiento exponencial desde 2015 refleja la estrategia agresiva de expansión, la dominancia geográfica de Estados Unidos e India muestra prioridades de mercado, y el sesgo hacia contenido adulto (TV-MA, TV-14) representa tanto una fortaleza como una oportunidad de diversificación.
+
+**Próximos pasos:** Integrar datos de audiencia (visualizaciones, ratings de usuarios) para correlacionar disponibilidad de contenido con consumo real. Explorar análisis de sentimiento de reviews para entender qué tipos de contenido generan mejor recepción. Desarrollar un modelo de recomendación basado en características del catálogo para identificar gaps y oportunidades de contenido. Analizar tendencias temporales más granulares (mensuales) para identificar estacionalidad en lanzamientos. Incorporar datos de costos de producción para evaluar eficiencia de inversión por tipo de contenido y género.
+
+---
+
+_Nota: Este análisis fue realizado con fines educativos utilizando datos públicos de Netflix._

@@ -1,0 +1,743 @@
+---
+title: "Audio como Dato: Procesamiento y Análisis"
+description: "Pipeline completo de procesamiento de audio digital: carga de señales, análisis temporal y frecuencial, extracción de características (MFCCs, espectrogramas) y aplicaciones de machine learning con librosa."
+---
+
+# Audio como Dato: Procesamiento y Análisis
+
+## Objetivos de Aprendizaje
+
+- **Comprender la representación digital** de señales de audio
+- **Dominar los conceptos fundamentales**: sampling rate, duración, amplitud
+- **Visualizar señales** en dominio temporal y frecuencial
+- **Extraer características** relevantes para machine learning (MFCCs, Spectral Features)
+- **Aplicar transformadas** de Fourier para análisis espectral
+- **Implementar pipelines** de clasificación de audio
+
+## Contexto de Negocio
+
+El procesamiento de audio es crucial en múltiples industrias:
+- **Asistentes de voz** (Alexa, Siri, Google Assistant)
+- **Sistemas de reconocimiento de voz** (transcripción automática)
+- **Análisis de sentimientos** por voz en call centers
+- **Clasificación de música** y sistemas de recomendación
+- **Detección de anomalías** en audio industrial
+- **Aplicaciones médicas** (análisis de sonidos cardíacos, respiratorios)
+
+Como ingeniero de datos trabajando con audio, necesitas:
+- **Cargar y normalizar** archivos de audio en diversos formatos
+- **Extraer features robustas** para entrenamiento de modelos
+- **Analizar patrones** temporales y frecuenciales
+- **Optimizar el rendimiento** de sistemas de clasificación
+
+### Dataset de Ejemplo
+
+Trabajaremos con audio de diferentes fuentes:
+- **Formato:** WAV, MP3
+- **Aplicación:** Clasificación de género musical, reconocimiento de voz
+
+## Proceso de Análisis
+
+### 1. Preparación del Entorno
+
+```python
+import librosa
+import librosa.display
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from scipy import signal
+from scipy.fft import fft, fftfreq
+import warnings
+warnings.filterwarnings('ignore')
+
+# Configuración
+plt.style.use('seaborn-v0_8-darkgrid')
+%matplotlib inline
+
+print("✅ Librerías listas")
+print(f"librosa: {librosa.__version__}")
+```
+
+**Librerías clave:**
+- `librosa`: Biblioteca especializada en análisis de audio
+- `scipy`: Transformadas de Fourier y procesamiento de señales
+- `numpy`: Operaciones matriciales
+- `matplotlib`: Visualización
+
+### 2. Fundamentos de Audio Digital
+
+#### 2.1 Conceptos Básicos
+
+Un audio digital se representa como una **secuencia de muestras** (samples) tomadas a intervalos regulares:
+
+- **Sampling Rate (sr)**: Frecuencia de muestreo (Hz) - típicamente 22050, 44100, 48000 Hz
+- **Duración**: Tiempo total del audio (segundos)
+- **Amplitud**: Intensidad de la señal en cada muestra
+- **Canales**: Mono (1) o Estéreo (2)
+
+**Teorema de Nyquist:** Para capturar una frecuencia `f`, necesitamos `sr ≥ 2f`.
+
+```python
+# Ejemplo: generar tono puro
+duration = 2.0  # segundos
+sr = 22050  # Hz
+frequency = 440  # Hz (nota La)
+
+t = np.linspace(0, duration, int(sr * duration))
+tone = 0.5 * np.sin(2 * np.pi * frequency * t)
+
+print(f"Muestras totales: {len(tone)}")
+print(f"Rango de amplitud: [{tone.min():.2f}, {tone.max():.2f}]")
+```
+
+### 3. Carga de Audio
+
+```python
+# Cargar archivo de audio
+audio_path = "data/audio/sample.wav"
+y, sr = librosa.load(audio_path, sr=None)  # sr=None mantiene tasa original
+
+# Información básica
+duration = librosa.get_duration(y=y, sr=sr)
+n_samples = len(y)
+
+print(f"Sampling rate: {sr} Hz")
+print(f"Duración: {duration:.2f} segundos")
+print(f"Número de muestras: {n_samples}")
+print(f"Tipo de dato: {y.dtype}")
+print(f"Rango: [{y.min():.3f}, {y.max():.3f}]")
+```
+
+**Nota:** `librosa.load()` por defecto remuestrea a 22050 Hz y convierte a mono.
+
+### 4. Visualización: Forma de Onda (Waveform)
+
+La forma de onda muestra la **amplitud en función del tiempo**.
+
+```python
+# Plotear waveform
+plt.figure(figsize=(14, 5))
+librosa.display.waveshow(y, sr=sr, alpha=0.6)
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Amplitud')
+plt.title('Forma de Onda - Dominio Temporal')
+plt.tight_layout()
+plt.show()
+```
+
+![Forma de Onda](/images/practica14/p14_waveform.png)
+
+**Interpretación:**
+- **Eje X**: Tiempo
+- **Eje Y**: Amplitud normalizada (típicamente -1 a 1)
+- **Zonas densas**: Mayor actividad sonora (ej: voz, música)
+- **Zonas planas**: Silencio
+
+### 5. Análisis Frecuencial: Transformada de Fourier
+
+La **FFT (Fast Fourier Transform)** descompone la señal en sus componentes frecuenciales.
+
+```python
+# Calcular FFT
+fft_values = fft(y)
+fft_freq = fftfreq(len(y), 1/sr)
+
+# Tomar solo frecuencias positivas
+positive_freq = fft_freq[:len(fft_freq)//2]
+magnitude = np.abs(fft_values[:len(fft_values)//2])
+
+# Plotear espectro
+plt.figure(figsize=(14, 5))
+plt.plot(positive_freq, magnitude)
+plt.xlabel('Frecuencia (Hz)')
+plt.ylabel('Magnitud')
+plt.title('Espectro de Frecuencia (FFT)')
+plt.xlim(0, 5000)  # Limitar a frecuencias audibles relevantes
+plt.tight_layout()
+plt.show()
+```
+
+![Espectro de Frecuencia](/images/practica14/p14_fft.png)
+
+**Interpretación:**
+- **Picos**: Frecuencias dominantes en la señal
+- **Voz humana**: Concentrada en 80-300 Hz (fundamental) + armónicos
+- **Música**: Distribución más amplia según instrumentos
+
+### 6. Espectrograma
+
+Un espectrograma muestra cómo evoluciona el **contenido frecuencial a lo largo del tiempo**.
+
+```python
+# Calcular espectrograma (STFT - Short-Time Fourier Transform)
+D = librosa.stft(y)
+S_db = librosa.amplitude_to_db(np.abs(D), ref=np.max)
+
+# Visualizar
+plt.figure(figsize=(14, 6))
+librosa.display.specshow(S_db, sr=sr, x_axis='time', y_axis='hz', cmap='viridis')
+plt.colorbar(format='%+2.0f dB')
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Frecuencia (Hz)')
+plt.title('Espectrograma (STFT)')
+plt.tight_layout()
+plt.show()
+```
+
+![Espectrograma](/images/practica14/p14_spectrogram.png)
+
+**Dimensiones:**
+- **Eje X**: Tiempo
+- **Eje Y**: Frecuencia
+- **Color**: Intensidad (dB)
+
+**Aplicación:** Visualizar formantes de voz, patrones rítmicos, identificar instrumentos.
+
+### 7. Espectrograma Mel
+
+La escala **Mel** ajusta las frecuencias según la percepción humana (más resolución en bajas frecuencias).
+
+```python
+# Mel-spectrogram
+mel_spec = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
+mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
+
+# Visualizar
+plt.figure(figsize=(14, 6))
+librosa.display.specshow(mel_spec_db, sr=sr, x_axis='time', y_axis='mel', cmap='coolwarm')
+plt.colorbar(format='%+2.0f dB')
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Frecuencia (Mel)')
+plt.title('Mel-Espectrograma')
+plt.tight_layout()
+plt.show()
+```
+
+![Mel-Espectrograma](/images/practica14/p14_melspectrogram.png)
+
+**Ventaja:** Mejor representación para modelos de machine learning que buscan simular percepción humana.
+
+### 8. Extracción de Características
+
+#### 8.1 MFCCs (Mel-Frequency Cepstral Coefficients)
+
+Los **MFCCs** son la característica más popular para tareas de clasificación de audio.
+
+```python
+# Calcular MFCCs
+mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+
+# Visualizar
+plt.figure(figsize=(14, 6))
+librosa.display.specshow(mfccs, sr=sr, x_axis='time', cmap='coolwarm')
+plt.colorbar()
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Coeficiente MFCC')
+
+**Uso común:** Los primeros 13-20 coeficientes capturan información espectral importante.
+
+**Features derivados:**
+- Media y desviación estándar de cada MFCC
+- Delta MFCCs (variación temporal)
+- Delta-Delta MFCCs (aceleración)
+
+#### 8.2 Características Espectrales
+
+```python
+# Zero Crossing Rate (cambios de signo)
+zcr = librosa.feature.zero_crossing_rate(y)
+
+# Spectral Centroid (centro de masa del espectro)
+spectral_centroids = librosa.feature.spectral_centroid(y=y, sr=sr)
+
+# Spectral Rolloff (frecuencia bajo la cual está el 85% de energía)
+spectral_rolloff = librosa.feature.spectral_rolloff(y=y, sr=sr, roll_percent=0.85)
+
+# Chroma Features (contenido armónico)
+chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+
+# Visualizar
+fig, axes = plt.subplots(4, 1, figsize=(14, 10))
+
+# ZCR
+axes[0].plot(librosa.times_like(zcr), zcr[0])
+axes[0].set_ylabel('ZCR')
+axes[0].set_title('Zero Crossing Rate')
+
+# Spectral Centroid
+axes[1].plot(librosa.times_like(spectral_centroids), spectral_centroids[0])
+axes[1].set_ylabel('Hz')
+axes[1].set_title('Spectral Centroid')
+
+# Spectral Rolloff
+axes[2].plot(librosa.times_like(spectral_rolloff), spectral_rolloff[0])
+axes[2].set_ylabel('Hz')
+axes[2].set_title('Spectral Rolloff')
+
+# Chroma
+librosa.display.specshow(chroma, sr=sr, x_axis='time', y_axis='chroma', ax=axes[3], cmap='coolwarm')
+axes[3].set_title('Chromagram')
+
+plt.tight_layout()
+plt.show()
+```
+
+![Características Espectrales](/images/practica14/p14_spectral_features.png)
+
+**Interpretación:**
+- **ZCR**: Alto para sonidos sin tono (percusión), bajo para tonos puros
+- **Spectral Centroid**: "Brillo" del sonido (~donde está el centro de energía)
+- **Spectral Rolloff**: Indica presencia de altas frecuencias
+- **Chroma**: Útil para análisis de música (acordes, tonalidad)
+
+### 9. Pipeline de Extracción para ML
+
+```python
+def extract_features(file_path):
+    """
+    Extrae features completos de un archivo de audio.
+    Retorna un vector de características listo para ML.
+    """
+    # Cargar audio
+    y, sr = librosa.load(file_path, sr=22050, duration=30)
+    
+    # MFCCs
+    mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+    mfcc_mean = np.mean(mfccs, axis=1)
+    mfcc_std = np.std(mfccs, axis=1)
+    
+    # Spectral features
+    zcr = np.mean(librosa.feature.zero_crossing_rate(y))
+    spectral_centroid = np.mean(librosa.feature.spectral_centroid(y=y, sr=sr))
+    spectral_rolloff = np.mean(librosa.feature.spectral_rolloff(y=y, sr=sr))
+    spectral_bandwidth = np.mean(librosa.feature.spectral_bandwidth(y=y, sr=sr))
+    
+    # Chroma
+    chroma = np.mean(librosa.feature.chroma_stft(y=y, sr=sr), axis=1)
+    
+    # Combinar features
+    features = np.concatenate([
+        mfcc_mean, mfcc_std,
+        [zcr, spectral_centroid, spectral_rolloff, spectral_bandwidth],
+        chroma
+    ])
+    
+    return features
+
+# Ejemplo de uso
+features = extract_features("data/audio/sample.wav")
+print(f"Vector de features shape: {features.shape}")
+print(f"Total features: {len(features)}")
+```
+
+**Output típico:** 
+- 13 MFCCs (media) + 13 MFCCs (std) + 4 spectral + 12 chroma = **42 features**
+
+### 10. Ejemplo: Clasificación de Género Musical
+
+```python
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+
+# Cargar datos (suponiendo estructura: data/genre/audio_files/)
+def load_dataset(data_dir):
+    features_list = []
+    labels_list = []
+    
+    for genre in os.listdir(data_dir):
+        genre_path = os.path.join(data_dir, genre)
+        if not os.path.isdir(genre_path):
+            continue
+            
+        for file in os.listdir(genre_path):
+            if file.endswith('.wav'):
+                file_path = os.path.join(genre_path, file)
+                try:
+                    features = extract_features(file_path)
+                    features_list.append(features)
+                    labels_list.append(genre)
+                except Exception as e:
+                    print(f"Error procesando {file}: {e}")
+    
+    return np.array(features_list), np.array(labels_list)
+
+# Cargar y preparar datos
+X, y = load_dataset("data/genres")
+
+# Split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Normalizar
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Entrenar modelo
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train_scaled, y_train)
+
+# Evaluar
+y_pred = clf.predict(X_test_scaled)
+print("Accuracy:", clf.score(X_test_scaled, y_test))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+```
+
+### 11. Procesamiento Avanzado
+
+#### 11.1 Beat Tracking
+
+```python
+# Detección de tempo y beats
+tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+beat_times = librosa.frames_to_time(beats, sr=sr)
+
+print(f"Tempo estimado: {tempo:.2f} BPM")
+print(f"Número de beats: {len(beats)}")
+
+# Visualizar beats en waveform
+plt.figure(figsize=(14, 5))
+librosa.display.waveshow(y, sr=sr, alpha=0.6)
+plt.vlines(beat_times, -1, 1, color='r', alpha=0.6, linestyle='--', label='Beats')
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Amplitud')
+plt.title(f'Detección de Beats - Tempo: {tempo:.1f} BPM')
+plt.legend()
+plt.tight_layout()
+```
+
+#### 11.2 Pitch Tracking
+
+```python
+# Estimación de pitch (frecuencia fundamental)
+pitches, magnitudes = librosa.piptrack(y=y, sr=sr)
+
+# Extraer pitch dominante por frame
+pitch_track = []
+for t in range(pitches.shape[1]):
+    index = magnitudes[:, t].argmax()
+    pitch = pitches[index, t]
+    pitch_track.append(pitch if pitch > 0 else np.nan)
+
+# Visualizar
+times = librosa.times_like(pitches)
+plt.figure(figsize=(14, 5))
+plt.plot(times, pitch_track)
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Frecuencia (Hz)')
+plt.title('Pitch Tracking')
+plt.ylim(0, 500)
+plt.tight_layout()
+```
+
+## Análisis Crítico y Decisiones
+
+### Elección de Sampling Rate
+
+**Regla general:**
+- **8000 Hz**: Telefonía, voz de baja calidad
+- **16000 Hz**: Reconocimiento de voz
+- **22050 Hz**: Análisis general (por defecto en librosa)
+- **44100 Hz**: Audio CD, música de alta calidad
+- **48000 Hz**: Audio profesional, video
+
+**Decisión:** 
+- Para **clasificación de voz**: 16000 Hz es suficiente
+- Para **música**: 22050-44100 Hz
+- **Mayor sr** = más datos, mayor costo computacional
+
+### MFCCs vs Espectrograma Raw
+
+| Característica | MFCCs | Espectrograma |
+|----------------|-------|---------------|
+| Dimensionalidad | Baja (13-20) | Alta (128+ bins) |
+| Interpretabilidad | Baja | Media |
+| Performance ML | Excelente | Bueno |
+| Uso común | Clasificación | Deep Learning |
+
+**Decisión:**
+- **MFCCs** para modelos tradicionales (RF, SVM)
+- **Espectrograma** como input para CNNs
+
+### Normalización de Features
+
+**Crítico:** Las features de audio tienen escalas muy diferentes (ej: ZCR ~0.1, spectral centroid ~2000).
+
+**Solución:** Siempre aplicar `StandardScaler` antes de entrenar modelos.
+
+## Conclusiones
+
+El procesamiento de audio con librosa permite:
+
+1. **Cargar y manipular** señales de audio en diversos formatos
+2. **Visualizar** tanto en dominio temporal como frecuencial
+3. **Extraer características robustas** (MFCCs, spectral features) para ML
+4. **Implementar pipelines completos** de clasificación
+5. **Analizar patrones musicales** (tempo, pitch, armonía)
+
+**Aplicaciones prácticas:**
+- Reconocimiento automático de voz (ASR)
+- Clasificación de género musical
+- Detección de emociones por voz
+- Identificación de hablantes
+### 9. Pipeline de Extracción para ML
+
+```python
+def extract_features(file_path):
+    """
+    Extrae features completos de un archivo de audio.
+    Retorna un vector de características listo para ML.
+    """
+    # Cargar audio
+    y, sr = librosa.load(file_path, sr=22050, duration=30)
+    
+    # MFCCs
+    mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+    mfcc_mean = np.mean(mfccs, axis=1)
+    mfcc_std = np.std(mfccs, axis=1)
+    
+    # Spectral features
+    zcr = np.mean(librosa.feature.zero_crossing_rate(y))
+    spectral_centroid = np.mean(librosa.feature.spectral_centroid(y=y, sr=sr))
+    spectral_rolloff = np.mean(librosa.feature.spectral_rolloff(y=y, sr=sr))
+    spectral_bandwidth = np.mean(librosa.feature.spectral_bandwidth(y=y, sr=sr))
+    
+    # Chroma
+    chroma = np.mean(librosa.feature.chroma_stft(y=y, sr=sr), axis=1)
+    
+    # Combinar features
+    features = np.concatenate([
+        mfcc_mean, mfcc_std,
+        [zcr, spectral_centroid, spectral_rolloff, spectral_bandwidth],
+        chroma
+    ])
+    
+    return features
+
+# Ejemplo de uso
+features = extract_features("data/audio/sample.wav")
+print(f"Vector de features shape: {features.shape}")
+print(f"Total features: {len(features)}")
+```
+
+**Output típico:** 
+- 13 MFCCs (media) + 13 MFCCs (std) + 4 spectral + 12 chroma = **42 features**
+
+### 10. Ejemplo: Clasificación de Género Musical
+
+```python
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+
+# Cargar datos (suponiendo estructura: data/genre/audio_files/)
+def load_dataset(data_dir):
+    features_list = []
+    labels_list = []
+    
+    for genre in os.listdir(data_dir):
+        genre_path = os.path.join(data_dir, genre)
+        if not os.path.isdir(genre_path):
+            continue
+            
+        for file in os.listdir(genre_path):
+            if file.endswith('.wav'):
+                file_path = os.path.join(genre_path, file)
+                try:
+                    features = extract_features(file_path)
+                    features_list.append(features)
+                    labels_list.append(genre)
+                except Exception as e:
+                    print(f"Error procesando {file}: {e}")
+    
+    return np.array(features_list), np.array(labels_list)
+
+# Cargar y preparar datos
+X, y = load_dataset("data/genres")
+
+# Split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Normalizar
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Entrenar modelo
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+clf.fit(X_train_scaled, y_train)
+
+# Evaluar
+y_pred = clf.predict(X_test_scaled)
+print("Accuracy:", clf.score(X_test_scaled, y_test))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+```
+
+### 11. Procesamiento Avanzado
+
+#### 11.1 Beat Tracking
+
+```python
+# Detección de tempo y beats
+tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+beat_times = librosa.frames_to_time(beats, sr=sr)
+
+print(f"Tempo estimado: {tempo:.2f} BPM")
+print(f"Número de beats: {len(beats)}")
+
+# Visualizar beats en waveform
+plt.figure(figsize=(14, 5))
+librosa.display.waveshow(y, sr=sr, alpha=0.6)
+plt.vlines(beat_times, -1, 1, color='r', alpha=0.6, linestyle='--', label='Beats')
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Amplitud')
+plt.title(f'Detección de Beats - Tempo: {tempo:.1f} BPM')
+plt.legend()
+plt.tight_layout()
+```
+
+#### 11.2 Pitch Tracking
+
+```python
+# Estimación de pitch (frecuencia fundamental)
+pitches, magnitudes = librosa.piptrack(y=y, sr=sr)
+
+# Extraer pitch dominante por frame
+pitch_track = []
+for t in range(pitches.shape[1]):
+    index = magnitudes[:, t].argmax()
+    pitch = pitches[index, t]
+    pitch_track.append(pitch if pitch > 0 else np.nan)
+
+# Visualizar
+times = librosa.times_like(pitches)
+plt.figure(figsize=(14, 5))
+plt.plot(times, pitch_track)
+plt.xlabel('Tiempo (s)')
+plt.ylabel('Frecuencia (Hz)')
+plt.title('Pitch Tracking')
+plt.ylim(0, 500)
+plt.tight_layout()
+```
+
+## Análisis Crítico y Decisiones
+
+### Elección de Sampling Rate
+
+**Regla general:**
+- **8000 Hz**: Telefonía, voz de baja calidad
+- **16000 Hz**: Reconocimiento de voz
+- **22050 Hz**: Análisis general (por defecto en librosa)
+- **44100 Hz**: Audio CD, música de alta calidad
+- **48000 Hz**: Audio profesional, video
+
+**Decisión:** 
+- Para **clasificación de voz**: 16000 Hz es suficiente
+- Para **música**: 22050-44100 Hz
+- **Mayor sr** = más datos, mayor costo computacional
+
+### MFCCs vs Espectrograma Raw
+
+| Característica | MFCCs | Espectrograma |
+|----------------|-------|---------------|
+| Dimensionalidad | Baja (13-20) | Alta (128+ bins) |
+| Interpretabilidad | Baja | Media |
+| Performance ML | Excelente | Bueno |
+| Uso común | Clasificación | Deep Learning |
+
+**Decisión:**
+- **MFCCs** para modelos tradicionales (RF, SVM)
+- **Espectrograma** como input para CNNs
+
+### Normalización de Features
+
+**Crítico:** Las features de audio tienen escalas muy diferentes (ej: ZCR ~0.1, spectral centroid ~2000).
+
+**Solución:** Siempre aplicar `StandardScaler` antes de entrenar modelos.
+
+## Conclusiones
+
+El procesamiento de audio con librosa permite:
+
+1. **Cargar y manipular** señales de audio en diversos formatos
+2. **Visualizar** tanto en dominio temporal como frecuencial
+3. **Extraer características robustas** (MFCCs, spectral features) para ML
+4. **Implementar pipelines completos** de clasificación
+5. **Analizar patrones musicales** (tempo, pitch, armonía)
+
+**Aplicaciones prácticas:**
+- Reconocimiento automático de voz (ASR)
+- Clasificación de género musical
+- Detección de emociones por voz
+- Identificación de hablantes
+- Análisis de sentimientos en call centers
+- Sistemas de recomendación musical
+- Detección de anomalías en audio industrial
+
+**Pipeline típico ML:**
+1. Carga de- **Pipeline:** Preprocesamiento → Extracción de Features → Modelo ML → Predicción
+
+## Extra: Data Augmentation para Audio
+
+En Deep Learning para audio, a menudo tenemos datasets pequeños. **Data Augmentation** es una técnica crítica para aumentar artificialmente el tamaño del dataset y mejorar la robustez del modelo, generando nuevas muestras a partir de las existentes.
+
+### Técnicas Comunes
+
+1. **Time Stretching:** Cambiar la velocidad sin cambiar el tono.
+2. **Pitch Shifting:** Cambiar el tono sin cambiar la duración.
+3. **Añadir Ruido:** Inyectar ruido blanco o de fondo.
+
+### Implementación con Librosa
+
+```python
+import librosa
+import numpy as np
+
+# Cargar audio
+y, sr = librosa.load('audio.wav')
+
+# 1. Time Stretch (más rápido)
+# rate > 1: más rápido, rate < 1: más lento
+y_fast = librosa.effects.time_stretch(y, rate=1.5)
+
+# 2. Pitch Shift (más agudo)
+# n_steps: número de semitonos (positivo = más agudo)
+y_high = librosa.effects.pitch_shift(y, sr=sr, n_steps=4)
+
+# 3. Añadir Ruido Blanco
+noise = np.random.normal(0, 0.005, len(y))
+y_noise = y + noise
+```
+
+![Data Augmentation](/images/practica14/audio_augmentation_extra.png)
+
+**Pie de figura:** Comparación de espectrogramas.
+- **Original:** Señal "chirp" que sube de frecuencia.
+- **Time Stretch:** La señal dura menos tiempo, pero las frecuencias se mantienen.
+- **Pitch Shift:** La duración es igual, pero toda la señal se desplaza hacia arriba en frecuencia.
+
+Estas transformaciones permiten que el modelo aprenda que una palabra dicha rápido o lento, o por una voz grave o aguda, sigue siendo la misma palabra.
+
+**Recursos adicionales:**
+- Dataset GTZAN (clasificación de géneros)
+- LibriSpeech (reconocimiento de voz)
+- ESC-50 (clasificación de sonidos ambientales)
+
+## Conclusión
+
+El procesamiento de audio con librerías como Librosa permite extraer características temporales y espectrales fundamentales para análisis de señales sonoras. Las transformadas de Fourier (FFT, STFT) revelan la composición frecuencial del audio, mientras que los espectrogramas y mel-espectrogramas proporcionan representaciones visuales útiles para machine learning. Los MFCCs (Mel-Frequency Cepstral Coefficients) son features robustas ampliamente utilizadas en reconocimiento de voz y clasificación de audio, capturando información espectral compacta y discriminativa. Las técnicas de aumento de datos (pitch shifting, time stretching, adición de ruido) mejoran significativamente la generalización de modelos de audio al simular variaciones naturales en las señales.
+
+**Próximos pasos:** Implementar clasificación de audio con redes neuronales convolucionales (CNNs) sobre espectrogramas para aprovechar patrones espaciales. Explorar arquitecturas especializadas como WaveNet o Tacotron para síntesis de voz de alta calidad. Aplicar técnicas de separación de fuentes (source separation) para aislar instrumentos o voces en mezclas de audio complejas. Investigar modelos de atención (attention mechanisms) y transformers para tareas de speech-to-text y audio captioning. Desarrollar sistemas de detección de eventos sonoros para aplicaciones de monitoreo ambiental, seguridad o análisis de salud mediante sonidos corporales.
+
+---

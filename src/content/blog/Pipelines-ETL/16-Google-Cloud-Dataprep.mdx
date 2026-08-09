@@ -1,0 +1,63 @@
+---
+title: "Práctica 16: Creating a Data Transformation Pipeline with Cloud Dataprep"
+description: "Uso de Cloud Dataprep de Alteryx para explorar, limpiar y preparar datos de comercio electrónico para su análisis en BigQuery."
+---
+
+## Objetivos de la Práctica
+
+En esta práctica, utilizamos **Cloud Dataprep by Alteryx**, un servicio inteligente de datos para explorar, limpiar y preparar datos estructurados y no estructurados visualmente. El objetivo es construir un pipeline de transformación de datos que tome datos crudos de comercio electrónico y los prepare para el análisis.
+
+Los objetivos específicos fueron:
+1.  Conectar datasets de BigQuery a Dataprep.
+2.  Explorar la calidad del dataset con Dataprep.
+3.  Crear un pipeline de transformación de datos.
+4.  Ejecutar jobs de transformación y enviar los resultados a BigQuery.
+
+## Desarrollo
+
+### 1. Configuración Inicial y BigQuery
+
+Primero, accedimos a **Cloud Dataprep** desde la consola de Google Cloud, aceptando los términos de servicio necesarios.
+
+Aunque el foco es Dataprep, necesitamos **BigQuery** como punto de entrada y salida. Creamos un dataset llamado `ecommerce` en BigQuery y ejecutamos una query SQL para copiar un subconjunto de datos públicos (`all_sessions_raw_dataprep`) a nuestro dataset para su limpieza.
+
+### 2. Conexión de Datos a Dataprep
+
+Creamos un nuevo "Flow" en Dataprep llamado `Ecommerce Analytics Pipeline`. Importamos el dataset `all_sessions_raw_dataprep` desde BigQuery y lo añadimos al flujo. Esto permitió que Dataprep accediera a los datos para su procesamiento.
+
+### 3. Exploración de Datos
+
+Dataprep cargó una muestra del dataset en la vista "Transformer". Realizamos una exploración visual respondiendo preguntas clave sobre los datos:
+-   Identificamos columnas con valores nulos (ej. `itemQuantity`, `itemRevenue`).
+-   Detectamos tipos de datos inferidos incorrectamente (ej. `productSKU` detectado como entero cuando debería ser string).
+-   Analizamos la distribución de valores (ej. `sessionQualityDim` sesgado a valores bajos).
+-   Identificamos valores atípicos y patrones en los datos.
+
+### 4. Limpieza de Datos
+
+Implementamos varios pasos de limpieza en nuestra "Recipe":
+1.  **Conversión de Tipos**: Corregimos la columna `productSKU` a tipo String.
+2.  **Eliminación de Columnas**: Borramos `itemQuantity` e `itemRevenue` ya que solo contenían valores nulos.
+3.  **Deduplicación**: Eliminamos filas duplicadas para asegurar la integridad de los datos.
+4.  **Filtrado**:
+    -   Filtramos sesiones sin ingresos (`totalTransactionRevenue` es NULL).
+    -   Filtramos para mantener solo registros de tipo `PAGE` (vistas de página) para evitar conteos dobles.
+
+### 5. Enriquecimiento de Datos
+
+Mejoramos el dataset con nuevas columnas y transformaciones:
+1.  **ID Único de Sesión**: Como `visitId` no es único entre usuarios, creamos `unique_session_id` concatenando `fullVisitorId` y `visitId`.
+2.  **Mapeo de Acciones**: La columna `eCommerceAction_type` usaba códigos numéricos. Creamos una columna calculada `eCommerceAction_label` usando un `CASE` statement para mapear estos números a descripciones legibles (ej. 6 = 'Completed purchase').
+3.  **Ajuste de Ingresos**: La columna `totalTransactionRevenue` estaba multiplicada por 10^6. Creamos una nueva columna `totalTransactionRevenue1` dividiendo el valor original por 1,000,000 para obtener el valor real.
+
+### 6. Ejecución del Job a BigQuery
+
+Finalmente, configuramos la salida del pipeline para escribir en una nueva tabla de BigQuery llamada `revenue_reporting`. Ejecutamos el job en el entorno **Dataflow + BigQuery**.
+
+Una vez finalizado, verificamos en BigQuery que la tabla `revenue_reporting` se creó correctamente con los datos limpios y transformados.
+
+## Conclusión
+
+Hemos creado exitosamente un pipeline ETL completo utilizando una interfaz visual, sin necesidad de escribir código complejo de procesamiento. Cloud Dataprep facilitó la identificación de problemas de calidad de datos y la aplicación de transformaciones, permitiendo obtener un dataset limpio y enriquecido listo para el análisis en BigQuery.
+
+**Próximos pasos:** Explorar la automatización del pipeline mediante Cloud Scheduler para ejecuciones periódicas. Investigar la integración de funciones avanzadas de limpieza utilizando expresiones regulares personalizadas en Dataprep. Conectar el dataset resultante en BigQuery con herramientas de visualización como Looker Studio para crear dashboards de monitoreo de ingresos. Evaluar el costo del procesamiento en Dataflow para optimizar el uso de recursos en datasets de mayor volumen.

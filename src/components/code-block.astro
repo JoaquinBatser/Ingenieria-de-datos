@@ -1,0 +1,71 @@
+---
+import { CloneFilledIcon, CloneIcon } from "@/components/icons"
+import { Button } from "@/components/ui/button"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemHeader,
+  ItemTitle,
+} from "@/components/ui/item"
+
+const { className, class: classAttribute, ...preProps } = Astro.props
+const preClassName = className ?? classAttribute
+---
+
+<Item
+  variant="outline"
+  className="not-typeset block overflow-hidden bg-muted/50 p-0"
+  data-code-block
+>
+  <ItemHeader className="border-b bg-muted px-4 py-2">
+    <ItemTitle className="font-mono text-xs text-muted-foreground">
+      Python
+    </ItemTitle>
+    <ItemActions>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-xs"
+        aria-label="Copiar código"
+        data-copy-code
+      >
+        <CloneIcon data-icon="inline-start" data-copy-icon />
+        <CloneFilledIcon
+          data-icon="inline-start"
+          data-copy-success
+          className="hidden"
+        />
+      </Button>
+    </ItemActions>
+  </ItemHeader>
+  <ItemContent className="min-w-0 gap-0">
+    <pre {...preProps} class={preClassName}><slot /></pre>
+  </ItemContent>
+</Item>
+
+<script>
+  document.addEventListener("click", async (event) => {
+    if (!(event.target instanceof Element)) return
+
+    const button = event.target.closest<HTMLButtonElement>("[data-copy-code]")
+    if (!button) return
+
+    const block = button.closest<HTMLElement>("[data-code-block]")
+    const code = block?.querySelector("pre code")?.textContent
+    const copyIcon = button.querySelector("[data-copy-icon]")
+    const successIcon = button.querySelector("[data-copy-success]")
+    if (!code || !copyIcon || !successIcon) return
+
+    await navigator.clipboard.writeText(code)
+    copyIcon.classList.add("hidden")
+    successIcon.classList.remove("hidden")
+    button.setAttribute("aria-label", "Código copiado")
+
+    window.setTimeout(() => {
+      copyIcon.classList.remove("hidden")
+      successIcon.classList.add("hidden")
+      button.setAttribute("aria-label", "Copiar código")
+    }, 1500)
+  })
+</script>

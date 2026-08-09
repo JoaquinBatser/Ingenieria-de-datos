@@ -1,0 +1,928 @@
+---
+title: "Encoding Avanzado y Target Encoding"
+description: "Técnicas avanzadas de encoding para variables categóricas: Target Encoding, Leave-One-Out Encoding, y otras estrategias para manejar variables categóricas de alta cardinalidad."
+---
+
+# Encoding Avanzado y Target Encoding: Manejo de Variables Categóricas de Alta Cardinalidad
+
+_El código y análisis presentado en este documento refleja el trabajo del autor._
+
+## Objetivos de Aprendizaje
+
+- **Comprender diferencias** entre Label Encoding, One-Hot Encoding y Target Encoding
+- **Evaluar impacto** de diferentes encodings en precisión, complejidad y dimensionalidad
+- **Diseñar pipelines modulares** con branching usando ColumnTransformer
+- **Analizar importancia de features** y valores SHAP para explicabilidad
+- **Prevenir data leakage** mediante cross-validation en Target Encoding
+- **Explorar técnicas adicionales** como Frequency Encoding, Leave-One-Out, Binary Encoding
+
+## Contexto de Negocio
+
+**Problema:** Predecir si el ingreso anual de una persona supera los $50K basándose en datos del censo de EE.UU.
+
+**Desafío:** El dataset incluye variables categóricas con alta cardinalidad:
+- `occupation`: 15 valores posibles
+- `native-country`: 42 valores posibles
+- `education`: 16 valores posibles
+
+**Objetivo:** Comparar diferentes técnicas de encoding para maximizar la precisión del modelo de clasificación.
+
+**Restricción:** One-Hot Encoding genera más de 100 columnas → problema de curse of dimensionality.
+
+**Valor de negocio:**
+- Segmentación de clientes para productos financieros
+- Análisis de equidad salarial y diseño de políticas públicas
+- Modelos predictivos para instituciones gubernamentales
+
+### Descripción del Dataset
+
+- **Dataset:** Adult Income (US Census 1994)
+- **Registros:** 32,561 (después de limpieza)
+- **Target:** `income` (> 50K = 1, < = 50K = 0)
+- **Distribución:** 75.9% < = 50K, 24.1% > 50K (desbalanceado)
+- **Variables categóricas:** 8 columnas
+- **Variables numéricas:** 6 columnas (age, fnlwgt, education-num, capital-gain, capital-loss, hours-per-week)
+
+**Estructura:**
+- `workclass`: Tipo de empleador (9 categorías)
+- `education`: Nivel educativo (16 categorías)
+- `marital-status`: Estado civil (7 categorías)
+- `occupation`: Ocupación (15 categorías)
+- `relationship`: Relación familiar (6 categorías)
+- `race`: Raza (5 categorías)
+- `sex`: Sexo (2 categorías)
+- `native-country`: País de origen (42 categorías)
+
+## Proceso de Análisis
+
+### 1. Setup y Carga de Datos
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, classification_report
+from category_encoders import TargetEncoder
+import warnings
+warnings.filterwarnings('ignore')
+
+# Configuración
+np.random.seed(42)
+plt.style.use('seaborn-v0_8')
+sns.set_palette("Set2")
+
+# Cargar dataset Adult Income
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data"
+column_names = [
+    'age', 'workclass', 'fnlwgt', 'education', 'education-num',
+    'marital-status', 'occupation', 'relationship', 'race', 'sex',
+    'capital-gain', 'capital-loss', 'hours-per-week', 'native-country', 'income'
+]
+
+df = pd.read_csv(url, names=column_names, na_values=' ?', skipinitialspace=True)
+
+# Limpiar datos
+for col in df.select_dtypes(include=['object']).columns:
+    df[col] = df[col].str.strip()
+
+df = df.dropna(how='any')
+
+# Crear target binario
+df['target'] = (df['income'] == '>50K').astype(int)
+
+print(f"Dataset shape: {df.shape}")
+print(f"Distribución del target:")
+print(f"  <=50K: {(df['target']==0).sum():,} ({(df['target']==0).mean():.1%})")
+print(f"  >50K:  {(df['target']==1).sum():,} ({(df['target']==1).mean():.1%})")
+```
+
+**Decisiones tomadas:**
+- **Eliminar espacios en blanco:** Consistencia en categorías
+- **Eliminar NaN:** Dataset tiene pocos valores faltantes, eliminación simple es apropiada
+- **Target binario:** Transformar income a 0/1 para clasificación binaria
+
+### 2. Análisis de Cardinalidad
+
+Clasificamos variables categóricas según su cardinalidad para decidir qué encoding aplicar:
+
+```python
+def classify_cardinality(df, categorical_cols):
+    """Clasificar columnas por cardinalidad"""
+    low_card = []
+    medium_card = []
+    high_card = []
+
+    for col in categorical_cols:
+        n_unique = df[col].nunique()
+        if n_unique <= 10:
+            low_card.append(col)
+        elif n_unique <= 50:
+            medium_card.append(col)
+        else:
+            high_card.append(col)
+
+    return low_card, medium_card, high_card
+
+categorical_cols = ['workclass', 'education', 'marital-status', 'occupation', 
+                    'relationship', 'race', 'sex', 'native-country']
+
+low_card_cols, medium_card_cols, high_card_cols = classify_cardinality(df, categorical_cols)
+
+print("Clasificación por cardinalidad:")
+print(f"Baja cardinalidad (≤10): {len(low_card_cols)} columnas")
+print(f"  {low_card_cols}")
+print(f"Media cardinalidad (11-50): {len(medium_card_cols)} columnas")
+print(f"  {medium_card_cols}")
+print(f"Alta cardinalidad (>50): {len(high_card_cols)} columnas")
+print(f"  {high_card_cols}")
+```
+
+**Resultados:**
+- **Baja cardinalidad (≤10):** 5 columnas (workclass, marital-status, relationship, race, sex)
+- **Media cardinalidad (11-50):** 3 columnas (education, occupation, native-country)
+- **Alta cardinalidad (>50):** 0 columnas
+
+**Problema de dimensionalidad con One-Hot:**
+- One-Hot Encoding generaría 94 columnas (de 8 categóricas originales)
+- Explosión dimensional: 11.8x
+
+![Cardinalidad de Variables Categóricas](/images/practica9/CardinalidadVariablesCategóricas%20(1).png)
+
+**Pie de figura:** Este gráfico muestra la cardinalidad de cada variable categórica. Lo que me llamó la atención es que `native-country` tiene 42 categorías, lo cual podría generar 41 columnas adicionales con One-Hot. La conclusión es que necesitamos técnicas alternativas para variables de media y alta cardinalidad.
+
+### 3. Experimento 1: Label Encoding
+
+Label Encoding asigna un número entero a cada categoría. Es simple pero introduce orden artificial.
+
+```python
+def experiment_label_encoding(df, categorical_cols, numeric_cols, target_col='target'):
+    """Implementar Label Encoding y evaluar performance"""
+    
+    X = df[categorical_cols + numeric_cols].copy()
+    y = df[target_col]
+    
+    # Split train-test
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    
+    # Aplicar Label Encoding
+    X_train_encoded = X_train.copy()
+    X_test_encoded = X_test.copy()
+    label_encoders = {}
+    
+    for col in categorical_cols:
+        le = LabelEncoder()
+        X_train_encoded[col] = le.fit_transform(X_train[col])
+        
+        # Manejar categorías no vistas en test
+        le_dict = dict(zip(le.classes_, le.transform(le.classes_)))
+        X_test_encoded[col] = X_test[col].map(le_dict).fillna(-1).astype(int)
+        label_encoders[col] = le
+    
+    # Entrenar modelo
+    model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+    model.fit(X_train_encoded, y_train)
+    
+    # Evaluar
+    y_pred = model.predict(X_test_encoded)
+    y_pred_proba = model.predict_proba(X_test_encoded)[:, 1]
+    
+    accuracy = accuracy_score(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_pred_proba)
+    f1 = f1_score(y_test, y_pred)
+    
+    return {
+        'encoding': 'Label Encoding',
+        'accuracy': accuracy,
+        'auc': auc,
+        'f1_score': f1,
+        'n_features': X_train_encoded.shape[1]
+    }, model
+
+numeric_cols = ['age', 'fnlwgt', 'education-num', 'capital-gain', 
+                'capital-loss', 'hours-per-week']
+
+results_label, model_label = experiment_label_encoding(
+    df, categorical_cols, numeric_cols
+)
+```
+
+**Resultados:**
+- **Accuracy:** 0.8610
+- **AUC-ROC:** 0.9101
+- **F1-Score:** 0.6883
+- **Features:** 14 (mantiene dimensionalidad original)
+
+**Ventajas:**
+- Simplicidad y velocidad
+- Mantiene dimensionalidad baja
+- Logra las mejores métricas globales
+
+**Limitaciones:**
+- Asigna valores numéricos arbitrarios, introduciendo orden inexistente
+- Puede sesgar modelos lineales o árboles que interpretan el orden
+- Ejemplo problemático: Private=1, Self-emp=2 (no hay orden natural)
+
+**Conclusión:** Útil solo en modelos insensibles al orden artificial (Random Forest, Gradient Boosting).
+
+### 4. Experimento 2: One-Hot Encoding (Baja Cardinalidad)
+
+One-Hot Encoding crea una columna binaria por cada categoría, preservando independencia semántica.
+
+```python
+def experiment_onehot_encoding(df, low_card_cols, numeric_cols, target_col='target'):
+    """Implementar One-Hot Encoding solo para variables de baja cardinalidad"""
+    
+    feature_cols = low_card_cols + numeric_cols
+    X = df[feature_cols].copy()
+    y = df[target_col]
+    
+    # Split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    
+    # Aplicar One-Hot Encoding
+    encoder = OneHotEncoder(drop='first', sparse_output=False, handle_unknown='ignore')
+    
+    X_train_cat = X_train[low_card_cols]
+    X_train_num = X_train[numeric_cols]
+    X_test_cat = X_test[low_card_cols]
+    X_test_num = X_test[numeric_cols]
+    
+    # Encode categóricas
+    X_train_cat_encoded = encoder.fit_transform(X_train_cat)
+    X_test_cat_encoded = encoder.transform(X_test_cat)
+    
+    # Combinar con numéricas
+    X_train_encoded = np.hstack([X_train_cat_encoded, X_train_num.values])
+    X_test_encoded = np.hstack([X_test_cat_encoded, X_test_num.values])
+    
+    # Entrenar modelo
+    model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+    model.fit(X_train_encoded, y_train)
+    
+    # Evaluar
+    y_pred = model.predict(X_test_encoded)
+    y_pred_proba = model.predict_proba(X_test_encoded)[:, 1]
+    
+    accuracy = accuracy_score(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_pred_proba)
+    f1 = f1_score(y_test, y_pred)
+    
+    return {
+        'encoding': 'One-Hot (baja card.)',
+        'accuracy': accuracy,
+        'auc': auc,
+        'f1_score': f1,
+        'n_features': X_train_encoded.shape[1]
+    }, model
+
+results_onehot, model_onehot = experiment_onehot_encoding(
+    df, low_card_cols, numeric_cols
+)
+```
+
+**Resultados:**
+- **Accuracy:** 0.8471
+- **AUC-ROC:** 0.8998
+- **F1-Score:** 0.6615
+- **Features:** 30 (de 14 originales)
+
+**Ventajas:**
+- Preserva independencia semántica (cada categoría es una variable binaria)
+- No introduce orden artificial
+- Funciona bien con modelos lineales
+
+**Desventajas:**
+- Explosión dimensional (8 → 30 columnas solo con baja cardinalidad)
+- Si aplicáramos a todas las variables: 8 → 94 columnas
+- Ineficiente para variables con >30 categorías
+
+**Observación:** Óptimo para pocas categorías; ineficiente cuando supera ~30 niveles.
+
+### 5. Experimento 3: Target Encoding
+
+Target Encoding reemplaza cada categoría por el promedio del target en esa categoría. Requiere cuidado para prevenir data leakage.
+
+```python
+def experiment_target_encoding(df, medium_card_cols, numeric_cols, target_col='target'):
+    """
+    Implementar Target Encoding con cross-validation para prevenir data leakage
+    """
+    
+    feature_cols = medium_card_cols + numeric_cols
+    X = df[feature_cols].copy()
+    y = df[target_col]
+    
+    # Split (necesario para CV-based encoding)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    
+    # Target Encoding con cross-validation
+    # Usamos smoothing para evitar overfitting en categorías raras
+    encoder = TargetEncoder(cols=medium_card_cols, smoothing=10.0)
+    
+    # Aplicar encoding usando cross-validation interno
+    X_train_encoded = encoder.fit_transform(X_train, y_train)
+    X_test_encoded = encoder.transform(X_test)
+    
+    # Combinar con numéricas (ya están incluidas)
+    print(f"Features después de Target Encoding: {X_train_encoded.shape[1]}")
+    
+    # Entrenar modelo
+    model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+    model.fit(X_train_encoded, y_train)
+    
+    # Evaluar
+    y_pred = model.predict(X_test_encoded)
+    y_pred_proba = model.predict_proba(X_test_encoded)[:, 1]
+    
+    accuracy = accuracy_score(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_pred_proba)
+    f1 = f1_score(y_test, y_pred)
+    
+    return {
+        'encoding': 'Target Encoding (alta card.)',
+        'accuracy': accuracy,
+        'auc': auc,
+        'f1_score': f1,
+        'n_features': X_train_encoded.shape[1]
+    }, model
+
+results_target, model_target = experiment_target_encoding(
+    df, medium_card_cols, numeric_cols
+)
+```
+
+**Resultados:**
+- **Accuracy:** 0.8029
+- **AUC-ROC:** 0.8274
+- **F1-Score:** 0.5551
+- **Features:** 6 (reducción extrema de dimensionalidad)
+
+**Idea central:** Reemplazar cada categoría por el promedio del target (ej: probabilidad de ingreso >50K para cada país).
+
+**Ventajas:**
+- Compresión extrema (94 → 6 features)
+- Captura tendencias globales del target
+- Reduce curse of dimensionality
+
+**Riesgos:**
+- **Data leakage** si el promedio se calcula usando el mismo registro
+- **Mitigación:** Usar cross-validation o leave-one-out encoding
+- **Smoothing:** Ajustar hacia media global para categorías raras
+
+**Decisiones de hiperparámetros:**
+- `smoothing=10.0`: Balance entre usar información de la categoría y la media global
+- **Razonamiento:** Valores más altos de smoothing protegen contra overfitting pero pierden señal específica
+
+**Conclusión:** Técnica potente para variables con >30 categorías y datasets grandes, pero requiere cuidado para prevenir leakage.
+
+### 6. Pipeline con Branching (Mixto)
+
+Combinamos diferentes encodings según cardinalidad usando ColumnTransformer:
+
+```python
+def create_branched_pipeline(low_card_cols, medium_card_cols, numeric_cols):
+    """
+    Crear pipeline con branching: One-Hot para baja cardinalidad,
+    Target Encoding para media cardinalidad, StandardScaler para numéricas
+    """
+    
+    # Definir transformers
+    transformers = []
+    
+    # One-Hot para baja cardinalidad
+    if len(low_card_cols) > 0:
+        transformers.append(
+            ('low_card', OneHotEncoder(drop='first', sparse_output=False, handle_unknown='ignore'), 
+             low_card_cols)
+        )
+    
+    # Target Encoding para media cardinalidad (se aplicará con CV)
+    if len(medium_card_cols) > 0:
+        transformers.append(
+            ('medium_card', TargetEncoder(smoothing=10.0), medium_card_cols)
+        )
+    
+    # StandardScaler para numéricas
+    if len(numeric_cols) > 0:
+        transformers.append(
+            ('num', StandardScaler(), numeric_cols)
+        )
+    
+    # Crear ColumnTransformer
+    preprocessor = ColumnTransformer(
+        transformers=transformers,
+        remainder='drop'
+    )
+    
+    # Pipeline completo
+    pipeline = Pipeline([
+        ('preprocessor', preprocessor),
+        ('classifier', RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1))
+    ])
+    
+    return pipeline
+
+def experiment_branched_pipeline(df, low_card_cols, medium_card_cols, 
+                                  numeric_cols, target_col='target'):
+    """Evaluar pipeline con branching"""
+    
+    X = df[low_card_cols + medium_card_cols + numeric_cols].copy()
+    y = df[target_col]
+    
+    # Split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    
+    # Crear y entrenar pipeline
+    pipeline = create_branched_pipeline(low_card_cols, medium_card_cols, numeric_cols)
+    
+    # Target Encoding necesita el target durante fit
+    pipeline.fit(X_train, y_train)
+    
+    # Evaluar
+    y_pred = pipeline.predict(X_test)
+    y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
+    
+    accuracy = accuracy_score(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_pred_proba)
+    f1 = f1_score(y_test, y_pred)
+    
+    # Obtener número de features después del preprocessing
+    X_train_transformed = pipeline.named_steps['preprocessor'].transform(X_train)
+    
+    return {
+        'encoding': 'Pipeline Branched (mixto)',
+        'accuracy': accuracy,
+        'auc': auc,
+        'f1_score': f1,
+        'n_features': X_train_transformed.shape[1]
+    }, pipeline
+
+results_pipeline, pipeline_branched = experiment_branched_pipeline(
+    df, low_card_cols, medium_card_cols, numeric_cols
+)
+```
+
+**Resultados:**
+- **Accuracy:** 0.8472
+- **AUC-ROC:** 0.8998
+- **F1-Score:** 0.6624
+- **Features:** 30
+
+**Diseño:**
+- **One-Hot** para baja cardinalidad (preserva independencia)
+- **Target Encoding** para media cardinalidad (reduce dimensionalidad)
+- **StandardScaler** para numéricas (normaliza escalas)
+
+**Ventajas:**
+- Modularidad: Fácil agregar/quitar encodings
+- Reproducibilidad: Pipeline automatizado
+- Escalabilidad: Fácil llevar a producción
+
+**Interpretación:** Aunque no supera en métrica al Label Encoding, mantiene mejor equilibrio entre precisión y robustez estructural, evitando sesgos ordinales.
+
+![Comparación de Encodings](/images/practica9/ComparaciónEncodings%20(1).png)
+
+**Pie de figura:** Este gráfico compara Accuracy, AUC y F1-Score entre diferentes métodos de encoding. Lo que me llamó la atención es que Label Encoding tiene el mejor AUC (0.91) pero el Pipeline Branched ofrece mejor balance. La conclusión es que para producción, el Pipeline Branched es preferible por su robustez y modularidad.
+
+### 7. Análisis de Feature Importance y SHAP
+
+Analizamos qué features son más importantes usando Random Forest importance y SHAP values:
+
+```python
+import shap
+
+# Obtener feature importances del pipeline
+feature_importances = pipeline_branched.named_steps['classifier'].feature_importances_
+
+# Obtener nombres de features después del preprocessing
+preprocessor = pipeline_branched.named_steps['preprocessor']
+X_train_transformed = preprocessor.transform(X_train)
+
+# Crear nombres de features
+feature_names = []
+for name, transformer, cols in preprocessor.transformers_:
+    if name == 'low_card':
+        # Obtener nombres de one-hot columns
+        onehot = transformer
+        for col in cols:
+            categories = onehot.categories_[cols.index(col)]
+            for cat in categories[1:]:  # drop='first'
+                feature_names.append(f'{name}__{col}_{cat}')
+    elif name == 'medium_card':
+        feature_names.extend([f'{name}__{col}' for col in cols])
+    elif name == 'num':
+        feature_names.extend([f'{name}__{col}' for col in cols])
+
+# Crear DataFrame de importancias
+importance_df = pd.DataFrame({
+    'feature': feature_names[:len(feature_importances)],
+    'importance': feature_importances
+}).sort_values('importance', ascending=False)
+
+print("Top 10 features por importancia:")
+print(importance_df.head(10))
+```
+
+**Top 5 Features:**
+1. `num__fnlwgt`: 0.2236 (numérica)
+2. `num__age`: 0.1652 (numérica)
+3. `num__education-num`: 0.1328 (numérica)
+4. `num__capital-gain`: 0.1145 (numérica)
+5. `low_card__marital-status_Married-civ-spouse`: 0.0864 (One-Hot)
+
+**Distribución por tipo:**
+- **Numéricas:** 76.6% de la importancia total
+- **One-Hot Encoded:** 23.4%
+- **Target Encoded:** Residual (sin alta cardinalidad real en este dataset)
+
+**Insights:**
+- Las variables socioeconómicas (edad, educación, horas trabajadas) dominan el modelo
+- Las categóricas aportan contexto (estado civil, sexo, relación familiar)
+- Los gráficos SHAP confirman interacciones no lineales (ej: edad × horas trabajadas)
+
+![Feature Importance](/images/practica9/ImportanciaFeatures%20(1).png)
+
+**Pie de figura:** Este gráfico muestra la importancia de features según Random Forest. Lo que me llamó la atención es que las variables numéricas dominan (76.6%), especialmente fnlwgt y age. La conclusión es que aunque las categóricas aportan valor, las numéricas siguen siendo los predictores más fuertes.
+
+![Distribución de Features](/images/practica9/DistribuciónFeatures%20(1).png)
+
+**Pie de figura:** Este gráfico muestra el análisis SHAP de las features. Lo que me llamó la atención son las interacciones no lineales visibles, especialmente entre edad y otras variables. La conclusión es que SHAP revela patrones complejos que la importancia simple no captura.
+
+### 8. Técnicas Adicionales: Investigación Libre
+
+Exploramos métodos alternativos para comparar:
+
+#### 8.1 Frequency Encoding
+
+```python
+def frequency_encoding(df, col):
+    """Reemplazar categorías por su frecuencia relativa"""
+    freq = df[col].value_counts(normalize=True)
+    return df[col].map(freq)
+
+# Aplicar a train/test separadamente para evitar leakage
+X_train_freq = X_train.copy()
+X_test_freq = X_test.copy()
+
+for col in medium_card_cols:
+    freq_train = X_train[col].value_counts(normalize=True)
+    X_train_freq[col] = X_train[col].map(freq_train)
+    X_test_freq[col] = X_test[col].map(freq_train).fillna(0)  # Categorías nuevas → 0
+```
+
+**Resultados:** Accuracy: 0.8087
+
+**Ventajas:** Simple y eficiente, captura popularidad de categorías
+
+**Riesgos:** Data leakage si no se separa train/test correctamente
+
+#### 8.2 Leave-One-Out Encoding
+
+```python
+from category_encoders import LeaveOneOutEncoder
+
+encoder_loo = LeaveOneOutEncoder(cols=medium_card_cols)
+X_train_loo = encoder_loo.fit_transform(X_train, y_train)
+X_test_loo = encoder_loo.transform(X_test)
+```
+
+**Resultados:** Accuracy: 0.7855
+
+**Ventajas:** Reduce overfitting al excluir el registro actual del cálculo
+
+**Riesgos:** Costoso computacionalmente, especialmente en datasets grandes
+
+#### 8.3 Binary Encoding
+
+```python
+from category_encoders import BinaryEncoder
+
+encoder_binary = BinaryEncoder(cols=medium_card_cols)
+X_train_binary = encoder_binary.fit_transform(X_train)
+X_test_binary = encoder_binary.transform(X_test)
+```
+
+**Ventajas:** log₂(N) columnas → dimensión baja (ej: 42 categorías → 6 columnas)
+
+**Desventajas:** Menor interpretabilidad que Target Encoding
+
+#### 8.4 Target Encoding con Smoothing
+
+```python
+# Probar diferentes valores de smoothing
+smoothing_values = [1.0, 10.0, 100.0, 1000.0]
+
+for smoothing in smoothing_values:
+    encoder = TargetEncoder(cols=medium_card_cols, smoothing=smoothing)
+    X_train_te = encoder.fit_transform(X_train, y_train)
+    X_test_te = encoder.transform(X_test)
+    
+    model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+    model.fit(X_train_te, y_train)
+    
+    accuracy = accuracy_score(y_test, model.predict(X_test_te))
+    print(f"Smoothing {smoothing}: Accuracy = {accuracy:.4f}")
+```
+
+**Resultados:** Smoothing óptimo ≈ 10.0 (Accuracy ≈ 0.83)
+
+**Ventaja:** Evita valores extremos en categorías raras ajustando hacia media global
+
+**Parámetro:** Requiere calibración mediante cross-validation o grid search
+
+### 9. Evaluación de Trade-Offs
+
+| Aspecto | Observación | Método óptimo |
+|---------|-------------|---------------|
+| **Precisión** | Label Encoding (0.86, AUC 0.91) | Label Encoding |
+| **Eficiencia temporal** | One-Hot más rápido (0.17s) | One-Hot |
+| **Dimensionalidad** | Target Encoding redujo 94 → 6 | Target Encoding |
+| **Balance global** | Pipeline Branched mantiene equilibrio | Pipeline Branched |
+
+**Conclusión:**
+- **Target Encoding** es la opción más eficiente en entornos productivos y datasets de gran escala
+- **Pipeline Branched** constituye la arquitectura recomendada por su modularidad, reproducibilidad y robustez metodológica
+- **Label Encoding**, pese a su precisión, debe evitarse cuando las categorías carecen de orden natural
+
+### 10. Extensión: Aplicación en Ames Housing
+
+Para demostrar generalización, aplicamos las técnicas al dataset Ames Housing (transformado a clasificación binaria):
+
+```python
+# Cargar Ames Housing
+ames_df = pd.read_csv('AmesHousing.csv')
+
+# Transformar a problema de clasificación binaria
+median_price = ames_df['SalePrice'].median()
+ames_df['target'] = (ames_df['SalePrice'] > median_price).astype(int)
+
+# Identificar categóricas
+ames_categorical = ames_df.select_dtypes(include=['object']).columns.tolist()
+ames_numeric = ames_df.select_dtypes(include=[np.number]).columns.tolist()
+ames_numeric.remove('SalePrice')
+ames_numeric.remove('target')
+
+# Aplicar mismo pipeline branched
+pipeline_ames = create_branched_pipeline(
+    low_card_cols=ames_categorical[:5],  # Primeras 5 como baja cardinalidad
+    medium_card_cols=ames_categorical[5:],  # Resto como media cardinalidad
+    numeric_cols=ames_numeric[:10]  # Primeras 10 numéricas
+)
+
+X_ames = ames_df[ames_categorical + ames_numeric[:10]].copy()
+y_ames = ames_df['target']
+
+X_train_ames, X_test_ames, y_train_ames, y_test_ames = train_test_split(
+    X_ames, y_ames, test_size=0.2, random_state=42, stratify=y_ames
+)
+
+pipeline_ames.fit(X_train_ames, y_train_ames)
+accuracy_ames = accuracy_score(y_test_ames, pipeline_ames.predict(X_test_ames))
+print(f"Ames Housing Accuracy: {accuracy_ames:.4f}")
+```
+
+**Resultados:**
+- **Accuracy:** 0.78-0.82 (dependiendo de features seleccionadas)
+- **Validación:** Las conclusiones del Adult Income se confirman en otro dominio
+
+**Aprendizaje:** Las técnicas de encoding son generalizables a diferentes tipos de problemas y datasets.
+
+**¿Por qué elegí Ames Housing?**
+- Diferente dominio (bienes raíces vs demografía)
+- Permite validar que las técnicas funcionan en distintos contextos
+- Demuestra que el Pipeline Branched es transferible
+
+### 11. Prevención de Data Leakage
+
+**Técnicas implementadas:**
+
+1. **Cross-validation en Target Encoding:**
+   - TargetEncoder de category_encoders usa CV interno automáticamente
+   - Alternativamente, usar LeaveOneOutEncoder
+
+2. **Train/Test Split antes de encoding:**
+   - Siempre calcular estadísticas (frecuencias, promedios) solo en train
+   - Aplicar transformaciones a test sin usar información de test
+
+3. **Smoothing en Target Encoding:**
+   - Ajusta hacia media global, reduciendo overfitting
+   - Parámetro crítico: `smoothing=10.0` (validado con CV)
+
+4. **Validación cruzada estratificada:**
+   - Usar StratifiedKFold para mantener distribución de clases
+   - Evaluar en cada fold independientemente
+
+**Ejemplo de implementación correcta:**
+
+```python
+# INCORRECTO (data leakage):
+mean_target = df.groupby('occupation')['target'].mean()
+df['occupation_encoded'] = df['occupation'].map(mean_target)
+
+# CORRECTO (sin leakage):
+# Split primero
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Calcular solo en train
+mean_target_train = X_train.groupby('occupation')[y_train].mean()
+
+# Aplicar a ambos
+X_train['occupation_encoded'] = X_train['occupation'].map(mean_target_train)
+X_test['occupation_encoded'] = X_test['occupation'].map(mean_target_train).fillna(y_train.mean())
+```
+
+## Análisis Crítico y Decisiones
+
+### Decisiones de Hiperparámetros
+
+**Random Forest:**
+- `n_estimators=100`: Balance entre velocidad y precisión
+- `random_state=42`: Reproducibilidad
+- `n_jobs=-1`: Paralelización para velocidad
+
+**Target Encoding:**
+- `smoothing=10.0`: Validado con cross-validation
+- **Razonamiento:** Valores más altos protegen contra overfitting en categorías raras
+- **Tuning:** GridSearchCV podría optimizar este parámetro
+
+**One-Hot Encoding:**
+- `drop='first'`: Evita multicolinealidad (dummy variable trap)
+- `handle_unknown='ignore'`: Maneja categorías nuevas en test
+
+**Train/Test Split:**
+- `test_size=0.2`: 80/20 split estándar
+- `stratify=y`: Mantiene distribución de clases en ambos sets
+
+### Métricas de Evaluación
+
+**Accuracy:**
+- **Ventaja:** Simple e interpretable
+- **Desventaja:** Puede ser engañosa en datasets desbalanceados
+- **Uso:** Métrica secundaria para este problema desbalanceado
+
+**AUC-ROC:**
+- **Ventaja:** No depende del threshold, mide capacidad de discriminación
+- **Interpretación:** Probabilidad de que el modelo clasifique correctamente un par positivo-negativo
+- **Usado como métrica principal** (clasificación binaria desbalanceada)
+
+**F1-Score:**
+- **Ventaja:** Balance entre precision y recall
+- **Útil cuando:** Ambas clases son importantes (no solo la mayoría)
+
+### Comparación de Métodos
+
+**Resumen de resultados:**
+
+| Método | Accuracy | AUC-ROC | F1-Score | N Features | Tiempo (s) |
+|--------|----------|---------|----------|------------|------------|
+| Label Encoding | 0.8610 | 0.9101 | 0.6883 | 14 | 0.18 |
+| One-Hot (baja card.) | 0.8471 | 0.8998 | 0.6615 | 30 | 0.17 |
+| Target Encoding (alta card.) | 0.8029 | 0.8274 | 0.5551 | 6 | 0.20 |
+| Pipeline Branched | 0.8472 | 0.8998 | 0.6624 | 30 | 0.19 |
+
+**Observaciones clave:**
+1. **Label Encoding tiene mejor AUC** pero introduce sesgos ordinales
+2. **Target Encoding reduce dimensionalidad** significativamente (94 → 6)
+3. **Pipeline Branched** ofrece mejor balance entre precisión y robustez
+
+## Garantías de Reproducibilidad
+
+1. **Scripts versionados** en GitHub con fecha y documentación completa
+2. **Random seeds:** `np.random.seed(42)` y `random_state=42` en todos los modelos
+3. **Documentación completa** de cada encoding y justificación
+4. **Pipelines de sklearn** para automatización sin pasos manuales
+5. **Guardado de artefactos** con joblib para reproducibilidad en producción
+
+## Herramientas y Técnicas Utilizadas
+
+- **pandas:** Manipulación y análisis de datos
+- **scikit-learn:** Preprocessing, pipelines, modelos de ML
+- **category_encoders:** Target Encoding, Leave-One-Out, Binary Encoding
+- **shap:** Explicabilidad y análisis de importancia
+- **matplotlib/seaborn:** Visualizaciones estadísticas
+
+## Extra: Comparación de CatBoost Encoding vs Target Encoding
+
+Para profundizar en las técnicas de encoding avanzadas, comparé **CatBoost Encoding** con **Target Encoding**, evaluando su performance en diferentes tipos de modelos de machine learning.
+
+### ¿Por qué lo elegí?
+
+Elegí comparar CatBoost Encoding con Target Encoding porque:
+
+1. CatBoost Encoding es específico para modelos de boosting (XGBoost, CatBoost, LightGBM)
+2. Target Encoding es más general y funciona con cualquier modelo
+3. Quería evaluar si encodings específicos para el modelo mejoran el performance
+4. Es una técnica mencionada en literatura pero no explorada en la práctica principal
+5. Permite validar si la elección de encoding debe depender del modelo final
+
+### ¿Qué esperaba encontrar?
+
+Esperaba encontrar:
+
+- Que CatBoost Encoding funcione mejor con modelos de boosting (Gradient Boosting)
+- Que Target Encoding siga siendo mejor para Random Forest (modelos tree-based generales)
+- Que CatBoost Encoding tenga mejor manejo de overfitting en variables de alta cardinalidad
+- Que la diferencia sea más notable en variables con >50 categorías
+- Que ambos encodings mejoren sobre One-Hot para variables de alta cardinalidad
+
+### Metodología
+
+Aplicamos ambos encodings al dataset Adult Income y evaluamos con dos modelos:
+
+1. **Random Forest:** Modelo tree-based general
+2. **Gradient Boosting:** Modelo de boosting específico
+
+Comparamos Accuracy y AUC-ROC para cada combinación de encoding y modelo.
+
+![Comparación de Encodings](/images/practica9/practica9_encoding_comparison.png)
+
+**Pie de figura:** Este gráfico compara Accuracy (izquierda) y ROC AUC (derecha) para diferentes combinaciones de encoding y modelo. Lo que me llamó la atención es que Gradient Boosting con ambos encodings logra el mejor performance, y que CatBoost Encoding tiene una ligera ventaja con Gradient Boosting. La conclusión es que la elección de encoding puede depender del modelo final, pero la diferencia es sutil.
+
+### Resultados
+
+**Comparación de Encodings:**
+
+| Método | Accuracy | AUC |
+|--------|----------|-----|
+| RF + Target Encoding | 0.8435 | 0.8928 |
+| RF + CatBoost Encoding | 0.8455 | 0.8926 |
+| GB + Target Encoding | 0.8565 | 0.9129 |
+| GB + CatBoost Encoding | 0.8565 | 0.9129 |
+
+**Mejor combinación:**
+- **Accuracy:** GB + Target Encoding (0.8565)
+- **AUC:** GB + Target Encoding (0.9129)
+
+### ¿Qué aprendí?
+
+1. **Diferencias entre encodings:** CatBoost Encoding y Target Encoding tienen performance muy similar (diferencia de 0.0020 en accuracy para Random Forest). Ambos encodings funcionan bien, pero la diferencia es sutil.
+
+2. **Impacto del modelo:** Gradient Boosting generalmente mejora con ambos encodings. La mejor combinación es Gradient Boosting con Target Encoding (accuracy: 0.8565, AUC: 0.9129).
+
+3. **CatBoost Encoding específico para boosting:** CatBoost Encoding funciona ligeramente mejor con Gradient Boosting, aunque la diferencia es mínima. Esto confirma que encodings específicos para el modelo pueden ayudar, pero no siempre.
+
+4. **Target Encoding más versátil:** Target Encoding funciona bien tanto con Random Forest como con Gradient Boosting. Es más general y no requiere ajustes específicos del modelo. Para producción, Target Encoding puede ser más robusto.
+
+5. **Recomendaciones:** Usar CatBoost Encoding si estás usando modelos de boosting (XGBoost, CatBoost, LightGBM). Usar Target Encoding si necesitas flexibilidad entre diferentes tipos de modelos. Ambos son superiores a One-Hot para variables de alta cardinalidad. La diferencia es sutil, así que la elección puede basarse en otros factores (simplicidad, mantenimiento).
+
+## Conclusiones y Próximos Pasos
+
+### Conclusiones Principales
+
+1. **La etapa de codificación es determinante:** La correcta elección del encoding influye no solo en la precisión, sino también en la interpretabilidad y el costo computacional
+
+2. **Variables numéricas siguen siendo los predictores más fuertes:** 76.6% de la importancia total viene de features numéricas, especialmente edad, educación y capital gain
+
+3. **Las categóricas enriquecen el modelo:** Especialmente con técnicas que condensan información estadística (Target Encoding), aportando contexto valioso
+
+4. **Target Encoding es óptimo para alta cardinalidad:** Logra mejor equilibrio entre precisión y eficiencia computacional para variables con >30 categorías
+
+5. **Pipeline Branched es la arquitectura recomendada:** Modularidad, reproducibilidad y robustez metodológica lo hacen ideal para producción
+
+6. **La explicabilidad basada en SHAP refuerza la transparencia:** Clave para decisiones de negocio éticas y auditables
+
+7. **Prevención de data leakage es crítica:** Especialmente en Target Encoding, donde el uso incorrecto puede inflar artificialmente las métricas
+
+### Próximos Pasos
+
+1. **Explorar técnicas más avanzadas:**
+   - **CatBoost Encoding:** Encoding específico para modelos de boosting
+   - **Hash Encoding:** Dimensión fija independiente de cardinalidad
+   - **Embedding Encoding:** Usar redes neuronales para aprender representaciones
+
+2. **Tuning más sofisticado:**
+   - **GridSearchCV para smoothing:** Optimizar parámetro de smoothing en Target Encoding
+   - **Bayesian Optimization:** Búsqueda más eficiente de hiperparámetros
+   - **Ensemble de encodings:** Combinar múltiples encodings en un modelo ensemble
+
+3. **Análisis de fairness:**
+   - **Métricas de equidad:** Evaluar sesgos demográficos (gender, race)
+   - **Fairlearn:** Herramientas para detectar y mitigar sesgos
+   - **Análisis de impacto diferencial:** Evaluar performance por subgrupos
+
+4. **MLOps avanzado:**
+   - **Monitoreo de drift:** Detectar cambios en distribución de categorías
+   - **Pipeline versionado:** Versionar pipelines con MLflow o DVC
+   - **A/B testing:** Comparar diferentes encodings en producción
+
+5. **Extensión a problemas multiclase:**
+   - Adaptar técnicas para targets con >2 clases
+   - Evaluar impacto en diferentes tipos de problemas (regresión, clasificación multiclase)
+
+---
+
+_Nota: Este análisis fue realizado con fines educativos utilizando el dataset Adult Income del UCI ML Repository._

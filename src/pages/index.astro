@@ -1,0 +1,86 @@
+---
+import Layout from "@/layouts/main.astro"
+import { Kbd } from "@/components/ui/kbd"
+import { getCollection } from "astro:content"
+
+const getFolder = (id: string) =>
+  id.includes("/") ? id.split("/")[0] : "general"
+
+const folderLabels: Record<string, string> = {
+  "eda-y-fuentes": "EDA & Fuentes",
+  "calidad-y-etica": "Calidad & Ética",
+  "feature-engineering": "Feature Engineering",
+  "datos-especiales": "Datos Especiales",
+  "pipelines-etl": "Pipelines ETL",
+  general: "General",
+}
+
+const getPostOrder = (id: string) => {
+  const filename = id.split("/").at(-1)
+  const match = filename?.match(/^(\d+)/)
+
+  return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER
+}
+
+const postsByFolder = new Map<
+  string,
+  Awaited<ReturnType<typeof getCollection<"blog">>>
+>()
+
+for (const post of await getCollection("blog")) {
+  const folder = getFolder(post.id)
+  const folderPosts = postsByFolder.get(folder) ?? []
+
+  folderPosts.push(post)
+  postsByFolder.set(folder, folderPosts)
+}
+
+const groups = Array.from(postsByFolder, ([folder, posts]) => ({
+  folder,
+  label: folderLabels[folder] ?? folder.replaceAll("-", " "),
+  order: Math.min(...posts.map((post) => getPostOrder(post.id))),
+  posts: posts.sort(
+    (a, b) =>
+      getPostOrder(a.id) - getPostOrder(b.id) ||
+      a.data.title.localeCompare(b.data.title, "es")
+  ),
+})).sort((a, b) => a.order - b.order || a.label.localeCompare(b.label, "es"))
+---
+
+<Layout>
+  <section class="mx-auto flex max-w-3xl flex-col gap-8 p-6">
+    <header class="flex flex-col gap-2">
+      <h1 class="font-medium">Posts</h1>
+      <p>
+        Notas publicadas en Markdown. Usa <Kbd>⌘K</Kbd> para buscar.
+      </p>
+    </header>
+
+    <div class="flex flex-col gap-10">
+      {
+        groups.map((group) => (
+          <section class="flex flex-col gap-4">
+            <h2 class="font-medium">{group.label}</h2>
+            <ul class="flex flex-col gap-6">
+              {group.posts.map((post) => (
+                <li>
+                  <article class="flex flex-col gap-1">
+                    <h3
+                      transition:name={`article-title-${post.id.replaceAll("/", "-")}`}
+                      class="font-medium"
+                    >
+                      <a href={`/blog/${post.id}/`} data-astro-prefetch="hover">
+                        {post.data.title}
+                      </a>
+                    </h3>
+                    <p>{post.data.description}</p>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </section>
+</Layout>

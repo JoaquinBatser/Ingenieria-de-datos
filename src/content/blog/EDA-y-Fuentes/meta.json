@@ -1,0 +1,12 @@
+{
+    "title": "EDA & Fuentes",
+    "icon": "MyIcon",
+    "pages": [
+        "01-Exploracion-del-Dataset-Iris",
+        "02-Publicacion-del-Portfolio-en-Vercel",
+        "03-EDA-Netflix-Dataset-con-pandas",
+        "04-EDA-Multi-fuentes-y-Joins",
+        "..."
+    ],
+    "defaultOpen": false
+}

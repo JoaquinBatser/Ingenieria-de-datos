@@ -1,0 +1,39 @@
+---
+import type { CollectionEntry } from "astro:content"
+import { getCollection, render } from "astro:content"
+
+import CodeBlock from "@/components/code-block.astro"
+import Layout from "@/layouts/main.astro"
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog")
+
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }))
+}
+
+interface Props {
+  post: CollectionEntry<"blog">
+}
+
+const { post } = Astro.props
+const { Content, headings } = await render(post)
+const articleTransitionName = `article-title-${post.id.replaceAll("/", "-")}`
+---
+
+<Layout
+  title={post.data.title}
+  description={post.data.description}
+  articleNavigation={{ title: post.data.title, headings }}
+>
+  <article class="mx-auto flex max-w-3xl flex-col gap-8 p-6">
+    <div
+      class="article-content typeset typeset-docs max-w-[37em]"
+      style={`--article-title-transition: ${articleTransitionName}`}
+    >
+      <Content components={{ pre: CodeBlock }} />
+    </div>
+  </article>
+</Layout>

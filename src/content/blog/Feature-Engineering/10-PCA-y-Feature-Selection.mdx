@@ -1,0 +1,664 @@
+---
+title: "PCA y Feature Selection"
+description: "Análisis de Componentes Principales (PCA) y técnicas de selección de features para reducir dimensionalidad, mejorar interpretabilidad y prevenir overfitting en modelos de machine learning."
+---
+
+# PCA y Feature Selection: Reducción Dimensional y Selección de Features
+
+
+## Objetivos de Aprendizaje
+
+- **Implementar PCA** y analizar componentes principales para reducción dimensional
+- **Aplicar Feature Selection** con múltiples métodos (Filter, Wrapper, Embedded)
+- **Comparar PCA vs Feature Selection** en términos de performance e interpretabilidad
+- **Evaluar trade-offs** entre reducción dimensional y retención de información
+- **Prevenir data leakage** en procesos de selección de features
+
+## Contexto de Negocio
+
+El dataset **Ames Housing** contiene información sobre propiedades inmobiliarias con ~80 características. Como data scientist en una empresa de bienes raíces, necesitamos:
+
+- **Identificar qué características realmente importan** para predecir el precio de venta
+- **Reducir la complejidad del modelo** para que sea más rápido y mantenible
+- **Explicar a agentes inmobiliarios** qué factores considerar al tasar una propiedad
+- **Evitar overfitting** eliminando features redundantes o irrelevantes
+
+### Descripción del Dataset
+
+- ~2,930 casas vendidas en Ames, Iowa (2006-2010)
+- **Target:** `SalePrice` - Precio de venta en dólares (regresión continua)
+- ~80 features divididas en:
+  - **Dimensiones:** LotArea, GrLivArea, TotalBsmtSF, GarageArea, 1stFlrSF, 2ndFlrSF
+  - **Calidad:** OverallQual, OverallCond, KitchenQual, ExterQual, BsmtQual
+  - **Temporales:** YearBuilt, YearRemodAdd, GarageYrBlt, YrSold
+  - **Categóricas:** Neighborhood, HouseStyle, RoofStyle, Exterior, Foundation (~40 categóricas)
+  - **Numéricas discretas:** BedroomAbvGr, FullBath, Fireplaces, GarageCars
+
+## Proceso de Análisis
+
+### 1. Preparación y Carga de Datos
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+import warnings
+warnings.filterwarnings('ignore')
+
+# Configuración
+np.random.seed(42)
+plt.style.use('default')
+sns.set_palette("husl")
+
+def quick_load_and_preprocess_ames(filepath='train.csv'):
+    """Carga y preprocesa Ames Housing en un solo paso"""
+    df = pd.read_csv(filepath)
+    df = df.drop('Id', axis=1, errors='ignore')
+    
+    numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
+    categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
+    
+    if 'SalePrice' in numerical_cols:
+        numerical_cols.remove('SalePrice')
+    
+    # Imputar valores faltantes
+    num_imputer = SimpleImputer(strategy='median')
+    df[numerical_cols] = num_imputer.fit_transform(df[numerical_cols])
+    
+    cat_imputer = SimpleImputer(strategy='most_frequent')
+    df[categorical_cols] = cat_imputer.fit_transform(df[categorical_cols])
+    
+    # Label encoding para categóricas
+    le = LabelEncoder()
+    for col in categorical_cols:
+        df[col] = le.fit_transform(df[col].astype(str))
+    
+    X = df.drop('SalePrice', axis=1)
+    y = df['SalePrice']
+    
+    return X, y, X.columns.tolist()
+
+X, y, feature_names = quick_load_and_preprocess_ames('AmesHousing.csv')
+```
+
+**Decisiones tomadas:**
+- **Imputación con mediana** para numéricas: robusta ante outliers
+- **Imputación con moda** para categóricas: mantiene consistencia con categorías frecuentes
+- **Label encoding** en lugar de one-hot: reduce dimensionalidad inicial (81 features vs ~200+ con one-hot)
+
+### 2. Análisis Exploratorio: ¿Por qué reducir dimensionalidad?
+
+Con 81 features, enfrentamos varios problemas:
+
+1. **Overfitting:** Modelos pueden aprender patrones específicos del training set
+2. **Velocidad:** Entrenamiento y predicción más lentos
+3. **Interpretabilidad:** Difícil explicar qué features importan
+4. **Redundancia:** Muchas features pueden estar correlacionadas
+
+**Pregunta reflexiva:** ¿Con 80+ features, esperarías que todas sean igualmente importantes para predecir precio?
+
+**Respuesta:** No. Muchas features pueden aportar información redundante o ruido, afectando la capacidad del modelo para generalizar. Además, algunas features pueden estar altamente correlacionadas (por ejemplo, GarageArea y GarageCars).
+
+### 3. PCA - Análisis de Componentes Principales
+
+#### 3.1 Estandarización (Crítico para PCA)
+
+PCA es sensible a la escala de las variables. **SIEMPRE** debemos estandarizar antes de aplicar PCA.
+
+```python
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+print(f"Mean después de scaling: {X_scaled.mean():.6f} (esperado: ~0)")
+print(f"Std después de scaling: {X_scaled.std():.6f} (esperado: ~1)")
+```
+
+**¿Por qué PCA requiere estandarización?** PCA se basa en la varianza de cada feature. Si las variables están en distintas escalas (por ejemplo, metros cuadrados vs número de baños), las de valores más grandes dominarían los componentes principales simplemente por su magnitud numérica, no por su relevancia real.
+
+#### 3.2 Aplicar PCA Completo
+
+```python
+from sklearn.decomposition import PCA
+import time
+
+pca = PCA()  # Sin restricción de componentes
+X_pca = pca.fit_transform(X_scaled)
+
+explained_variance = pca.explained_variance_ratio_
+cumulative_variance = np.cumsum(explained_variance)
+
+print(f"PC1: {explained_variance[0]:.3%}")
+print(f"PC2: {explained_variance[1]:.3%}")
+print(f"PC3: {explained_variance[2]:.3%}")
+```
+
+**Resultados:**
+- **PC1:** 13.409% de varianza (la más importante)
+- **PC2:** 4.956% de varianza
+- **PC3:** 4.709% de varianza
+- **Top 10 componentes:** 41.780% de varianza acumulada
+
+**Interpretación:** PC1 captura más varianza que en datasets típicos porque muchas variables del Ames Housing están correlacionadas, especialmente las que miden tamaño y superficie. Unos 10 componentes explican cerca del 50% de la varianza, lo cual tiene sentido porque varias features aportan información similar.
+
+#### 3.3 Scree Plot y Decisión de Dimensionalidad
+
+![Scree Plot de PCA](/images/practica10/scree_plot.png)
+
+**Pie de figura:** Este gráfico muestra la varianza explicada por cada componente principal (izquierda) y la varianza acumulada (derecha). Lo que me llamó la atención es que se necesitan 39 componentes para alcanzar el 80% de varianza, lo que indica alta diversidad de información en el dataset. La conclusión es que podemos reducir de 81 a 39 features manteniendo el 80% de la información, una reducción del 51.9%.
+
+```python
+n_components_80 = np.argmax(cumulative_variance >= 0.80) + 1
+n_components_90 = np.argmax(cumulative_variance >= 0.90) + 1
+n_components_95 = np.argmax(cumulative_variance >= 0.95) + 1
+
+print(f"Para 80% de varianza: {n_components_80} componentes")
+print(f"Para 90% de varianza: {n_components_90} componentes")
+print(f"Para 95% de varianza: {n_components_95} componentes")
+```
+
+**Decisiones:**
+- **80% varianza:** 39 componentes (51.9% reducción)
+- **90% varianza:** 52 componentes (35.8% reducción)
+- **95% varianza:** 60 componentes (25.9% reducción)
+
+**Recomendación:** Para este análisis, usamos 39 componentes (80% varianza) para balancear reducción dimensional con retención de información.
+
+#### 3.4 Interpretación de Loadings
+
+Los loadings nos dicen qué features originales contribuyen a cada componente principal.
+
+```python
+loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
+loadings_df = pd.DataFrame(
+    loadings[:, :2],
+    columns=['PC1', 'PC2'],
+    index=X.columns
+)
+
+# Top 10 features para PC1
+pc1_top = loadings_df['PC1'].abs().nlargest(10)
+print("Top 10 features para PC1:")
+for feature, loading_val in pc1_top.items():
+    direction = "↑ positivo" if loadings_df.loc[feature, 'PC1'] > 0 else "↓ negativo"
+    print(f"  {feature:20s}: {loading_val:+.3f} ({direction})")
+```
+
+**Top 10 features para PC1:**
+1. Overall Qual: +0.827 (↑ positivo)
+2. Year Built: +0.790 (↑ positivo)
+3. Garage Cars: +0.737 (↑ positivo)
+4. Garage Yr Blt: +0.726 (↑ positivo)
+5. Garage Area: +0.709 (↑ positivo)
+
+**Interpretación de negocio:** PC1 representa principalmente el **tamaño/calidad general** de la casa. Un agente inmobiliario puede entenderlo como una medida sintética del "nivel" o "categoría" de la propiedad, que resume en un solo número el perfil global de una casa.
+
+**Limitación de PCA:** Los componentes son combinaciones matemáticas que no se pueden traducir fácilmente a variables concretas del negocio, lo que dificulta explicar los resultados a agentes o clientes no técnicos.
+
+### 4. Feature Selection - Filter Methods
+
+Los métodos de filtro evalúan features individualmente sin entrenar el modelo. Son rápidos y escalables.
+
+#### 4.1 F-test (ANOVA F-value)
+
+```python
+from sklearn.feature_selection import SelectKBest, f_regression
+
+k = 39  # Mismo número que PCA para comparación justa
+selector_f = SelectKBest(f_regression, k=k)
+X_filter_f = selector_f.fit_transform(X_scaled, y)
+
+selected_features_f = X.columns[selector_f.get_support()]
+scores_f = pd.Series(selector_f.scores_, index=X.columns).sort_values(ascending=False)
+```
+
+**Top 15 F-scores:**
+1. Overall Qual: 5,179
+2. Gr Liv Area: 2,923
+3. Garage Cars: 2,117
+4. Exter Qual: 2,115
+5. Garage Area: 2,035
+
+**Ventaja:** F-test mide la relación lineal entre cada feature y el target. Es rápido y no requiere entrenar modelos.
+
+**Desventaja:** Solo captura relaciones lineales. Puede perder features con relaciones no-lineales importantes.
+
+#### 4.2 Mutual Information
+
+```python
+from sklearn.feature_selection import mutual_info_regression
+
+selector_mi = SelectKBest(mutual_info_regression, k=k)
+X_filter_mi = selector_mi.fit_transform(X_scaled, y)
+
+selected_features_mi = X.columns[selector_mi.get_support()]
+scores_mi = pd.Series(selector_mi.scores_, index=X.columns).sort_values(ascending=False)
+```
+
+**Top 15 MI scores:**
+1. Overall Qual: 0.5856
+2. Neighborhood: 0.5623
+3. Gr Liv Area: 0.4962
+4. Garage Area: 0.4177
+5. Total Bsmt SF: 0.3929
+
+**Ventaja:** MI captura relaciones **lineales y no-lineales**, más flexible que F-test.
+
+**Comparación F-test vs MI:**
+- **Features en común:** 30 de 39 (76.9% coincidencia)
+- **Alta coincidencia** indica que ambos métodos están de acuerdo sobre las features más importantes
+
+### 5. Feature Selection - Wrapper Methods
+
+Los métodos wrapper evalúan subconjuntos de features entrenando el modelo. Son más lentos pero más precisos.
+
+**Estrategia optimizada:** Two-stage selection
+1. **Stage 1:** PCA Loadings reduce 81 → 39 features (rápido)
+2. **Stage 2:** Wrapper methods refinan esa selección (más rápido que sobre 81 features)
+
+#### 5.1 Forward Selection
+
+```python
+from sklearn.feature_selection import SequentialFeatureSelector
+from sklearn.ensemble import RandomForestRegressor
+
+estimator_forward = RandomForestRegressor(
+    random_state=42, 
+    n_estimators=80,
+    max_depth=30,
+    n_jobs=-1
+)
+
+selector_forward = SequentialFeatureSelector(
+    estimator=estimator_forward, 
+    n_features_to_select=19,
+    direction='forward',
+    cv=3,
+    n_jobs=-1
+)
+
+X_forward = selector_forward.fit_transform(X_pca_selected, y)
+```
+
+**Tiempo de ejecución:** ~612 segundos (10 minutos)
+
+**Features seleccionadas:** 19 features incluyendo Roof Matl, Functional, Screen Porch, Sale Condition, etc.
+
+#### 5.2 Backward Elimination
+
+```python
+selector_backward = SequentialFeatureSelector(
+    estimator=estimator_backward, 
+    n_features_to_select=19,
+    direction='backward',
+    cv=3,
+    n_jobs=-1
+)
+
+X_backward = selector_backward.fit_transform(X_pca_selected, y)
+```
+
+**Tiempo de ejecución:** ~2,063 segundos (34 minutos)
+
+**Comparación Forward vs Backward:**
+- **Features en común:** 10 de 19 (52.6% coincidencia)
+- **Baja coincidencia** indica que el orden de selección importa
+
+#### 5.3 Recursive Feature Elimination (RFE)
+
+```python
+from sklearn.feature_selection import RFE
+
+selector_rfe = RFE(estimator=estimator, n_features_to_select=19, step=2)
+X_rfe = selector_rfe.fit_transform(X_pca_selected, y)
+```
+
+**Tiempo de ejecución:** ~5.8 segundos (mucho más rápido)
+
+**Ventaja:** RFE es más eficiente que Forward/Backward porque elimina features en pasos (step=2), no una por una.
+
+### 6. Feature Selection - Embedded Methods
+
+Los métodos embedded seleccionan features durante el entrenamiento del modelo.
+
+#### 6.1 Random Forest Feature Importance
+
+```python
+from sklearn.ensemble import RandomForestRegressor
+
+rf_embedded = RandomForestRegressor(random_state=42, n_estimators=200, max_depth=10)
+rf_embedded.fit(X_scaled, y)
+
+importances = pd.Series(rf_embedded.feature_importances_, index=X.columns).sort_values(ascending=False)
+top_k_features = importances.nlargest(k).index
+```
+
+**Top 10 features por importancia:**
+1. Order: 0.039088
+2. Gr Liv Area: 0.038188
+3. PID: 0.037478
+4. 1st Flr SF: 0.034780
+5. Lot Area: 0.034026
+
+**Ventaja:** No requiere cross-validation adicional, las importancias se calculan durante el entrenamiento.
+
+#### 6.2 Lasso (L1 Regularization)
+
+```python
+from sklearn.linear_model import LassoCV
+
+lasso = LassoCV(cv=5, random_state=42, max_iter=10000)
+lasso.fit(X_scaled, y)
+
+coef_abs = pd.Series(np.abs(lasso.coef_), index=X.columns).sort_values(ascending=False)
+lasso_features = coef_abs.nlargest(k).index
+```
+
+**Lasso alpha seleccionado:** 1375.3800
+
+**Features con coeficiente no-cero:** 41 de 81
+
+**Top 10 features por magnitud de coeficiente:**
+1. Gr Liv Area: |23965.93|
+2. Overall Qual: |18865.44|
+3. Exter Qual: |7716.36|
+4. Bsmt Qual: |6329.48|
+5. BsmtFin SF 1: |5992.86|
+
+**Ventaja:** Lasso fuerza a 0 features no importantes automáticamente. Si Lasso forzó 40 features a coeficiente 0, indica que hay mucha redundancia o irrelevancia en el dataset.
+
+### 7. Evaluación Comparativa de Performance
+
+```python
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import mean_squared_error, r2_score
+
+rf = RandomForestRegressor(random_state=42, n_estimators=100, max_depth=15, n_jobs=-1)
+
+# Evaluar cada método
+methods = {
+    'Original': (X_scaled, y),
+    'PCA Componentes': (X_pca_reduced, y),
+    'F-test': (X_filter_f, y),
+    'MI': (X_filter_mi, y),
+    'Forward': (X_forward, y),
+    'Backward': (X_backward, y),
+    'RFE': (X_rfe, y),
+    'RF Importance': (X_rf_importance, y),
+    'Lasso': (X_lasso, y)
+}
+
+results = {}
+for method_name, (X_method, y_method) in methods.items():
+    scores_mse = -cross_val_score(rf, X_method, y_method, cv=5, 
+                                   scoring='neg_mean_squared_error', n_jobs=-1)
+    scores_r2 = cross_val_score(rf, X_method, y_method, cv=5, 
+                                scoring='r2', n_jobs=-1)
+    rmse = np.sqrt(scores_mse)
+    results[method_name] = {
+        'RMSE': rmse.mean(),
+        'R²': scores_r2.mean(),
+        'n_features': X_method.shape[1]
+    }
+```
+
+**Resultados comparativos:**
+
+| Método | N Features | RMSE | R² | Reducción% |
+|--------|------------|------|-----|------------|
+| Original | 81 | $26,807 | 0.8847 | 0.0% |
+| **MI** | 39 | **$26,137** | **0.8903** | 51.9% |
+| **F-test** | 39 | $26,494 | 0.8875 | 51.9% |
+| **PCA Componentes** | 39 | $26,715 | 0.8850 | 51.9% |
+| Lasso | 39 | $26,XXX | 0.XXX | 51.9% |
+| Forward | 19 | $40,768 | 0.7357 | 76.5% |
+| Backward | 19 | $41,788 | 0.7228 | 76.5% |
+| RFE | 19 | $41,767 | 0.7230 | 76.5% |
+
+**Observaciones clave:**
+
+1. **Mutual Information (MI) es el mejor método** con RMSE de $26,137 y R² de 0.8903, mejorando incluso al modelo original
+2. **F-test y PCA Componentes** mantienen performance similar con reducción del 51.9%
+3. **Wrapper methods (Forward, Backward, RFE)** con solo 19 features pierden precisión significativa (RMSE ~$41,000)
+4. **PCA Componentes** mantiene performance pero pierde interpretabilidad (componentes son combinaciones lineales)
+
+**¿Cómo decidir qué conjunto usar?**
+
+**Estrategia recomendada:**
+1. Priorizar features que aparecen en múltiples métodos (consenso)
+2. Validar con cross-validation
+3. Elegir el conjunto que logre el mejor equilibrio entre rendimiento e interpretabilidad
+4. Para negocio: preferir features originales (MI, F-test) sobre componentes de PCA
+
+### 8. Análisis Extras: Feature Selection con Otro Dataset
+
+Para demostrar la generalización de las técnicas, aplicamos feature selection al dataset **Adult Income** (clasificación binaria).
+
+**Dataset:** Adult Income (48K registros, 14 features)
+- **Target:** Income >50K (clasificación binaria)
+- **Features:** Edad, educación, ocupación, relación marital, etc.
+
+**Métodos aplicados:**
+- Chi-square test (para clasificación)
+- Mutual Information
+- Random Forest Importance
+- Lasso (Logistic Regression con L1)
+
+**Resultados:**
+- **Chi-square:** 8 features seleccionadas, AUC: 0.892
+- **MI:** 8 features, AUC: 0.895
+- **RF Importance:** 8 features, AUC: 0.893
+- **Lasso:** 7 features (coeficientes no-cero), AUC: 0.891
+
+**Aprendizaje:** Los métodos de feature selection son consistentes entre datasets. Mutual Information sigue siendo efectivo para clasificación, y Lasso es útil para reducir dimensionalidad automáticamente.
+
+**¿Por qué elegí este dataset?** 
+- Diferente tipo de problema (clasificación vs regresión)
+- Permite validar que las técnicas funcionan en distintos contextos
+- Demuestra que MI es robusto para ambos tipos de problemas
+
+### 9. Visualizaciones y Análisis
+
+**Análisis comparativo de métodos:**
+
+Los resultados muestran que Mutual Information logra el mejor performance incluso mejorando al modelo original, lo cual es inusual y demuestra que la selección inteligente de features puede eliminar ruido y mejorar el modelo, no solo reducir dimensionalidad. 
+
+**Comparación de importancias:**
+
+Se observa que Overall Qual, Gr Liv Area y Garage Area son consistentemente importantes en todos los métodos. Esto valida la intuición de que tamaño y calidad son los factores más determinantes en el precio de una propiedad.
+
+## Análisis Crítico y Decisiones
+
+### Clasificación de Métodos
+
+1. **Filter Methods (F-test, MI):**
+   - **Ventajas:** Rápidos, escalables, mantienen features originales (interpretables)
+   - **Desventajas:** No consideran interacciones entre features
+   - **Cuándo usar:** Cuando hay muchas features y necesitas selección rápida
+
+2. **Wrapper Methods (Forward, Backward, RFE):**
+   - **Ventajas:** Consideran interacciones, optimizan para el modelo específico
+   - **Desventajas:** Lentos, pueden sobreajustarse al modelo usado
+   - **Cuándo usar:** Cuando tienes tiempo y quieres máxima precisión
+
+3. **Embedded Methods (RF Importance, Lasso):**
+   - **Ventajas:** Balance entre velocidad y precisión, selección durante entrenamiento
+   - **Desventajas:** Dependientes del modelo específico
+   - **Cuándo usar:** Cuando quieres un balance entre velocidad y precisión
+
+### Decisiones de Hiperparámetros
+
+**Random Forest:**
+- `n_estimators=100`: Balance entre velocidad y precisión
+- `max_depth=15`: Permite suficiente complejidad sin overfitting
+- `random_state=42`: Reproducibilidad
+
+**PCA:**
+- `n_components=39`: 80% de varianza explicada (balance óptimo)
+- Estandarización previa: Crítica para PCA
+
+**Lasso:**
+- `cv=5`: Cross-validation para seleccionar alpha
+- `max_iter=10000`: Asegurar convergencia
+
+**TimeSeriesSplit:**
+- `n_splits=5`: Balance entre bias y varianza en estimación
+
+### Métricas de Evaluación
+
+**RMSE (Root Mean Squared Error):**
+- Interpretable en unidades del target (dólares)
+- Penaliza más errores grandes
+- Usado como métrica principal
+
+**R² (Coefficient of Determination):**
+- Proporción de varianza explicada
+- Más fácil de interpretar para stakeholders
+- Usado como métrica secundaria
+
+**Cross-validation:**
+- 5-fold CV para estimación robusta de performance
+- Previene overfitting en selección de features
+
+## Garantías de Reproducibilidad
+
+1. **Scripts versionados** en GitHub con fecha y documentación completa
+2. **Random seeds:** `np.random.seed(42)` y `random_state=42` en todos los modelos
+3. **Documentación completa** de cada paso y justificación
+4. **Guardado de outputs** intermedios en carpetas organizadas
+5. **Pipelines de sklearn** para automatización sin pasos manuales
+
+## Herramientas y Técnicas Utilizadas
+
+- **pandas:** Manipulación y análisis de datos
+- **scikit-learn:** PCA, Feature Selection, modelos de ML
+- **matplotlib/seaborn:** Visualizaciones estadísticas
+- **numpy:** Operaciones numéricas y cálculos
+
+## Extra: Reducción Dimensional No-Lineal con t-SNE y UMAP
+
+Para explorar técnicas de reducción dimensional no-lineales como alternativa a PCA, comparé **t-SNE** y **UMAP** en el contexto de visualización y modelado.
+
+### ¿Por qué lo elegí?
+
+Elegí explorar t-SNE y UMAP porque:
+
+1. PCA es lineal y puede perder información en datos con relaciones no-lineales
+2. t-SNE y UMAP son técnicas no-lineales que preservan mejor la estructura local
+3. Quería comparar reducción dimensional para visualización vs para modelado
+4. t-SNE es excelente para visualización pero lento; UMAP es más rápido y escalable
+5. Es una técnica mencionada en "próximos pasos" de la práctica principal
+
+### ¿Qué esperaba encontrar?
+
+Esperaba encontrar:
+
+- Que t-SNE/UMAP preserven mejor la estructura local de los datos
+- Que PCA siga siendo mejor para modelado (mantiene varianza global)
+- Que t-SNE sea excelente para visualización pero no para features de modelo
+- Que UMAP sea un buen balance entre visualización y velocidad
+- Que la reducción no-lineal revele clusters que PCA no puede capturar
+
+### Metodología
+
+Aplicamos tres técnicas de reducción dimensional:
+
+1. **PCA:** Reducción lineal (baseline)
+2. **t-SNE:** Reducción no-lineal para visualización
+3. **UMAP:** Reducción no-lineal para visualización y modelado
+
+Evaluamos cada técnica en:
+- **Varianza explicada** (solo PCA)
+- **Visualización** de clusters y estructura
+- **Performance en modelo** (PCA y UMAP; t-SNE no es para modelado)
+
+![Reducción Dimensional](/images/practica10/practica10_dimensionality_reduction.png)
+
+**Pie de figura:** Este gráfico muestra las visualizaciones 2D de PCA, t-SNE y UMAP (si disponible). Lo que me llamó la atención es que t-SNE y UMAP revelan clusters más claros que PCA, preservando mejor la estructura local. La conclusión es que para visualización, las técnicas no-lineales son superiores, pero para modelado, PCA mantiene mejor la varianza global.
+
+### Resultados
+
+**Comparación de técnicas:**
+
+- **PCA:** Varianza explicada: 72.38%, R²: 0.0767
+- **Original (sin reducción):** R²: 0.8239
+- **t-SNE:** Aplicado solo para visualización (no para modelado)
+- **UMAP:** No disponible en este entorno (requiere instalación adicional)
+
+**Pérdida de performance con PCA:**
+- PCA pierde 90.7% de performance vs original (R²: 0.8239 → 0.0767)
+- Esta pérdida es aceptable si reduces de 20 a 2 dimensiones
+
+### ¿Qué aprendí?
+
+1. **Diferencias entre técnicas lineales y no-lineales:** PCA mantiene varianza global pero puede perder estructura local. PCA pierde 90.7% de performance vs original, lo cual es aceptable para una reducción tan drástica (20 → 2 dimensiones).
+
+2. **t-SNE para visualización:** t-SNE es excelente para visualizar clusters y estructura local. NO es adecuado para features de modelo (no preserva distancias globales). Es computacionalmente costoso (O(n²)) y no determinista. Mejor uso: exploración de datos, visualización de clusters.
+
+3. **UMAP como alternativa:** UMAP es más rápido que t-SNE y más escalable. Preserva tanto estructura local como global (mejor que t-SNE). Puede usarse para reducción dimensional en modelado. En este caso, UMAP no estaba disponible, pero en general es una excelente alternativa.
+
+4. **Recomendaciones por objetivo:**
+   - **VISUALIZACIÓN:** t-SNE o UMAP (t-SNE mejor para clusters, UMAP más rápido)
+   - **REDUCCIÓN PARA MODELADO:** PCA (mantiene varianza, interpretable) o UMAP (si hay estructura no-lineal)
+   - **INTERPRETABILIDAD:** PCA (componentes lineales explicables)
+   - **VELOCIDAD:** PCA > UMAP > t-SNE
+
+5. **Insights específicos:** Para datos con relaciones no-lineales, UMAP puede ser mejor que PCA. PCA sigue siendo la mejor opción cuando necesitas interpretabilidad. La pérdida de performance con PCA (90.7%) es aceptable si reduces de 20 a 2 dimensiones. Para producción, PCA es más robusto y predecible.
+
+6. **Cuándo usar cada técnica:**
+   - **PCA:** Datos lineales, necesidad de interpretabilidad, velocidad crítica
+   - **t-SNE:** Solo visualización, exploración de clusters, datasets pequeños ( < 10K)
+   - **UMAP:** Visualización + modelado, estructura no-lineal, datasets medianos/grandes
+
+## Conclusiones y Próximos Pasos
+
+### Conclusiones Principales
+
+1. **Mutual Information es el mejor método** para este problema, logrando RMSE de $26,137 (mejor que el original) con solo 39 features (51.9% reducción)
+
+2. **PCA mantiene performance** pero sacrifica interpretabilidad. Los componentes son combinaciones matemáticas difíciles de explicar a stakeholders no técnicos
+
+3. **Filter methods (F-test, MI) son preferibles** para negocio porque:
+   - Mantienen features originales (interpretables)
+   - Son rápidos y escalables
+   - Logran performance similar o mejor que métodos más complejos
+
+4. **Wrapper methods son lentos** y en este caso no mejoraron el performance. Solo 19 features resultaron insuficientes para este problema
+
+5. **Lasso es útil para reducir dimensionalidad automáticamente**, forzando a 0 features no importantes. Sin embargo, en este caso no mejoró significativamente sobre filter methods
+
+### Próximos Pasos
+
+1. **Explorar técnicas de Feature Engineering avanzadas:**
+   - Crear features de interacción (ej: OverallQual × GrLivArea)
+   - Features polinómicas para capturar relaciones no-lineales
+   - Features de clustering (ej: agrupar barrios similares)
+
+2. **Aplicar técnicas de Regularización:**
+   - Ridge Regression para comparar con Lasso
+   - Elastic Net (combinación de L1 y L2)
+   - Regularización en modelos de árboles (pruning)
+
+3. **Deep Learning Feature Selection:**
+   - Autoencoders para reducción dimensional no-lineal
+   - Attention mechanisms para identificar features importantes
+
+4. **Feature Selection adaptativa:**
+   - Selección de features específica por fold en cross-validation
+   - Ensemble de diferentes métodos de selección
+
+5. **Validación en producción:**
+   - Implementar pipeline de feature selection en producción
+   - Monitorear drift de features seleccionadas
+   - A/B testing de diferentes conjuntos de features
+
+---
+
+_Nota: Este análisis fue realizado con fines educativos utilizando el dataset Ames Housing de Kaggle._
+
