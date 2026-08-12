@@ -1,0 +1,124 @@
+---
+title: "Mi primer recorrido por Google Cloud"
+description: "Notas del laboratorio GSP282: acceso a la consola, proyectos temporales, IAM y activación de una API."
+---
+
+# Primer recorrido por Google Cloud
+
+## Qué tenía que hacer
+
+- Acceder a la **Google Cloud Console** con credenciales temporales del lab.  
+- Reconocer los elementos del entorno Qwiklabs/Skills Boost: panel de detalles, timer, Start/End Lab.  
+- Explorar **proyectos de Google Cloud** y entender su propósito.  
+- Navegar servicios desde el menú principal de la consola.  
+- Revisar y modificar permisos básicos con **Cloud IAM**.  
+- Habilitar una API desde la **API Library** (Dialogflow).
+
+---
+
+## Antes de empezar
+
+El laboratorio es un recorrido guiado por la consola. Al iniciarlo aparece un **proyecto temporal** para hacer las tareas; las credenciales y el proyecto desaparecen al terminar o al vencer el tiempo.
+
+Se indica usar navegación de incógnito y no mezclar cuentas personales con las credenciales del lab.
+
+---
+
+# 1. Entrar al entorno
+
+### El panel “Lab details”
+Incluye:
+
+- Botón **Open Google Cloud Console**  
+- **Username** y **Password** temporales del lab  
+- **Project ID** asignado automáticamente  
+
+Las credenciales solo funcionan mientras el timer del lab está activo.
+
+### Abrir la consola
+
+1. Se hizo clic en **Start Lab** para crear el proyecto temporal.  
+2. Desde **Open Google Cloud Console**, se abrió la consola en una nueva pestaña.  
+3. Se eligió “Use another account” y se ingresaron el email y password del lab.  
+4. Se aceptaron términos de servicio.  
+
+Una vez autenticado, la consola queda asociada al proyecto temporal del lab.
+
+---
+
+# 2. Mirar el proyecto
+
+Un **Google Cloud Project** agrupa recursos, redes, bases de datos, APIs y permisos. En el lab revisé qué identificador tenía el proyecto temporal.
+
+### Qué revisé
+
+- En la tarjeta **Project Info** se revisaron:  
+  - **Project Name**  
+  - **Project Number**  
+  - **Project ID**  
+- En el selector de proyectos de la barra superior se abrió la vista **All**.  
+- Allí se observó otro proyecto: **Qwiklabs Resources**, un proyecto compartido en modo lectura que contiene recursos comunes.  
+- Se aclaró que **no** se debe cambiar a Qwiklabs Resources; todo el trabajo se hace en el proyecto temporal asignado.
+
+Cada laboratorio trabaja en un proyecto independiente que desaparece al finalizar.
+
+---
+
+# 3. Roles y permisos con IAM
+
+### Roles básicos
+- **Viewer**: acceso solo lectura  
+- **Editor**: lectura + modificación de recursos  
+- **Owner**: todo, incluyendo gestión de permisos e IAM  
+
+La cuenta del lab (`student…`) suele tener rol **Editor**.
+
+### Dar acceso a otra cuenta
+1. Se entró en **Navigation menu → IAM & Admin → IAM**.  
+2. Se hizo clic en **Grant Access**.  
+3. Se ingresó una segunda cuenta de estudiante provista por el lab.  
+4. Se le asignó el rol **Viewer**.  
+5. Se guardaron los cambios y se verificó que apareciera en la lista.
+
+El ejercicio muestra dónde se concede acceso a otra cuenta dentro del proyecto.
+
+---
+
+# 4. Activar una API
+
+La **API Library** es el lugar para activar un servicio antes de llamarlo desde el proyecto.
+
+### Pasos
+
+1. Ir a **Navigation menu → APIs & Services → Library**.  
+2. Buscar **Dialogflow API**.  
+3. Abrirla y presionar **Enable**.  
+4. Confirmar que la API aparece como habilitada.  
+5. Examinar la documentación mediante **Try this API**.
+
+La prueba deja claro el requisito: la API debe estar habilitada antes de usar el servicio.
+
+---
+
+# 5. Cerrar el lab
+
+Para cerrar:
+
+1. Desde la interfaz del lab se presionó **End Lab**.  
+2. Se envió la evaluación (opcional).  
+3. El proyecto temporal se eliminó por completo.  
+4. La sesión de la consola quedó invalidada automáticamente.
+
+Al cerrar el lab se elimina el proyecto temporal y la sesión deja de ser válida.
+
+---
+
+# Qué me llevo
+
+- Se recorrió la consola de Google Cloud desde cero.  
+- Se entendió cómo funcionan los proyectos temporales del sistema de labs.  
+- Se revisaron roles y permisos en **IAM** y se añadió un nuevo principal con rol Viewer.  
+- Se aprendió a habilitar APIs usando la **API Library**.  
+- Se comprendió el ciclo de vida completo del entorno del lab: iniciar, trabajar y destruir el proyecto temporal.
+
+Con este recorrido ya puedo pasar a labs de Compute Engine, Cloud Shell, redes, bases de datos y arquitecturas en Google Cloud.

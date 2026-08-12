@@ -1,0 +1,2854 @@
+{
+  "sources": {
+    "boston": {
+      "url": "https://lib.stat.cmu.edu/datasets/boston",
+      "sha256": "1df1f5ccfcd1cb9e8f9eaa2c871bb3355eafdde755267bcd593f817b21b92a7b"
+    },
+    "titanic": {
+      "url": "https://raw.githubusercontent.com/datasciencedojo/datasets/f0ccab6a7ceafdff780052166fb6fab3311398eb/titanic.csv",
+      "sha256": "4a437fde05fe5264e1701a7387ac6fb75393772ba38bb2c9c566405af5af4bd7"
+    }
+  },
+  "boston": {
+    "groups": [
+      {
+        "racial_group": "Low_African_American",
+        "mean": 12.004999999999999,
+        "median": 11.75,
+        "count": 20
+      },
+      {
+        "racial_group": "Medium_African_American",
+        "mean": 14.305263157894737,
+        "median": 14.1,
+        "count": 19
+      },
+      {
+        "racial_group": "High_African_American",
+        "mean": 23.31841541755889,
+        "median": 21.7,
+        "count": 467
+      }
+    ],
+    "correlation": [
+      {
+        "x": "MEDV",
+        "y": "MEDV",
+        "value": 1.0
+      },
+      {
+        "x": "MEDV",
+        "y": "Bk_racial",
+        "value": 0.3222755726925769
+      },
+      {
+        "x": "MEDV",
+        "y": "LSTAT",
+        "value": -0.7376627261740144
+      },
+      {
+        "x": "MEDV",
+        "y": "CRIM",
+        "value": -0.38830460858681154
+      },
+      {
+        "x": "Bk_racial",
+        "y": "MEDV",
+        "value": 0.3222755726925769
+      },
+      {
+        "x": "Bk_racial",
+        "y": "Bk_racial",
+        "value": 1.0
+      },
+      {
+        "x": "Bk_racial",
+        "y": "LSTAT",
+        "value": -0.3426495921617693
+      },
+      {
+        "x": "Bk_racial",
+        "y": "CRIM",
+        "value": -0.38556770168110094
+      },
+      {
+        "x": "LSTAT",
+        "y": "MEDV",
+        "value": -0.7376627261740144
+      },
+      {
+        "x": "LSTAT",
+        "y": "Bk_racial",
+        "value": -0.3426495921617693
+      },
+      {
+        "x": "LSTAT",
+        "y": "LSTAT",
+        "value": 1.0
+      },
+      {
+        "x": "LSTAT",
+        "y": "CRIM",
+        "value": 0.4556214794479463
+      },
+      {
+        "x": "CRIM",
+        "y": "MEDV",
+        "value": -0.38830460858681154
+      },
+      {
+        "x": "CRIM",
+        "y": "Bk_racial",
+        "value": -0.38556770168110094
+      },
+      {
+        "x": "CRIM",
+        "y": "LSTAT",
+        "value": 0.4556214794479463
+      },
+      {
+        "x": "CRIM",
+        "y": "CRIM",
+        "value": 1.0
+      }
+    ],
+    "histogram": [
+      {
+        "x": 0.6580904014229982,
+        "count": 1
+      },
+      {
+        "x": 0.6784941166289984,
+        "count": 2
+      },
+      {
+        "x": 0.6988978318349983,
+        "count": 2
+      },
+      {
+        "x": 0.7193015470409985,
+        "count": 3
+      },
+      {
+        "x": 0.7397052622469986,
+        "count": 1
+      },
+      {
+        "x": 0.7601089774529985,
+        "count": 2
+      },
+      {
+        "x": 0.7805126926589987,
+        "count": 3
+      },
+      {
+        "x": 0.8009164078649986,
+        "count": 3
+      },
+      {
+        "x": 0.8213201230709988,
+        "count": 1
+      },
+      {
+        "x": 0.8417238382769988,
+        "count": 2
+      },
+      {
+        "x": 0.8621275534829989,
+        "count": 1
+      },
+      {
+        "x": 0.882531268688999,
+        "count": 2
+      },
+      {
+        "x": 0.9029349838949989,
+        "count": 1
+      },
+      {
+        "x": 0.9233386991009991,
+        "count": 5
+      },
+      {
+        "x": 0.943742414306999,
+        "count": 4
+      },
+      {
+        "x": 0.9641461295129992,
+        "count": 1
+      },
+      {
+        "x": 0.9845498447189992,
+        "count": 2
+      },
+      {
+        "x": 1.0049535599249992,
+        "count": 0
+      },
+      {
+        "x": 1.0253572751309994,
+        "count": 0
+      },
+      {
+        "x": 1.0457609903369995,
+        "count": 3
+      },
+      {
+        "x": 1.0661647055429995,
+        "count": 0
+      },
+      {
+        "x": 1.0865684207489994,
+        "count": 1
+      },
+      {
+        "x": 1.1069721359549995,
+        "count": 2
+      },
+      {
+        "x": 1.1273758511609997,
+        "count": 4
+      },
+      {
+        "x": 1.1477795663669998,
+        "count": 3
+      },
+      {
+        "x": 1.1681832815729996,
+        "count": 5
+      },
+      {
+        "x": 1.1885869967789997,
+        "count": 11
+      },
+      {
+        "x": 1.2089907119849999,
+        "count": 13
+      },
+      {
+        "x": 1.229394427191,
+        "count": 35
+      },
+      {
+        "x": 1.2497981423970002,
+        "count": 393
+      }
+    ],
+    "scatter": [
+      {
+        "racial": 1.26,
+        "price": 24.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 21.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2567615176444704,
+        "price": 34.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2581958293398645,
+        "price": 33.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 36.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2577897737300283,
+        "price": 28.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2589674077406556,
+        "price": 22.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 27.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.251795786412227,
+        "price": 16.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2518601128871347,
+        "price": 18.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2565141658414438,
+        "price": 15.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 18.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2548999919987196,
+        "price": 21.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.246457622225567,
+        "price": 18.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2589833066147305,
+        "price": 19.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2519726682097856,
+        "price": 23.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2518922736294447,
+        "price": 17.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1675779013315188,
+        "price": 20.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2552599459424856,
+        "price": 18.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2436529964075789,
+        "price": 13.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.256522146456133,
+        "price": 19.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 15.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2581241915417682,
+        "price": 14.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2579570048976283,
+        "price": 15.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.18083572868869,
+        "price": 13.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2439055301917388,
+        "price": 16.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1835160340947677,
+        "price": 14.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2528482961363867,
+        "price": 18.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.246627926711076,
+        "price": 21.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2301416499460773,
+        "price": 12.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2437833493994441,
+        "price": 14.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1122862220714997,
+        "price": 13.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2289741229802837,
+        "price": 13.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1283071342054014,
+        "price": 13.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 18.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2444591117397479,
+        "price": 20.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 21.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2572399859702823,
+        "price": 24.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2589912559010656,
+        "price": 30.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2589833066147305,
+        "price": 34.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2508139818013122,
+        "price": 26.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2491687976634482,
+        "price": 25.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2580605066392887,
+        "price": 24.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2540112178478844,
+        "price": 21.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2566897158881738,
+        "price": 16.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 14.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258935608786782,
+        "price": 19.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.257670295617054,
+        "price": 20.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 25.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 18.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2592296877929394,
+        "price": 35.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 24.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2568173577685928,
+        "price": 31.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.255043998451309,
+        "price": 23.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2585777597083752,
+        "price": 18.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.244882102520475,
+        "price": 16.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 22.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258951508464683,
+        "price": 25.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.257088510499116,
+        "price": 33.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.259452142740018,
+        "price": 22.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 17.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2494594417716143,
+        "price": 24.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2439543957005275,
+        "price": 21.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2552279584279642,
+        "price": 22.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2441416774653875,
+        "price": 23.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2584266066932557,
+        "price": 24.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2490557325475633,
+        "price": 21.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2412773511263118,
+        "price": 20.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2520610902475737,
+        "price": 20.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.251610810716802,
+        "price": 21.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2593329802258897,
+        "price": 20.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 28.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2589912559010656,
+        "price": 23.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 24.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2550119998848022,
+        "price": 22.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2563385665915838,
+        "price": 26.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.259277363330352,
+        "price": 22.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2586095767644652,
+        "price": 22.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2593329802258897,
+        "price": 28.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2562427644292589,
+        "price": 22.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2573356358441627,
+        "price": 22.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2584982100213173,
+        "price": 22.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2595474565114213,
+        "price": 25.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2283142986758715,
+        "price": 28.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.255963257707671,
+        "price": 21.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 38.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2573196952113013,
+        "price": 43.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 33.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2582992917392155,
+        "price": 27.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258951508464683,
+        "price": 26.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.8960826939130014,
+        "price": 18.6,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 1.2580684676052445,
+        "price": 19.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2566498224686575,
+        "price": 20.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2577340201072427,
+        "price": 19.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.259023052041815,
+        "price": 19.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2526475728692756,
+        "price": 20.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2586811592532419,
+        "price": 19.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.255483812740186,
+        "price": 19.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2572878127303286,
+        "price": 21.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2589594581529084,
+        "price": 22.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258450475375745,
+        "price": 18.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 18.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.253490176346027,
+        "price": 18.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2172903881386108,
+        "price": 18.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2571363488110063,
+        "price": 21.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258100310460041,
+        "price": 19.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2119192383827846,
+        "price": 20.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2556996084384262,
+        "price": 19.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2538188839719426,
+        "price": 22.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2445486148385658,
+        "price": 20.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2448902341068688,
+        "price": 20.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2385310181083624,
+        "price": 17.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2459383085991649,
+        "price": 18.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.250499798549524,
+        "price": 21.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2294080413207684,
+        "price": 15.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2561868730658605,
+        "price": 16.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 18.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 14.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258522075984607,
+        "price": 19.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2510958058142077,
+        "price": 23.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.253450078193916,
+        "price": 18.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1426012095186666,
+        "price": 15.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2582276657391014,
+        "price": 18.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.245020324867398,
+        "price": 17.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.257757915123338,
+        "price": 17.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.256130976713339,
+        "price": 13.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 17.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2529606729160356,
+        "price": 14.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 14.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 13.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 15.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 11.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.04582448220373,
+        "price": 13.8,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 1.041424355137126,
+        "price": 15.6,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 1.2558673980964339,
+        "price": 14.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2274864015188967,
+        "price": 17.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.223169453023333,
+        "price": 15.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2405735008989498,
+        "price": 21.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2144655678480984,
+        "price": 19.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2159010155307806,
+        "price": 15.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1418105118107678,
+        "price": 19.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.196586268806437,
+        "price": 17.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.9266647940015802,
+        "price": 15.6,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.9277079105432033,
+        "price": 13.1,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 1.2328515571846854,
+        "price": 41.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2248865438047831,
+        "price": 24.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.233580980482321,
+        "price": 23.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2121683605281208,
+        "price": 27.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.24190685565697,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2541874718383892,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2532575711533716,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2585777597083752,
+        "price": 22.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1200612206653369,
+        "price": 25.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2377005841695399,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1070848981051487,
+        "price": 23.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1750596297654048,
+        "price": 23.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2044910791300418,
+        "price": 22.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.170638511391854,
+        "price": 17.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2200254231810694,
+        "price": 19.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258887907341205,
+        "price": 23.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.257080537092326,
+        "price": 22.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2552679425654252,
+        "price": 29.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.257080537092326,
+        "price": 23.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2589674077406556,
+        "price": 24.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2555157871708755,
+        "price": 29.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 37.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258935608786782,
+        "price": 39.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 36.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2577897737300283,
+        "price": 37.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 32.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2552999280345394,
+        "price": 26.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2521816455023405,
+        "price": 29.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2566019470126149,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2575906309052103,
+        "price": 32.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2487406564951102,
+        "price": 29.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 34.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2445567508375448,
+        "price": 37.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2542675708380182,
+        "price": 30.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2548919906671872,
+        "price": 36.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2571921555631893,
+        "price": 31.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2437589103222861,
+        "price": 29.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2578773765632905,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 33.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2252394476175112,
+        "price": 30.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.256258732474047,
+        "price": 34.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 34.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2499193495931546,
+        "price": 32.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.257510956079653,
+        "price": 24.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2587924935938724,
+        "price": 42.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2567216287954326,
+        "price": 48.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2549399971197235,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 22.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2583868235410414,
+        "price": 24.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2540432677306919,
+        "price": 22.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2475111335028706,
+        "price": 24.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.257096483804526,
+        "price": 21.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2586811592532419,
+        "price": 19.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2552519492172736,
+        "price": 22.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2511360559490972,
+        "price": 28.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2207029710438233,
+        "price": 23.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2573993943254966,
+        "price": 25.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.256737584639696,
+        "price": 23.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2567216287954326,
+        "price": 28.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 21.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2574870516592354,
+        "price": 23.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.255859409132754,
+        "price": 26.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2586811592532419,
+        "price": 21.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2548119717162916,
+        "price": 27.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 30.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2505239721396748,
+        "price": 44.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2480614856144978,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.252398586116646,
+        "price": 37.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2399836063370884,
+        "price": 31.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2444184242029206,
+        "price": 46.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2467171150535714,
+        "price": 31.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2451016176210237,
+        "price": 24.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2433025354586429,
+        "price": 31.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2512165483951632,
+        "price": 41.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2455891487022819,
+        "price": 48.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2301666435249463,
+        "price": 29.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.243799641576956,
+        "price": 24.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2532575711533716,
+        "price": 25.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2545558421790641,
+        "price": 31.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2459626612060184,
+        "price": 23.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2494997982243417,
+        "price": 23.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.25549980015984,
+        "price": 22.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2581878699879518,
+        "price": 20.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2405325544145867,
+        "price": 22.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2421356058913744,
+        "price": 23.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2403195884124973,
+        "price": 17.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2538028534721528,
+        "price": 18.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2546438985534079,
+        "price": 24.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2433025354586429,
+        "price": 20.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2421356058913744,
+        "price": 24.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2574870516592354,
+        "price": 26.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2595077441938263,
+        "price": 24.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2440602576294935,
+        "price": 24.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.251361408521643,
+        "price": 29.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 42.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2568093809125704,
+        "price": 21.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2586334384997349,
+        "price": 20.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2515625471342364,
+        "price": 44.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2542595614005445,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2491041915542165,
+        "price": 36.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2560431295046692,
+        "price": 30.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.256737584639696,
+        "price": 33.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2531933889251392,
+        "price": 43.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2519807070962892,
+        "price": 48.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2572320144890565,
+        "price": 31.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.252808156658212,
+        "price": 36.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2564183905346331,
+        "price": 22.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2497338138265492,
+        "price": 30.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2501128929477276,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.254739945897491,
+        "price": 43.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2555717384920775,
+        "price": 20.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.25341799781527,
+        "price": 21.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 25.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2584584314017913,
+        "price": 24.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2551159892371975,
+        "price": 35.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 32.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 32.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2538990302925628,
+        "price": 33.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2572559286288172,
+        "price": 33.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 29.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 35.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.25234234951512,
+        "price": 45.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2562826837778607,
+        "price": 35.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2440602576294935,
+        "price": 46.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2589038082250734,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258267458969506,
+        "price": 32.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258267458969506,
+        "price": 22.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2144655678480984,
+        "price": 20.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 22.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2396884450274583,
+        "price": 24.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 28.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 37.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 27.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 21.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 28.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2567774724732854,
+        "price": 27.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2368278174243499,
+        "price": 22.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2395736214765203,
+        "price": 29.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.255187971733302,
+        "price": 24.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2590866395020641,
+        "price": 22.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2493625755565152,
+        "price": 26.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.254843980526339,
+        "price": 33.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2574392400862413,
+        "price": 36.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2571841834740414,
+        "price": 28.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 33.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 28.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 22.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2594759725358864,
+        "price": 20.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2219881755575868,
+        "price": 16.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 22.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2595236294214858,
+        "price": 19.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2572080994374992,
+        "price": 21.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2590389495094878,
+        "price": 23.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2596189323710016,
+        "price": 16.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2550599971202765,
+        "price": 17.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2586572993292928,
+        "price": 23.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2594680293708331,
+        "price": 21.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2554038695115342,
+        "price": 18.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 25.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2574392400862413,
+        "price": 24.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 22.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2484173348152523,
+        "price": 19.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2425438759795089,
+        "price": 22.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2370996623290118,
+        "price": 19.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2577101241815365,
+        "price": 17.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2318720794321663,
+        "price": 19.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2542675708380182,
+        "price": 22.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2540192304729079,
+        "price": 20.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 21.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2583390804334869,
+        "price": 18.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2593965363743274,
+        "price": 20.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 18.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2582833755559668,
+        "price": 32.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2544677733878666,
+        "price": 16.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2528723785816802,
+        "price": 31.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2509991948464991,
+        "price": 17.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2338294461186867,
+        "price": 17.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2564423357341041,
+        "price": 23.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2552519492172736,
+        "price": 24.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2543796921745614,
+        "price": 26.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 22.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2389170715294489,
+        "price": 24.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.256362514842643,
+        "price": 18.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2500483852087674,
+        "price": 30.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2487083319303207,
+        "price": 18.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.243221004206477,
+        "price": 20.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2445974292168818,
+        "price": 17.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2555717384920775,
+        "price": 21.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2588322510813197,
+        "price": 22.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2550919932297966,
+        "price": 22.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2420130717558244,
+        "price": 25.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2221570737566174,
+        "price": 19.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2470818422219212,
+        "price": 20.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.224171692358362,
+        "price": 16.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2254410130315176,
+        "price": 21.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.225566956773124,
+        "price": 27.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.192165456071431,
+        "price": 21.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.992518965021142,
+        "price": 23.1,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 1.2427968668327214,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2426418203159169,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2561389622120636,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2351032969667246,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2198135298549873,
+        "price": 50.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 13.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 13.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 15.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.232511410680329,
+        "price": 13.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 13.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 13.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2574870516592354,
+        "price": 10.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 10.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 10.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 11.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 12.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1646307136706606,
+        "price": 8.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 7.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 10.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 7.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2406717612596805,
+        "price": 10.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 11.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2580366231359443,
+        "price": 15.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2451260033521587,
+        "price": 23.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 9.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 13.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 12.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2560830615820875,
+        "price": 13.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 12.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2569768735766895,
+        "price": 8.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 5.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2115152620525107,
+        "price": 6.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 5.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 7.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2432780772210923,
+        "price": 12.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 8.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2039860625485606,
+        "price": 8.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2504595071396682,
+        "price": 5.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2384570650423907,
+        "price": 11.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2062725049835366,
+        "price": 27.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1909278028409718,
+        "price": 17.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.0535091498421256,
+        "price": 27.5,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.6809901951359278,
+        "price": 15.0,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.8172164522684906,
+        "price": 17.2,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.7996761621442446,
+        "price": 17.9,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 1.0893147069276141,
+        "price": 16.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.9271026758546614,
+        "price": 7.0,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.7950757401921917,
+        "price": 7.2,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.7768672870315239,
+        "price": 7.5,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.9868753283711273,
+        "price": 10.4,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.7582575533838066,
+        "price": 8.8,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.8501136070305514,
+        "price": 8.4,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 1.1945794895318107,
+        "price": 16.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1956677470034862,
+        "price": 14.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.169953701718953,
+        "price": 20.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.6801996015920445,
+        "price": 13.4,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.6904152298679729,
+        "price": 11.7,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.7176356092008266,
+        "price": 8.3,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.7870031846810759,
+        "price": 10.2,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.7671860051171402,
+        "price": 10.9,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.9410144691167921,
+        "price": 11.0,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.8764142853001831,
+        "price": 9.5,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.9188771365130858,
+        "price": 14.5,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.915184151032276,
+        "price": 14.1,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.9429696470905765,
+        "price": 16.1,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.9465280398321767,
+        "price": 14.3,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.947222319517401,
+        "price": 11.7,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.961436268383531,
+        "price": 13.4,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.7958010856418015,
+        "price": 9.6,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.7265401470891774,
+        "price": 8.7,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.8925833201100177,
+        "price": 8.4,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 12.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2556596518875098,
+        "price": 10.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.251256790707353,
+        "price": 17.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2590389495094878,
+        "price": 18.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2518761934661915,
+        "price": 15.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1204283841704108,
+        "price": 10.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.8375090359478353,
+        "price": 11.8,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 1.1939237537114393,
+        "price": 14.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.25331372518179,
+        "price": 12.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 14.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1815523547225593,
+        "price": 13.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.6478885438199983,
+        "price": 13.4,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 1.2260620773040338,
+        "price": 15.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.250556202128381,
+        "price": 16.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.24308237619426,
+        "price": 17.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.7117312669668102,
+        "price": 14.9,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.8556546033210933,
+        "price": 14.1,
+        "racial_group": "Medium_African_American"
+      },
+      {
+        "racial": 0.7323718711365579,
+        "price": 12.7,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 0.6891607978309962,
+        "price": 13.5,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 1.1517374818814534,
+        "price": 14.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1352029295243646,
+        "price": 16.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2556436685526355,
+        "price": 17.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2575507947568867,
+        "price": 20.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 21.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2082732917920382,
+        "price": 19.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 0.7783576759052258,
+        "price": 19.0,
+        "racial_group": "Low_African_American"
+      },
+      {
+        "racial": 1.2055779703915013,
+        "price": 19.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2372396561490364,
+        "price": 19.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.258752733592467,
+        "price": 19.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2571921555631893,
+        "price": 23.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2421111010266028,
+        "price": 29.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2237844726834815,
+        "price": 13.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1802363128692979,
+        "price": 13.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.259452142740018,
+        "price": 16.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.221168334740622,
+        "price": 12.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.246198020120156,
+        "price": 14.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.249128419635216,
+        "price": 21.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2569529487928102,
+        "price": 23.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2587129710766272,
+        "price": 25.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2568333111761052,
+        "price": 21.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2388760136513837,
+        "price": 20.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2533939364478934,
+        "price": 21.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2566418434799898,
+        "price": 19.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2530730294275303,
+        "price": 20.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2585618505763772,
+        "price": 15.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2165577550420759,
+        "price": 7.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.1942960216056817,
+        "price": 8.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.25458786411521,
+        "price": 13.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 21.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 24.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2571283760124397,
+        "price": 23.1,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 19.7,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 18.3,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 21.2,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.259102535362877,
+        "price": 17.5,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 16.8,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2560910476919471,
+        "price": 22.4,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 20.6,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 23.9,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.2572559286288172,
+        "price": 22.0,
+        "racial_group": "High_African_American"
+      },
+      {
+        "racial": 1.26,
+        "price": 11.9,
+        "racial_group": "High_African_American"
+      }
+    ]
+  },
+  "titanic": {
+    "gender": [
+      {
+        "group": "female",
+        "rate": 0.7547892720306514
+      },
+      {
+        "group": "male",
+        "rate": 0.2052980132450331
+      }
+    ],
+    "classRates": [
+      {
+        "group": 1,
+        "rate": 0.6559139784946236
+      },
+      {
+        "group": 2,
+        "rate": 0.4797687861271676
+      },
+      {
+        "group": 3,
+        "rate": 0.23943661971830985
+      }
+    ],
+    "intersection": [
+      {
+        "Sex": "female",
+        "class": 1,
+        "rate": 0.9647058823529412
+      },
+      {
+        "Sex": "male",
+        "class": 1,
+        "rate": 0.39603960396039606
+      },
+      {
+        "Sex": "female",
+        "class": 2,
+        "rate": 0.918918918918919
+      },
+      {
+        "Sex": "male",
+        "class": 2,
+        "rate": 0.15151515151515152
+      },
+      {
+        "Sex": "female",
+        "class": 3,
+        "rate": 0.46078431372549017
+      },
+      {
+        "Sex": "male",
+        "class": 3,
+        "rate": 0.15019762845849802
+      }
+    ],
+    "counts": [
+      {
+        "group": "female · Clase 1",
+        "count": 85
+      },
+      {
+        "group": "female · Clase 2",
+        "count": 74
+      },
+      {
+        "group": "female · Clase 3",
+        "count": 102
+      },
+      {
+        "group": "male · Clase 1",
+        "count": 101
+      },
+      {
+        "group": "male · Clase 2",
+        "count": 99
+      },
+      {
+        "group": "male · Clase 3",
+        "count": 253
+      }
+    ]
+  }
+}

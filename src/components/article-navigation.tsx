@@ -1,4 +1,8 @@
-import { RiArrowUpSLine, RiMore2Line } from "@remixicon/react"
+import {
+  RiArrowLeftRightLine,
+  RiArrowUpSLine,
+  RiMore2Line,
+} from "@remixicon/react"
 
 import { Button } from "@/components/ui/button"
 import { House6FillIcon } from "@/components/icons"
@@ -22,6 +26,11 @@ type ArticleHeading = {
 type ArticleNavigationProps = {
   title: string
   headings: ArticleHeading[]
+  variant?: {
+    href: string
+    label: string
+    shortLabel: string
+  }
 }
 
 type ArticleMenuItemsProps = ArticleNavigationProps & {
@@ -33,6 +42,7 @@ type ArticleMenuItemsProps = ArticleNavigationProps & {
 function ArticleMenuItems({
   title,
   headings,
+  variant,
   showHome = false,
   onScrollToTop,
   onScrollToHeading,
@@ -44,6 +54,17 @@ function ArticleMenuItems({
           <DropdownMenuItem render={<a href="/" data-astro-prefetch="hover" />}>
             <House6FillIcon />
             Inicio
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+        </>
+      )}
+      {variant && (
+        <>
+          <DropdownMenuItem
+            render={<a href={variant.href} data-astro-prefetch="hover" />}
+          >
+            <RiArrowLeftRightLine />
+            {variant.label}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
         </>
@@ -63,7 +84,11 @@ function ArticleMenuItems({
   )
 }
 
-export function ArticleNavigation({ title, headings }: ArticleNavigationProps) {
+export function ArticleNavigation({
+  title,
+  headings,
+  variant,
+}: ArticleNavigationProps) {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
     window.history.replaceState(null, "", window.location.pathname)
@@ -102,6 +127,7 @@ export function ArticleNavigation({ title, headings }: ArticleNavigationProps) {
             <ArticleMenuItems
               title={title}
               headings={headings}
+              variant={variant}
               showHome
               onScrollToTop={scrollToTop}
               onScrollToHeading={scrollToHeading}
@@ -121,6 +147,23 @@ export function ArticleNavigation({ title, headings }: ArticleNavigationProps) {
         >
           <House6FillIcon data-icon="inline-start" />
         </Button>
+        {variant && (
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={
+              <a
+                href={variant.href}
+                aria-label={variant.label}
+                title={variant.label}
+                data-astro-prefetch="hover"
+              />
+            }
+          >
+            <RiArrowLeftRightLine data-icon="inline-start" />
+            <span>{variant.shortLabel}</span>
+          </Button>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger
             render={<Button variant="outline" className="min-w-0 shrink" />}
@@ -136,6 +179,7 @@ export function ArticleNavigation({ title, headings }: ArticleNavigationProps) {
             <ArticleMenuItems
               title={title}
               headings={headings}
+              variant={variant}
               onScrollToTop={scrollToTop}
               onScrollToHeading={scrollToHeading}
             />

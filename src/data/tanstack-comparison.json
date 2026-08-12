@@ -1,0 +1,6338 @@
+{
+  "source": {
+    "iris": {
+      "url": "https://raw.githubusercontent.com/mwaskom/seaborn-data/71e2436a092d714350de0fc409ca8a8714e7e78f/iris.csv",
+      "sha256": "9cc1c345c71bcc9b486b74cbf6063fa66f4bb5e0f603a4b3c3471ec2e5e8e355"
+    },
+    "netflix": {
+      "url": "https://raw.githubusercontent.com/swapnilg4u/Netflix-Data-Analysis/ed43f20aade686a7231369edbe571683588867a0/netflix_titles.csv",
+      "sha256": "7df8166ec178f05b79ad9fbe2be95816bccf14c88dfe30423f60001894b377e5"
+    },
+    "generatedBy": "scripts/generate-tanstack-comparison-data.mjs"
+  },
+  "iris": {
+    "rows": [
+      {
+        "id": 1,
+        "species": "setosa",
+        "sepalLength": 5.1,
+        "sepalWidth": 3.5,
+        "petalLength": 1.4,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 2,
+        "species": "setosa",
+        "sepalLength": 4.9,
+        "sepalWidth": 3,
+        "petalLength": 1.4,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 3,
+        "species": "setosa",
+        "sepalLength": 4.7,
+        "sepalWidth": 3.2,
+        "petalLength": 1.3,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 4,
+        "species": "setosa",
+        "sepalLength": 4.6,
+        "sepalWidth": 3.1,
+        "petalLength": 1.5,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 5,
+        "species": "setosa",
+        "sepalLength": 5,
+        "sepalWidth": 3.6,
+        "petalLength": 1.4,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 6,
+        "species": "setosa",
+        "sepalLength": 5.4,
+        "sepalWidth": 3.9,
+        "petalLength": 1.7,
+        "petalWidth": 0.4
+      },
+      {
+        "id": 7,
+        "species": "setosa",
+        "sepalLength": 4.6,
+        "sepalWidth": 3.4,
+        "petalLength": 1.4,
+        "petalWidth": 0.3
+      },
+      {
+        "id": 8,
+        "species": "setosa",
+        "sepalLength": 5,
+        "sepalWidth": 3.4,
+        "petalLength": 1.5,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 9,
+        "species": "setosa",
+        "sepalLength": 4.4,
+        "sepalWidth": 2.9,
+        "petalLength": 1.4,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 10,
+        "species": "setosa",
+        "sepalLength": 4.9,
+        "sepalWidth": 3.1,
+        "petalLength": 1.5,
+        "petalWidth": 0.1
+      },
+      {
+        "id": 11,
+        "species": "setosa",
+        "sepalLength": 5.4,
+        "sepalWidth": 3.7,
+        "petalLength": 1.5,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 12,
+        "species": "setosa",
+        "sepalLength": 4.8,
+        "sepalWidth": 3.4,
+        "petalLength": 1.6,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 13,
+        "species": "setosa",
+        "sepalLength": 4.8,
+        "sepalWidth": 3,
+        "petalLength": 1.4,
+        "petalWidth": 0.1
+      },
+      {
+        "id": 14,
+        "species": "setosa",
+        "sepalLength": 4.3,
+        "sepalWidth": 3,
+        "petalLength": 1.1,
+        "petalWidth": 0.1
+      },
+      {
+        "id": 15,
+        "species": "setosa",
+        "sepalLength": 5.8,
+        "sepalWidth": 4,
+        "petalLength": 1.2,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 16,
+        "species": "setosa",
+        "sepalLength": 5.7,
+        "sepalWidth": 4.4,
+        "petalLength": 1.5,
+        "petalWidth": 0.4
+      },
+      {
+        "id": 17,
+        "species": "setosa",
+        "sepalLength": 5.4,
+        "sepalWidth": 3.9,
+        "petalLength": 1.3,
+        "petalWidth": 0.4
+      },
+      {
+        "id": 18,
+        "species": "setosa",
+        "sepalLength": 5.1,
+        "sepalWidth": 3.5,
+        "petalLength": 1.4,
+        "petalWidth": 0.3
+      },
+      {
+        "id": 19,
+        "species": "setosa",
+        "sepalLength": 5.7,
+        "sepalWidth": 3.8,
+        "petalLength": 1.7,
+        "petalWidth": 0.3
+      },
+      {
+        "id": 20,
+        "species": "setosa",
+        "sepalLength": 5.1,
+        "sepalWidth": 3.8,
+        "petalLength": 1.5,
+        "petalWidth": 0.3
+      },
+      {
+        "id": 21,
+        "species": "setosa",
+        "sepalLength": 5.4,
+        "sepalWidth": 3.4,
+        "petalLength": 1.7,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 22,
+        "species": "setosa",
+        "sepalLength": 5.1,
+        "sepalWidth": 3.7,
+        "petalLength": 1.5,
+        "petalWidth": 0.4
+      },
+      {
+        "id": 23,
+        "species": "setosa",
+        "sepalLength": 4.6,
+        "sepalWidth": 3.6,
+        "petalLength": 1,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 24,
+        "species": "setosa",
+        "sepalLength": 5.1,
+        "sepalWidth": 3.3,
+        "petalLength": 1.7,
+        "petalWidth": 0.5
+      },
+      {
+        "id": 25,
+        "species": "setosa",
+        "sepalLength": 4.8,
+        "sepalWidth": 3.4,
+        "petalLength": 1.9,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 26,
+        "species": "setosa",
+        "sepalLength": 5,
+        "sepalWidth": 3,
+        "petalLength": 1.6,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 27,
+        "species": "setosa",
+        "sepalLength": 5,
+        "sepalWidth": 3.4,
+        "petalLength": 1.6,
+        "petalWidth": 0.4
+      },
+      {
+        "id": 28,
+        "species": "setosa",
+        "sepalLength": 5.2,
+        "sepalWidth": 3.5,
+        "petalLength": 1.5,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 29,
+        "species": "setosa",
+        "sepalLength": 5.2,
+        "sepalWidth": 3.4,
+        "petalLength": 1.4,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 30,
+        "species": "setosa",
+        "sepalLength": 4.7,
+        "sepalWidth": 3.2,
+        "petalLength": 1.6,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 31,
+        "species": "setosa",
+        "sepalLength": 4.8,
+        "sepalWidth": 3.1,
+        "petalLength": 1.6,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 32,
+        "species": "setosa",
+        "sepalLength": 5.4,
+        "sepalWidth": 3.4,
+        "petalLength": 1.5,
+        "petalWidth": 0.4
+      },
+      {
+        "id": 33,
+        "species": "setosa",
+        "sepalLength": 5.2,
+        "sepalWidth": 4.1,
+        "petalLength": 1.5,
+        "petalWidth": 0.1
+      },
+      {
+        "id": 34,
+        "species": "setosa",
+        "sepalLength": 5.5,
+        "sepalWidth": 4.2,
+        "petalLength": 1.4,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 35,
+        "species": "setosa",
+        "sepalLength": 4.9,
+        "sepalWidth": 3.1,
+        "petalLength": 1.5,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 36,
+        "species": "setosa",
+        "sepalLength": 5,
+        "sepalWidth": 3.2,
+        "petalLength": 1.2,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 37,
+        "species": "setosa",
+        "sepalLength": 5.5,
+        "sepalWidth": 3.5,
+        "petalLength": 1.3,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 38,
+        "species": "setosa",
+        "sepalLength": 4.9,
+        "sepalWidth": 3.6,
+        "petalLength": 1.4,
+        "petalWidth": 0.1
+      },
+      {
+        "id": 39,
+        "species": "setosa",
+        "sepalLength": 4.4,
+        "sepalWidth": 3,
+        "petalLength": 1.3,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 40,
+        "species": "setosa",
+        "sepalLength": 5.1,
+        "sepalWidth": 3.4,
+        "petalLength": 1.5,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 41,
+        "species": "setosa",
+        "sepalLength": 5,
+        "sepalWidth": 3.5,
+        "petalLength": 1.3,
+        "petalWidth": 0.3
+      },
+      {
+        "id": 42,
+        "species": "setosa",
+        "sepalLength": 4.5,
+        "sepalWidth": 2.3,
+        "petalLength": 1.3,
+        "petalWidth": 0.3
+      },
+      {
+        "id": 43,
+        "species": "setosa",
+        "sepalLength": 4.4,
+        "sepalWidth": 3.2,
+        "petalLength": 1.3,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 44,
+        "species": "setosa",
+        "sepalLength": 5,
+        "sepalWidth": 3.5,
+        "petalLength": 1.6,
+        "petalWidth": 0.6
+      },
+      {
+        "id": 45,
+        "species": "setosa",
+        "sepalLength": 5.1,
+        "sepalWidth": 3.8,
+        "petalLength": 1.9,
+        "petalWidth": 0.4
+      },
+      {
+        "id": 46,
+        "species": "setosa",
+        "sepalLength": 4.8,
+        "sepalWidth": 3,
+        "petalLength": 1.4,
+        "petalWidth": 0.3
+      },
+      {
+        "id": 47,
+        "species": "setosa",
+        "sepalLength": 5.1,
+        "sepalWidth": 3.8,
+        "petalLength": 1.6,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 48,
+        "species": "setosa",
+        "sepalLength": 4.6,
+        "sepalWidth": 3.2,
+        "petalLength": 1.4,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 49,
+        "species": "setosa",
+        "sepalLength": 5.3,
+        "sepalWidth": 3.7,
+        "petalLength": 1.5,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 50,
+        "species": "setosa",
+        "sepalLength": 5,
+        "sepalWidth": 3.3,
+        "petalLength": 1.4,
+        "petalWidth": 0.2
+      },
+      {
+        "id": 51,
+        "species": "versicolor",
+        "sepalLength": 7,
+        "sepalWidth": 3.2,
+        "petalLength": 4.7,
+        "petalWidth": 1.4
+      },
+      {
+        "id": 52,
+        "species": "versicolor",
+        "sepalLength": 6.4,
+        "sepalWidth": 3.2,
+        "petalLength": 4.5,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 53,
+        "species": "versicolor",
+        "sepalLength": 6.9,
+        "sepalWidth": 3.1,
+        "petalLength": 4.9,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 54,
+        "species": "versicolor",
+        "sepalLength": 5.5,
+        "sepalWidth": 2.3,
+        "petalLength": 4,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 55,
+        "species": "versicolor",
+        "sepalLength": 6.5,
+        "sepalWidth": 2.8,
+        "petalLength": 4.6,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 56,
+        "species": "versicolor",
+        "sepalLength": 5.7,
+        "sepalWidth": 2.8,
+        "petalLength": 4.5,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 57,
+        "species": "versicolor",
+        "sepalLength": 6.3,
+        "sepalWidth": 3.3,
+        "petalLength": 4.7,
+        "petalWidth": 1.6
+      },
+      {
+        "id": 58,
+        "species": "versicolor",
+        "sepalLength": 4.9,
+        "sepalWidth": 2.4,
+        "petalLength": 3.3,
+        "petalWidth": 1
+      },
+      {
+        "id": 59,
+        "species": "versicolor",
+        "sepalLength": 6.6,
+        "sepalWidth": 2.9,
+        "petalLength": 4.6,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 60,
+        "species": "versicolor",
+        "sepalLength": 5.2,
+        "sepalWidth": 2.7,
+        "petalLength": 3.9,
+        "petalWidth": 1.4
+      },
+      {
+        "id": 61,
+        "species": "versicolor",
+        "sepalLength": 5,
+        "sepalWidth": 2,
+        "petalLength": 3.5,
+        "petalWidth": 1
+      },
+      {
+        "id": 62,
+        "species": "versicolor",
+        "sepalLength": 5.9,
+        "sepalWidth": 3,
+        "petalLength": 4.2,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 63,
+        "species": "versicolor",
+        "sepalLength": 6,
+        "sepalWidth": 2.2,
+        "petalLength": 4,
+        "petalWidth": 1
+      },
+      {
+        "id": 64,
+        "species": "versicolor",
+        "sepalLength": 6.1,
+        "sepalWidth": 2.9,
+        "petalLength": 4.7,
+        "petalWidth": 1.4
+      },
+      {
+        "id": 65,
+        "species": "versicolor",
+        "sepalLength": 5.6,
+        "sepalWidth": 2.9,
+        "petalLength": 3.6,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 66,
+        "species": "versicolor",
+        "sepalLength": 6.7,
+        "sepalWidth": 3.1,
+        "petalLength": 4.4,
+        "petalWidth": 1.4
+      },
+      {
+        "id": 67,
+        "species": "versicolor",
+        "sepalLength": 5.6,
+        "sepalWidth": 3,
+        "petalLength": 4.5,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 68,
+        "species": "versicolor",
+        "sepalLength": 5.8,
+        "sepalWidth": 2.7,
+        "petalLength": 4.1,
+        "petalWidth": 1
+      },
+      {
+        "id": 69,
+        "species": "versicolor",
+        "sepalLength": 6.2,
+        "sepalWidth": 2.2,
+        "petalLength": 4.5,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 70,
+        "species": "versicolor",
+        "sepalLength": 5.6,
+        "sepalWidth": 2.5,
+        "petalLength": 3.9,
+        "petalWidth": 1.1
+      },
+      {
+        "id": 71,
+        "species": "versicolor",
+        "sepalLength": 5.9,
+        "sepalWidth": 3.2,
+        "petalLength": 4.8,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 72,
+        "species": "versicolor",
+        "sepalLength": 6.1,
+        "sepalWidth": 2.8,
+        "petalLength": 4,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 73,
+        "species": "versicolor",
+        "sepalLength": 6.3,
+        "sepalWidth": 2.5,
+        "petalLength": 4.9,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 74,
+        "species": "versicolor",
+        "sepalLength": 6.1,
+        "sepalWidth": 2.8,
+        "petalLength": 4.7,
+        "petalWidth": 1.2
+      },
+      {
+        "id": 75,
+        "species": "versicolor",
+        "sepalLength": 6.4,
+        "sepalWidth": 2.9,
+        "petalLength": 4.3,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 76,
+        "species": "versicolor",
+        "sepalLength": 6.6,
+        "sepalWidth": 3,
+        "petalLength": 4.4,
+        "petalWidth": 1.4
+      },
+      {
+        "id": 77,
+        "species": "versicolor",
+        "sepalLength": 6.8,
+        "sepalWidth": 2.8,
+        "petalLength": 4.8,
+        "petalWidth": 1.4
+      },
+      {
+        "id": 78,
+        "species": "versicolor",
+        "sepalLength": 6.7,
+        "sepalWidth": 3,
+        "petalLength": 5,
+        "petalWidth": 1.7
+      },
+      {
+        "id": 79,
+        "species": "versicolor",
+        "sepalLength": 6,
+        "sepalWidth": 2.9,
+        "petalLength": 4.5,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 80,
+        "species": "versicolor",
+        "sepalLength": 5.7,
+        "sepalWidth": 2.6,
+        "petalLength": 3.5,
+        "petalWidth": 1
+      },
+      {
+        "id": 81,
+        "species": "versicolor",
+        "sepalLength": 5.5,
+        "sepalWidth": 2.4,
+        "petalLength": 3.8,
+        "petalWidth": 1.1
+      },
+      {
+        "id": 82,
+        "species": "versicolor",
+        "sepalLength": 5.5,
+        "sepalWidth": 2.4,
+        "petalLength": 3.7,
+        "petalWidth": 1
+      },
+      {
+        "id": 83,
+        "species": "versicolor",
+        "sepalLength": 5.8,
+        "sepalWidth": 2.7,
+        "petalLength": 3.9,
+        "petalWidth": 1.2
+      },
+      {
+        "id": 84,
+        "species": "versicolor",
+        "sepalLength": 6,
+        "sepalWidth": 2.7,
+        "petalLength": 5.1,
+        "petalWidth": 1.6
+      },
+      {
+        "id": 85,
+        "species": "versicolor",
+        "sepalLength": 5.4,
+        "sepalWidth": 3,
+        "petalLength": 4.5,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 86,
+        "species": "versicolor",
+        "sepalLength": 6,
+        "sepalWidth": 3.4,
+        "petalLength": 4.5,
+        "petalWidth": 1.6
+      },
+      {
+        "id": 87,
+        "species": "versicolor",
+        "sepalLength": 6.7,
+        "sepalWidth": 3.1,
+        "petalLength": 4.7,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 88,
+        "species": "versicolor",
+        "sepalLength": 6.3,
+        "sepalWidth": 2.3,
+        "petalLength": 4.4,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 89,
+        "species": "versicolor",
+        "sepalLength": 5.6,
+        "sepalWidth": 3,
+        "petalLength": 4.1,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 90,
+        "species": "versicolor",
+        "sepalLength": 5.5,
+        "sepalWidth": 2.5,
+        "petalLength": 4,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 91,
+        "species": "versicolor",
+        "sepalLength": 5.5,
+        "sepalWidth": 2.6,
+        "petalLength": 4.4,
+        "petalWidth": 1.2
+      },
+      {
+        "id": 92,
+        "species": "versicolor",
+        "sepalLength": 6.1,
+        "sepalWidth": 3,
+        "petalLength": 4.6,
+        "petalWidth": 1.4
+      },
+      {
+        "id": 93,
+        "species": "versicolor",
+        "sepalLength": 5.8,
+        "sepalWidth": 2.6,
+        "petalLength": 4,
+        "petalWidth": 1.2
+      },
+      {
+        "id": 94,
+        "species": "versicolor",
+        "sepalLength": 5,
+        "sepalWidth": 2.3,
+        "petalLength": 3.3,
+        "petalWidth": 1
+      },
+      {
+        "id": 95,
+        "species": "versicolor",
+        "sepalLength": 5.6,
+        "sepalWidth": 2.7,
+        "petalLength": 4.2,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 96,
+        "species": "versicolor",
+        "sepalLength": 5.7,
+        "sepalWidth": 3,
+        "petalLength": 4.2,
+        "petalWidth": 1.2
+      },
+      {
+        "id": 97,
+        "species": "versicolor",
+        "sepalLength": 5.7,
+        "sepalWidth": 2.9,
+        "petalLength": 4.2,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 98,
+        "species": "versicolor",
+        "sepalLength": 6.2,
+        "sepalWidth": 2.9,
+        "petalLength": 4.3,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 99,
+        "species": "versicolor",
+        "sepalLength": 5.1,
+        "sepalWidth": 2.5,
+        "petalLength": 3,
+        "petalWidth": 1.1
+      },
+      {
+        "id": 100,
+        "species": "versicolor",
+        "sepalLength": 5.7,
+        "sepalWidth": 2.8,
+        "petalLength": 4.1,
+        "petalWidth": 1.3
+      },
+      {
+        "id": 101,
+        "species": "virginica",
+        "sepalLength": 6.3,
+        "sepalWidth": 3.3,
+        "petalLength": 6,
+        "petalWidth": 2.5
+      },
+      {
+        "id": 102,
+        "species": "virginica",
+        "sepalLength": 5.8,
+        "sepalWidth": 2.7,
+        "petalLength": 5.1,
+        "petalWidth": 1.9
+      },
+      {
+        "id": 103,
+        "species": "virginica",
+        "sepalLength": 7.1,
+        "sepalWidth": 3,
+        "petalLength": 5.9,
+        "petalWidth": 2.1
+      },
+      {
+        "id": 104,
+        "species": "virginica",
+        "sepalLength": 6.3,
+        "sepalWidth": 2.9,
+        "petalLength": 5.6,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 105,
+        "species": "virginica",
+        "sepalLength": 6.5,
+        "sepalWidth": 3,
+        "petalLength": 5.8,
+        "petalWidth": 2.2
+      },
+      {
+        "id": 106,
+        "species": "virginica",
+        "sepalLength": 7.6,
+        "sepalWidth": 3,
+        "petalLength": 6.6,
+        "petalWidth": 2.1
+      },
+      {
+        "id": 107,
+        "species": "virginica",
+        "sepalLength": 4.9,
+        "sepalWidth": 2.5,
+        "petalLength": 4.5,
+        "petalWidth": 1.7
+      },
+      {
+        "id": 108,
+        "species": "virginica",
+        "sepalLength": 7.3,
+        "sepalWidth": 2.9,
+        "petalLength": 6.3,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 109,
+        "species": "virginica",
+        "sepalLength": 6.7,
+        "sepalWidth": 2.5,
+        "petalLength": 5.8,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 110,
+        "species": "virginica",
+        "sepalLength": 7.2,
+        "sepalWidth": 3.6,
+        "petalLength": 6.1,
+        "petalWidth": 2.5
+      },
+      {
+        "id": 111,
+        "species": "virginica",
+        "sepalLength": 6.5,
+        "sepalWidth": 3.2,
+        "petalLength": 5.1,
+        "petalWidth": 2
+      },
+      {
+        "id": 112,
+        "species": "virginica",
+        "sepalLength": 6.4,
+        "sepalWidth": 2.7,
+        "petalLength": 5.3,
+        "petalWidth": 1.9
+      },
+      {
+        "id": 113,
+        "species": "virginica",
+        "sepalLength": 6.8,
+        "sepalWidth": 3,
+        "petalLength": 5.5,
+        "petalWidth": 2.1
+      },
+      {
+        "id": 114,
+        "species": "virginica",
+        "sepalLength": 5.7,
+        "sepalWidth": 2.5,
+        "petalLength": 5,
+        "petalWidth": 2
+      },
+      {
+        "id": 115,
+        "species": "virginica",
+        "sepalLength": 5.8,
+        "sepalWidth": 2.8,
+        "petalLength": 5.1,
+        "petalWidth": 2.4
+      },
+      {
+        "id": 116,
+        "species": "virginica",
+        "sepalLength": 6.4,
+        "sepalWidth": 3.2,
+        "petalLength": 5.3,
+        "petalWidth": 2.3
+      },
+      {
+        "id": 117,
+        "species": "virginica",
+        "sepalLength": 6.5,
+        "sepalWidth": 3,
+        "petalLength": 5.5,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 118,
+        "species": "virginica",
+        "sepalLength": 7.7,
+        "sepalWidth": 3.8,
+        "petalLength": 6.7,
+        "petalWidth": 2.2
+      },
+      {
+        "id": 119,
+        "species": "virginica",
+        "sepalLength": 7.7,
+        "sepalWidth": 2.6,
+        "petalLength": 6.9,
+        "petalWidth": 2.3
+      },
+      {
+        "id": 120,
+        "species": "virginica",
+        "sepalLength": 6,
+        "sepalWidth": 2.2,
+        "petalLength": 5,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 121,
+        "species": "virginica",
+        "sepalLength": 6.9,
+        "sepalWidth": 3.2,
+        "petalLength": 5.7,
+        "petalWidth": 2.3
+      },
+      {
+        "id": 122,
+        "species": "virginica",
+        "sepalLength": 5.6,
+        "sepalWidth": 2.8,
+        "petalLength": 4.9,
+        "petalWidth": 2
+      },
+      {
+        "id": 123,
+        "species": "virginica",
+        "sepalLength": 7.7,
+        "sepalWidth": 2.8,
+        "petalLength": 6.7,
+        "petalWidth": 2
+      },
+      {
+        "id": 124,
+        "species": "virginica",
+        "sepalLength": 6.3,
+        "sepalWidth": 2.7,
+        "petalLength": 4.9,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 125,
+        "species": "virginica",
+        "sepalLength": 6.7,
+        "sepalWidth": 3.3,
+        "petalLength": 5.7,
+        "petalWidth": 2.1
+      },
+      {
+        "id": 126,
+        "species": "virginica",
+        "sepalLength": 7.2,
+        "sepalWidth": 3.2,
+        "petalLength": 6,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 127,
+        "species": "virginica",
+        "sepalLength": 6.2,
+        "sepalWidth": 2.8,
+        "petalLength": 4.8,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 128,
+        "species": "virginica",
+        "sepalLength": 6.1,
+        "sepalWidth": 3,
+        "petalLength": 4.9,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 129,
+        "species": "virginica",
+        "sepalLength": 6.4,
+        "sepalWidth": 2.8,
+        "petalLength": 5.6,
+        "petalWidth": 2.1
+      },
+      {
+        "id": 130,
+        "species": "virginica",
+        "sepalLength": 7.2,
+        "sepalWidth": 3,
+        "petalLength": 5.8,
+        "petalWidth": 1.6
+      },
+      {
+        "id": 131,
+        "species": "virginica",
+        "sepalLength": 7.4,
+        "sepalWidth": 2.8,
+        "petalLength": 6.1,
+        "petalWidth": 1.9
+      },
+      {
+        "id": 132,
+        "species": "virginica",
+        "sepalLength": 7.9,
+        "sepalWidth": 3.8,
+        "petalLength": 6.4,
+        "petalWidth": 2
+      },
+      {
+        "id": 133,
+        "species": "virginica",
+        "sepalLength": 6.4,
+        "sepalWidth": 2.8,
+        "petalLength": 5.6,
+        "petalWidth": 2.2
+      },
+      {
+        "id": 134,
+        "species": "virginica",
+        "sepalLength": 6.3,
+        "sepalWidth": 2.8,
+        "petalLength": 5.1,
+        "petalWidth": 1.5
+      },
+      {
+        "id": 135,
+        "species": "virginica",
+        "sepalLength": 6.1,
+        "sepalWidth": 2.6,
+        "petalLength": 5.6,
+        "petalWidth": 1.4
+      },
+      {
+        "id": 136,
+        "species": "virginica",
+        "sepalLength": 7.7,
+        "sepalWidth": 3,
+        "petalLength": 6.1,
+        "petalWidth": 2.3
+      },
+      {
+        "id": 137,
+        "species": "virginica",
+        "sepalLength": 6.3,
+        "sepalWidth": 3.4,
+        "petalLength": 5.6,
+        "petalWidth": 2.4
+      },
+      {
+        "id": 138,
+        "species": "virginica",
+        "sepalLength": 6.4,
+        "sepalWidth": 3.1,
+        "petalLength": 5.5,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 139,
+        "species": "virginica",
+        "sepalLength": 6,
+        "sepalWidth": 3,
+        "petalLength": 4.8,
+        "petalWidth": 1.8
+      },
+      {
+        "id": 140,
+        "species": "virginica",
+        "sepalLength": 6.9,
+        "sepalWidth": 3.1,
+        "petalLength": 5.4,
+        "petalWidth": 2.1
+      },
+      {
+        "id": 141,
+        "species": "virginica",
+        "sepalLength": 6.7,
+        "sepalWidth": 3.1,
+        "petalLength": 5.6,
+        "petalWidth": 2.4
+      },
+      {
+        "id": 142,
+        "species": "virginica",
+        "sepalLength": 6.9,
+        "sepalWidth": 3.1,
+        "petalLength": 5.1,
+        "petalWidth": 2.3
+      },
+      {
+        "id": 143,
+        "species": "virginica",
+        "sepalLength": 5.8,
+        "sepalWidth": 2.7,
+        "petalLength": 5.1,
+        "petalWidth": 1.9
+      },
+      {
+        "id": 144,
+        "species": "virginica",
+        "sepalLength": 6.8,
+        "sepalWidth": 3.2,
+        "petalLength": 5.9,
+        "petalWidth": 2.3
+      },
+      {
+        "id": 145,
+        "species": "virginica",
+        "sepalLength": 6.7,
+        "sepalWidth": 3.3,
+        "petalLength": 5.7,
+        "petalWidth": 2.5
+      },
+      {
+        "id": 146,
+        "species": "virginica",
+        "sepalLength": 6.7,
+        "sepalWidth": 3,
+        "petalLength": 5.2,
+        "petalWidth": 2.3
+      },
+      {
+        "id": 147,
+        "species": "virginica",
+        "sepalLength": 6.3,
+        "sepalWidth": 2.5,
+        "petalLength": 5,
+        "petalWidth": 1.9
+      },
+      {
+        "id": 148,
+        "species": "virginica",
+        "sepalLength": 6.5,
+        "sepalWidth": 3,
+        "petalLength": 5.2,
+        "petalWidth": 2
+      },
+      {
+        "id": 149,
+        "species": "virginica",
+        "sepalLength": 6.2,
+        "sepalWidth": 3.4,
+        "petalLength": 5.4,
+        "petalWidth": 2.3
+      },
+      {
+        "id": 150,
+        "species": "virginica",
+        "sepalLength": 5.9,
+        "sepalWidth": 3,
+        "petalLength": 5.1,
+        "petalWidth": 1.8
+      }
+    ],
+    "correlations": [
+      {
+        "pair": "sepalLength / sepalWidth",
+        "correlation": -0.11757
+      },
+      {
+        "pair": "sepalLength / petalLength",
+        "correlation": 0.871754
+      },
+      {
+        "pair": "sepalLength / petalWidth",
+        "correlation": 0.817941
+      },
+      {
+        "pair": "sepalWidth / petalLength",
+        "correlation": -0.42844
+      },
+      {
+        "pair": "sepalWidth / petalWidth",
+        "correlation": -0.366126
+      },
+      {
+        "pair": "petalLength / petalWidth",
+        "correlation": 0.962865
+      }
+    ]
+  },
+  "netflix": {
+    "totalTitles": 6234,
+    "missing": [
+      {
+        "label": "director",
+        "value": 1969
+      },
+      {
+        "label": "cast",
+        "value": 570
+      },
+      {
+        "label": "country",
+        "value": 476
+      },
+      {
+        "label": "date_added",
+        "value": 11
+      },
+      {
+        "label": "rating",
+        "value": 10
+      }
+    ],
+    "missingMatrix": {
+      "fields": [
+        "show_id",
+        "type",
+        "title",
+        "director",
+        "cast",
+        "country",
+        "date_added",
+        "release_year",
+        "rating",
+        "duration",
+        "listed_in",
+        "description"
+      ],
+      "relevantFields": [
+        "director",
+        "cast",
+        "country",
+        "date_added",
+        "rating"
+      ],
+      "binSize": 24,
+      "bins": [
+        {
+          "rowStart": 0,
+          "rowEnd": 24,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.08333333333333333,
+            0.3333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 24,
+          "rowEnd": 48,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 48,
+          "rowEnd": 72,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 72,
+          "rowEnd": 96,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.2916666666666667,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 96,
+          "rowEnd": 120,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.20833333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 120,
+          "rowEnd": 144,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 144,
+          "rowEnd": 168,
+          "rates": [
+            0,
+            0,
+            0,
+            0.625,
+            0.041666666666666664,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 168,
+          "rowEnd": 192,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5,
+            0.08333333333333333,
+            0.2916666666666667,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 192,
+          "rowEnd": 216,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 216,
+          "rowEnd": 240,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.16666666666666666,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 240,
+          "rowEnd": 264,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.16666666666666666,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 264,
+          "rowEnd": 288,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 288,
+          "rowEnd": 312,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.125,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 312,
+          "rowEnd": 336,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 336,
+          "rowEnd": 360,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 360,
+          "rowEnd": 384,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 384,
+          "rowEnd": 408,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 408,
+          "rowEnd": 432,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 432,
+          "rowEnd": 456,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 456,
+          "rowEnd": 480,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 480,
+          "rowEnd": 504,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 504,
+          "rowEnd": 528,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 528,
+          "rowEnd": 552,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 552,
+          "rowEnd": 576,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 576,
+          "rowEnd": 600,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5,
+            0.16666666666666666,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 600,
+          "rowEnd": 624,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.16666666666666666,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 624,
+          "rowEnd": 648,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.041666666666666664,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 648,
+          "rowEnd": 672,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.20833333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 672,
+          "rowEnd": 696,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 696,
+          "rowEnd": 720,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 720,
+          "rowEnd": 744,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 744,
+          "rowEnd": 768,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.08333333333333333,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 768,
+          "rowEnd": 792,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 792,
+          "rowEnd": 816,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 816,
+          "rowEnd": 840,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 840,
+          "rowEnd": 864,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.041666666666666664,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 864,
+          "rowEnd": 888,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 888,
+          "rowEnd": 912,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 912,
+          "rowEnd": 936,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 936,
+          "rowEnd": 960,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.125,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 960,
+          "rowEnd": 984,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 984,
+          "rowEnd": 1008,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1008,
+          "rowEnd": 1032,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1032,
+          "rowEnd": 1056,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.16666666666666666,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1056,
+          "rowEnd": 1080,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1080,
+          "rowEnd": 1104,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1104,
+          "rowEnd": 1128,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1128,
+          "rowEnd": 1152,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1152,
+          "rowEnd": 1176,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1176,
+          "rowEnd": 1200,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1200,
+          "rowEnd": 1224,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1224,
+          "rowEnd": 1248,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1248,
+          "rowEnd": 1272,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1272,
+          "rowEnd": 1296,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1296,
+          "rowEnd": 1320,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1320,
+          "rowEnd": 1344,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1344,
+          "rowEnd": 1368,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1368,
+          "rowEnd": 1392,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.041666666666666664,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1392,
+          "rowEnd": 1416,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1416,
+          "rowEnd": 1440,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.041666666666666664,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1440,
+          "rowEnd": 1464,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1464,
+          "rowEnd": 1488,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1488,
+          "rowEnd": 1512,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1512,
+          "rowEnd": 1536,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5,
+            0.041666666666666664,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1536,
+          "rowEnd": 1560,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.041666666666666664,
+            0.3333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1560,
+          "rowEnd": 1584,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.20833333333333334,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1584,
+          "rowEnd": 1608,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1608,
+          "rowEnd": 1632,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1632,
+          "rowEnd": 1656,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.25,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1656,
+          "rowEnd": 1680,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.125,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1680,
+          "rowEnd": 1704,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1704,
+          "rowEnd": 1728,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.25,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1728,
+          "rowEnd": 1752,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1752,
+          "rowEnd": 1776,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1776,
+          "rowEnd": 1800,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1800,
+          "rowEnd": 1824,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.041666666666666664,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1824,
+          "rowEnd": 1848,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1848,
+          "rowEnd": 1872,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0.08333333333333333,
+            0.375,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1872,
+          "rowEnd": 1896,
+          "rates": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1896,
+          "rowEnd": 1920,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1920,
+          "rowEnd": 1944,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1944,
+          "rowEnd": 1968,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1968,
+          "rowEnd": 1992,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 1992,
+          "rowEnd": 2016,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.20833333333333334,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2016,
+          "rowEnd": 2040,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.25,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2040,
+          "rowEnd": 2064,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2064,
+          "rowEnd": 2088,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2088,
+          "rowEnd": 2112,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.16666666666666666,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2112,
+          "rowEnd": 2136,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2136,
+          "rowEnd": 2160,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2160,
+          "rowEnd": 2184,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2184,
+          "rowEnd": 2208,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2208,
+          "rowEnd": 2232,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2232,
+          "rowEnd": 2256,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2256,
+          "rowEnd": 2280,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2280,
+          "rowEnd": 2304,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2304,
+          "rowEnd": 2328,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2328,
+          "rowEnd": 2352,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2352,
+          "rowEnd": 2376,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2376,
+          "rowEnd": 2400,
+          "rates": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2400,
+          "rowEnd": 2424,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5,
+            0.25,
+            0.041666666666666664,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2424,
+          "rowEnd": 2448,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2448,
+          "rowEnd": 2472,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2472,
+          "rowEnd": 2496,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.20833333333333334,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2496,
+          "rowEnd": 2520,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2520,
+          "rowEnd": 2544,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2544,
+          "rowEnd": 2568,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2568,
+          "rowEnd": 2592,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2592,
+          "rowEnd": 2616,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2616,
+          "rowEnd": 2640,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.20833333333333334,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2640,
+          "rowEnd": 2664,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2664,
+          "rowEnd": 2688,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2688,
+          "rowEnd": 2712,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2712,
+          "rowEnd": 2736,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2736,
+          "rowEnd": 2760,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0.125,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2760,
+          "rowEnd": 2784,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2784,
+          "rowEnd": 2808,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.20833333333333334,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2808,
+          "rowEnd": 2832,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.041666666666666664,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2832,
+          "rowEnd": 2856,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2856,
+          "rowEnd": 2880,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.16666666666666666,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2880,
+          "rowEnd": 2904,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2904,
+          "rowEnd": 2928,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2928,
+          "rowEnd": 2952,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2952,
+          "rowEnd": 2976,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 2976,
+          "rowEnd": 3000,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3000,
+          "rowEnd": 3024,
+          "rates": [
+            0,
+            0,
+            0,
+            0.625,
+            0.2916666666666667,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3024,
+          "rowEnd": 3048,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3048,
+          "rowEnd": 3072,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3072,
+          "rowEnd": 3096,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3096,
+          "rowEnd": 3120,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3120,
+          "rowEnd": 3144,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3144,
+          "rowEnd": 3168,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3168,
+          "rowEnd": 3192,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3192,
+          "rowEnd": 3216,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3216,
+          "rowEnd": 3240,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.08333333333333333,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3240,
+          "rowEnd": 3264,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3264,
+          "rowEnd": 3288,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3288,
+          "rowEnd": 3312,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3312,
+          "rowEnd": 3336,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3336,
+          "rowEnd": 3360,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.08333333333333333,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3360,
+          "rowEnd": 3384,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3384,
+          "rowEnd": 3408,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3408,
+          "rowEnd": 3432,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3432,
+          "rowEnd": 3456,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3456,
+          "rowEnd": 3480,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3480,
+          "rowEnd": 3504,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3504,
+          "rowEnd": 3528,
+          "rates": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3528,
+          "rowEnd": 3552,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.041666666666666664,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3552,
+          "rowEnd": 3576,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3576,
+          "rowEnd": 3600,
+          "rates": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3600,
+          "rowEnd": 3624,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3624,
+          "rowEnd": 3648,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3648,
+          "rowEnd": 3672,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3672,
+          "rowEnd": 3696,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3696,
+          "rowEnd": 3720,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5416666666666666,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3720,
+          "rowEnd": 3744,
+          "rates": [
+            0,
+            0,
+            0,
+            0.8333333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3744,
+          "rowEnd": 3768,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3768,
+          "rowEnd": 3792,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3792,
+          "rowEnd": 3816,
+          "rates": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3816,
+          "rowEnd": 3840,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3840,
+          "rowEnd": 3864,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3864,
+          "rowEnd": 3888,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3888,
+          "rowEnd": 3912,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3912,
+          "rowEnd": 3936,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3936,
+          "rowEnd": 3960,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3960,
+          "rowEnd": 3984,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 3984,
+          "rowEnd": 4008,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4008,
+          "rowEnd": 4032,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4032,
+          "rowEnd": 4056,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4056,
+          "rowEnd": 4080,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.3333333333333333,
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4080,
+          "rowEnd": 4104,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4104,
+          "rowEnd": 4128,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4128,
+          "rowEnd": 4152,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4152,
+          "rowEnd": 4176,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4176,
+          "rowEnd": 4200,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4200,
+          "rowEnd": 4224,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4224,
+          "rowEnd": 4248,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4248,
+          "rowEnd": 4272,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.16666666666666666,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4272,
+          "rowEnd": 4296,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.16666666666666666,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4296,
+          "rowEnd": 4320,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4320,
+          "rowEnd": 4344,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.16666666666666666,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4344,
+          "rowEnd": 4368,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4368,
+          "rowEnd": 4392,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4392,
+          "rowEnd": 4416,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.125,
+            0.16666666666666666,
+            0,
+            0,
+            0.08333333333333333,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4416,
+          "rowEnd": 4440,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4440,
+          "rowEnd": 4464,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4464,
+          "rowEnd": 4488,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4488,
+          "rowEnd": 4512,
+          "rates": [
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.08333333333333333,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4512,
+          "rowEnd": 4536,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0.125,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4536,
+          "rowEnd": 4560,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4560,
+          "rowEnd": 4584,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4583333333333333,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4584,
+          "rowEnd": 4608,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4608,
+          "rowEnd": 4632,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4632,
+          "rowEnd": 4656,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4656,
+          "rowEnd": 4680,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.125,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4680,
+          "rowEnd": 4704,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.16666666666666666,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4704,
+          "rowEnd": 4728,
+          "rates": [
+            0,
+            0,
+            0,
+            0.4166666666666667,
+            0.08333333333333333,
+            0.16666666666666666,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4728,
+          "rowEnd": 4752,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4752,
+          "rowEnd": 4776,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4776,
+          "rowEnd": 4800,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4800,
+          "rowEnd": 4824,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4824,
+          "rowEnd": 4848,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4848,
+          "rowEnd": 4872,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4872,
+          "rowEnd": 4896,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4896,
+          "rowEnd": 4920,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4920,
+          "rowEnd": 4944,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4944,
+          "rowEnd": 4968,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4968,
+          "rowEnd": 4992,
+          "rates": [
+            0,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 4992,
+          "rowEnd": 5016,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.20833333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5016,
+          "rowEnd": 5040,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.20833333333333334,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5040,
+          "rowEnd": 5064,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5064,
+          "rowEnd": 5088,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5088,
+          "rowEnd": 5112,
+          "rates": [
+            0,
+            0,
+            0,
+            0,
+            0.08333333333333333,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5112,
+          "rowEnd": 5136,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5136,
+          "rowEnd": 5160,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5416666666666666,
+            0.125,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5160,
+          "rowEnd": 5184,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5416666666666666,
+            0.25,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5184,
+          "rowEnd": 5208,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5208,
+          "rowEnd": 5232,
+          "rates": [
+            0,
+            0,
+            0,
+            0.3333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5232,
+          "rowEnd": 5256,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5256,
+          "rowEnd": 5280,
+          "rates": [
+            0,
+            0,
+            0,
+            0.375,
+            0.20833333333333334,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5280,
+          "rowEnd": 5304,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5304,
+          "rowEnd": 5328,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5328,
+          "rowEnd": 5352,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.16666666666666666,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5352,
+          "rowEnd": 5376,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5376,
+          "rowEnd": 5400,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5400,
+          "rowEnd": 5424,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5424,
+          "rowEnd": 5448,
+          "rates": [
+            0,
+            0,
+            0,
+            0.125,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5448,
+          "rowEnd": 5472,
+          "rates": [
+            0,
+            0,
+            0,
+            0.25,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5472,
+          "rowEnd": 5496,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5496,
+          "rowEnd": 5520,
+          "rates": [
+            0,
+            0,
+            0,
+            0.16666666666666666,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5520,
+          "rowEnd": 5544,
+          "rates": [
+            0,
+            0,
+            0,
+            0.20833333333333334,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5544,
+          "rowEnd": 5568,
+          "rates": [
+            0,
+            0,
+            0,
+            0.2916666666666667,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5568,
+          "rowEnd": 5592,
+          "rates": [
+            0,
+            0,
+            0,
+            0.5,
+            0.16666666666666666,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5592,
+          "rowEnd": 5616,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5616,
+          "rowEnd": 5640,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9166666666666666,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5640,
+          "rowEnd": 5664,
+          "rates": [
+            0,
+            0,
+            0,
+            1,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5664,
+          "rowEnd": 5688,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5688,
+          "rowEnd": 5712,
+          "rates": [
+            0,
+            0,
+            0,
+            1,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5712,
+          "rowEnd": 5736,
+          "rates": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5736,
+          "rowEnd": 5760,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.041666666666666664,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5760,
+          "rowEnd": 5784,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9166666666666666,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5784,
+          "rowEnd": 5808,
+          "rates": [
+            0,
+            0,
+            0,
+            0.7083333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5808,
+          "rowEnd": 5832,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9166666666666666,
+            0.041666666666666664,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5832,
+          "rowEnd": 5856,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9166666666666666,
+            0,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5856,
+          "rowEnd": 5880,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.125,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5880,
+          "rowEnd": 5904,
+          "rates": [
+            0,
+            0,
+            0,
+            1,
+            0.20833333333333334,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5904,
+          "rowEnd": 5928,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9166666666666666,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5928,
+          "rowEnd": 5952,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9166666666666666,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5952,
+          "rowEnd": 5976,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.08333333333333333,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 5976,
+          "rowEnd": 6000,
+          "rates": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6000,
+          "rowEnd": 6024,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6024,
+          "rowEnd": 6048,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6048,
+          "rowEnd": 6072,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.08333333333333333,
+            0.125,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6072,
+          "rowEnd": 6096,
+          "rates": [
+            0,
+            0,
+            0,
+            1,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6096,
+          "rowEnd": 6120,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.041666666666666664,
+            0.16666666666666666,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6120,
+          "rowEnd": 6144,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9166666666666666,
+            0.08333333333333333,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6144,
+          "rowEnd": 6168,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9166666666666666,
+            0.125,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6168,
+          "rowEnd": 6192,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0,
+            0.041666666666666664,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6192,
+          "rowEnd": 6216,
+          "rates": [
+            0,
+            0,
+            0,
+            0.9583333333333334,
+            0.20833333333333334,
+            0.08333333333333333,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "rowStart": 6216,
+          "rowEnd": 6234,
+          "rates": [
+            0,
+            0,
+            0,
+            1,
+            0.05555555555555555,
+            0.1111111111111111,
+            0.6111111111111112,
+            0,
+            0.05555555555555555,
+            0,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    "types": [
+      {
+        "label": "Movie",
+        "value": 4265
+      },
+      {
+        "label": "TV Show",
+        "value": 1969
+      }
+    ],
+    "releaseYears": [
+      {
+        "year": 2000,
+        "value": 31
+      },
+      {
+        "year": 2001,
+        "value": 34
+      },
+      {
+        "year": 2002,
+        "value": 38
+      },
+      {
+        "year": 2003,
+        "value": 43
+      },
+      {
+        "year": 2004,
+        "value": 49
+      },
+      {
+        "year": 2005,
+        "value": 63
+      },
+      {
+        "year": 2006,
+        "value": 68
+      },
+      {
+        "year": 2007,
+        "value": 71
+      },
+      {
+        "year": 2008,
+        "value": 107
+      },
+      {
+        "year": 2009,
+        "value": 121
+      },
+      {
+        "year": 2010,
+        "value": 149
+      },
+      {
+        "year": 2011,
+        "value": 136
+      },
+      {
+        "year": 2012,
+        "value": 183
+      },
+      {
+        "year": 2013,
+        "value": 237
+      },
+      {
+        "year": 2014,
+        "value": 288
+      },
+      {
+        "year": 2015,
+        "value": 517
+      },
+      {
+        "year": 2016,
+        "value": 830
+      },
+      {
+        "year": 2017,
+        "value": 959
+      },
+      {
+        "year": 2018,
+        "value": 1063
+      },
+      {
+        "year": 2019,
+        "value": 843
+      },
+      {
+        "year": 2020,
+        "value": 25
+      }
+    ],
+    "countries": [
+      {
+        "label": "United States",
+        "value": 2609
+      },
+      {
+        "label": "India",
+        "value": 838
+      },
+      {
+        "label": "United Kingdom",
+        "value": 601
+      },
+      {
+        "label": "Canada",
+        "value": 318
+      },
+      {
+        "label": "France",
+        "value": 271
+      },
+      {
+        "label": "Japan",
+        "value": 231
+      },
+      {
+        "label": "Spain",
+        "value": 178
+      },
+      {
+        "label": "South Korea",
+        "value": 162
+      },
+      {
+        "label": "Germany",
+        "value": 151
+      },
+      {
+        "label": "Mexico",
+        "value": 129
+      },
+      {
+        "label": "Australia",
+        "value": 126
+      },
+      {
+        "label": "China",
+        "value": 120
+      },
+      {
+        "label": "Hong Kong",
+        "value": 97
+      },
+      {
+        "label": "Turkey",
+        "value": 87
+      },
+      {
+        "label": "Taiwan",
+        "value": 75
+      }
+    ],
+    "ratings": [
+      {
+        "label": "TV-MA",
+        "value": 2027
+      },
+      {
+        "label": "TV-14",
+        "value": 1698
+      },
+      {
+        "label": "TV-PG",
+        "value": 701
+      },
+      {
+        "label": "R",
+        "value": 508
+      },
+      {
+        "label": "PG-13",
+        "value": 286
+      },
+      {
+        "label": "NR",
+        "value": 218
+      },
+      {
+        "label": "PG",
+        "value": 184
+      },
+      {
+        "label": "TV-Y7",
+        "value": 169
+      },
+      {
+        "label": "TV-G",
+        "value": 149
+      },
+      {
+        "label": "TV-Y",
+        "value": 143
+      }
+    ],
+    "ratingsByType": [
+      {
+        "label": "TV-MA",
+        "type": "Movie",
+        "value": 1348
+      },
+      {
+        "label": "TV-MA",
+        "type": "TV Show",
+        "value": 679
+      },
+      {
+        "label": "TV-14",
+        "type": "Movie",
+        "value": 1038
+      },
+      {
+        "label": "TV-14",
+        "type": "TV Show",
+        "value": 660
+      },
+      {
+        "label": "TV-PG",
+        "type": "Movie",
+        "value": 432
+      },
+      {
+        "label": "TV-PG",
+        "type": "TV Show",
+        "value": 269
+      },
+      {
+        "label": "R",
+        "type": "Movie",
+        "value": 506
+      },
+      {
+        "label": "R",
+        "type": "TV Show",
+        "value": 2
+      },
+      {
+        "label": "PG-13",
+        "type": "Movie",
+        "value": 286
+      },
+      {
+        "label": "PG-13",
+        "type": "TV Show",
+        "value": 0
+      },
+      {
+        "label": "NR",
+        "type": "Movie",
+        "value": 202
+      },
+      {
+        "label": "NR",
+        "type": "TV Show",
+        "value": 16
+      },
+      {
+        "label": "PG",
+        "type": "Movie",
+        "value": 183
+      },
+      {
+        "label": "PG",
+        "type": "TV Show",
+        "value": 1
+      },
+      {
+        "label": "TV-Y7",
+        "type": "Movie",
+        "value": 69
+      },
+      {
+        "label": "TV-Y7",
+        "type": "TV Show",
+        "value": 100
+      },
+      {
+        "label": "TV-G",
+        "type": "Movie",
+        "value": 80
+      },
+      {
+        "label": "TV-G",
+        "type": "TV Show",
+        "value": 69
+      },
+      {
+        "label": "TV-Y",
+        "type": "Movie",
+        "value": 41
+      },
+      {
+        "label": "TV-Y",
+        "type": "TV Show",
+        "value": 102
+      }
+    ],
+    "genres": [
+      {
+        "label": "International Movies",
+        "value": 1927
+      },
+      {
+        "label": "Dramas",
+        "value": 1623
+      },
+      {
+        "label": "Comedies",
+        "value": 1113
+      },
+      {
+        "label": "International TV Shows",
+        "value": 1001
+      },
+      {
+        "label": "Documentaries",
+        "value": 668
+      },
+      {
+        "label": "TV Dramas",
+        "value": 599
+      },
+      {
+        "label": "Action & Adventure",
+        "value": 597
+      },
+      {
+        "label": "Independent Movies",
+        "value": 552
+      },
+      {
+        "label": "TV Comedies",
+        "value": 436
+      },
+      {
+        "label": "Thrillers",
+        "value": 392
+      },
+      {
+        "label": "Children & Family Movies",
+        "value": 378
+      },
+      {
+        "label": "Romantic Movies",
+        "value": 376
+      },
+      {
+        "label": "Crime TV Shows",
+        "value": 363
+      },
+      {
+        "label": "Kids' TV",
+        "value": 328
+      },
+      {
+        "label": "Stand-Up Comedy",
+        "value": 281
+      }
+    ]
+  }
+}

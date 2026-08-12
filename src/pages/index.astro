@@ -1,6 +1,14 @@
 ---
 import Layout from "@/layouts/main.astro"
 import { Kbd } from "@/components/ui/kbd"
+import {
+  getArticleDisplayTitle,
+  getArticleHref,
+  getArticleRouteId,
+  getPublishedArticles,
+  isAlternativeArticle,
+  validateArticleVariants,
+} from "@/lib/article-variants"
 import { getCollection } from "astro:content"
 
 const getFolder = (id: string) =>
@@ -27,7 +35,10 @@ const postsByFolder = new Map<
   Awaited<ReturnType<typeof getCollection<"blog">>>
 >()
 
-for (const post of await getCollection("blog")) {
+const allPosts = await getCollection("blog")
+validateArticleVariants(allPosts)
+
+for (const post of getPublishedArticles(allPosts)) {
   const folder = getFolder(post.id)
   const folderPosts = postsByFolder.get(folder) ?? []
 
@@ -42,6 +53,7 @@ const groups = Array.from(postsByFolder, ([folder, posts]) => ({
   posts: posts.sort(
     (a, b) =>
       getPostOrder(a.id) - getPostOrder(b.id) ||
+      Number(isAlternativeArticle(a)) - Number(isAlternativeArticle(b)) ||
       a.data.title.localeCompare(b.data.title, "es")
   ),
 })).sort((a, b) => a.order - b.order || a.label.localeCompare(b.label, "es"))
@@ -66,11 +78,14 @@ const groups = Array.from(postsByFolder, ([folder, posts]) => ({
                 <li>
                   <article class="flex flex-col gap-1">
                     <h3
-                      transition:name={`article-title-${post.id.replaceAll("/", "-")}`}
+                      transition:name={`article-title-${getArticleRouteId(post).replaceAll("/", "-")}`}
                       class="font-medium"
                     >
-                      <a href={`/blog/${post.id}/`} data-astro-prefetch="hover">
-                        {post.data.title}
+                      <a
+                        href={getArticleHref(post)}
+                        data-astro-prefetch="hover"
+                      >
+                        {getArticleDisplayTitle(post, allPosts)}
                       </a>
                     </h3>
                     <p>{post.data.description}</p>

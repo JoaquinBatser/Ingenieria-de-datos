@@ -1,0 +1,471 @@
+---
+title: "Medir el sesgo antes de corregirlo"
+description: "Dos ejercicios con Fairlearn sobre Boston Housing y Titanic: cómo medir diferencias entre grupos y decidir cuándo una corrección tiene sentido."
+---
+import { Unit07BiasAnalysis } from "@/components/tanstack-comparison/units05-08/unit07-boston-racial-price"
+
+
+## Qué quería aprender
+
+- Detectar sesgo histórico en dos datasets muy distintos.
+- Medir cuánto llega ese sesgo a las predicciones.
+- Comparar un reporte de detección con una mitigación automática.
+- Decidir cuándo corregir es razonable y cuándo solo corresponde documentar.
+- Dejar criterios para no desplegar un modelo a ciegas.
+
+## Por qué separar los casos
+
+Un modelo aprende de lo que encuentra en sus datos. Si esos datos reflejan una desigualdad, la predicción puede repetirla o hacerla más difícil de detectar. El mismo tratamiento no sirve para todos los contextos:
+
+- **Préstamos hipotecarios**: Discriminación racial en valuaciones inmobiliarias
+- **Seguros de vida**: Sesgos de género y clase social
+- **Contratación**: Perpetuación de desigualdades históricas
+- **Sistema judicial**: Sesgos en predicción de reincidencia
+
+### Qué puede salir mal
+
+Un algoritmo entrenado con datos históricos puede:
+- **Perpetuar discriminación** sistemática del pasado
+- **Amplificar sesgos** existentes en los datos
+- **Crear nuevas formas** de discriminación indirecta
+- **Afectar grupos vulnerables** de manera desproporcionada
+
+## Recorrido
+
+### 1. Configuración del Entorno
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Scikit-learn
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, r2_score, mean_squared_error
+
+# Fairlearn - Framework para equidad en ML
+from fairlearn.metrics import (
+    MetricFrame, 
+    demographic_parity_difference, 
+    equalized_odds_difference,
+    selection_rate
+)
+from fairlearn.reductions import ExponentiatedGradient, DemographicParity
+
+import warnings
+warnings.filterwarnings('ignore')
+
+plt.style.use('seaborn-v0_8')
+sns.set_palette("husl")
+np.random.seed(42)
+```
+
+## Parte I: Boston Housing
+
+### Por qué ya no está `load_boston()`
+
+El dataset Boston Housing fue removido de scikit-learn debido al **sesgo racial explícito** en la variable `B`, que representa la proporción de población afroamericana por área.
+
+### 1. Cargar Dataset desde Fuente Original
+
+```python
+# Cargar desde fuente original (CMU)
+data_url = "http://lib.stat.cmu.edu/datasets/boston"
+raw_df = pd.read_csv(data_url, sep=r"\s+", skiprows=22, header=None, engine="python")
+
+# Reconstruir formato especial del archivo
+data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
+target = raw_df.values[1::2, 2]
+
+# Crear DataFrame
+feature_names = ['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 
+                'RAD', 'TAX', 'PTRATIO', 'B', 'LSTAT']
+
+boston_df = pd.DataFrame(data, columns=feature_names)
+boston_df['MEDV'] = target
+
+# Decodificar variable B problemática
+# B = 1000(Bk - 0.63)² → Bk = sqrt(B/1000) + 0.63
+boston_df['Bk_racial'] = np.sqrt(boston_df['B'] / 1000) + 0.63
+
+print(f"✅ Boston Housing cargado: {boston_df.shape}")
+print(f"Variable racial Bk decodificada (proporción afroamericana)")
+```
+
+### 2. Mirar el sesgo antes del modelo
+
+```python
+# Crear grupos raciales para análisis
+# Terciles de proporción afroamericana
+boston_df['racial_group'] = pd.cut(
+    boston_df['Bk_racial'], 
+    bins=3, 
+    labels=['Low_African_American', 'Medium_African_American', 'High_African_American']
+)
+
+# Análisis descriptivo por grupo racial
+group_analysis = boston_df.groupby('racial_group').agg({
+    'MEDV': ['mean', 'median', 'std'],
+    'Bk_racial': ['mean', 'count'],
+    'LSTAT': 'mean',  # % población de bajo estatus socioeconómico
+    'CRIM': 'mean',   # Tasa de criminalidad
+    'DIS': 'mean'     # Distancia a centros de empleo
+}).round(2)
+
+print("📊 Análisis por grupo racial:")
+print(group_analysis)
+
+# Visualizar distribuciones
+fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+
+# Precio medio por grupo racial
+sns.boxplot(data=boston_df, x='racial_group', y='MEDV', ax=axes[0,0])
+axes[0,0].set_title('Precio Medio de Vivienda por Grupo Racial')
+axes[0,0].tick_params(axis='x', rotation=45)
+
+# Correlación entre variables problemáticas
+correlation_vars = ['MEDV', 'Bk_racial', 'LSTAT', 'CRIM']
+corr_matrix = boston_df[correlation_vars].corr()
+sns.heatmap(corr_matrix, annot=True, cmap='RdBu_r', center=0, ax=axes[0,1])
+axes[0,1].set_title('Matriz de Correlación')
+
+# Distribución de variable racial
+sns.histplot(data=boston_df, x='Bk_racial', bins=30, ax=axes[1,0])
+axes[1,0].set_title('Distribución de Proporción Afroamericana')
+
+# Scatter plot precio vs. proporción racial
+sns.scatterplot(data=boston_df, x='Bk_racial', y='MEDV', 
+               hue='racial_group', alpha=0.7, ax=axes[1,1])
+axes[1,1].set_title('Precio vs. Proporción Afroamericana')
+
+plt.tight_layout()
+plt.show()
+```
+
+<Unit07BiasAnalysis client:load />
+
+**Lectura:** Las medianas de `MEDV` cambian entre los grupos definidos por la proporción de población afroamericana. El gráfico no prueba por sí solo una causa, pero sí deja claro que el modelo recibiría una señal histórica que no se puede tratar como neutral.
+
+### 3. Cuantificar Sesgo en Predicciones
+
+```python
+# Entrenar modelo de regresión
+X = boston_df[feature_names]
+y = boston_df['MEDV']
+sensitive_feature = boston_df['racial_group']
+
+X_train, X_test, y_train, y_test, sens_train, sens_test = train_test_split(
+    X, y, sensitive_feature, test_size=0.3, random_state=42
+)
+
+# Modelo base
+lr_model = LinearRegression()
+lr_model.fit(X_train, y_train)
+y_pred = lr_model.predict(X_test)
+
+# Análisis de equidad usando Fairlearn
+# Elegí MetricFrame porque permite evaluar métricas de rendimiento (MSE, R²) desagregadas por grupos
+# sensibles, lo cual es crucial para identificar sesgos. MSE mide el error promedio de predicción,
+# mientras que R² mide la proporción de varianza explicada. Ambas son importantes: MSE para entender
+# el impacto absoluto del error, R² para entender si el modelo es igualmente útil para todos los grupos.
+metric_frame = MetricFrame(
+    metrics={'mse': mean_squared_error, 'r2': r2_score},
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=sens_test
+)
+
+print("📈 Métricas por grupo racial:")
+print(metric_frame.by_group)
+print(f"\nDiferencia en MSE entre grupos: {metric_frame.by_group['mse'].max() - metric_frame.by_group['mse'].min():.3f}")
+print(f"Diferencia en R² entre grupos: {metric_frame.by_group['r2'].max() - metric_frame.by_group['r2'].min():.3f}")
+
+# Análisis de residuos por grupo
+residuals = y_test - y_pred
+residual_analysis = pd.DataFrame({
+    'residuals': residuals,
+    'racial_group': sens_test,
+    'actual': y_test,
+    'predicted': y_pred
+})
+
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+sns.boxplot(data=residual_analysis, x='racial_group', y='residuals')
+plt.title('Distribución de Residuos por Grupo Racial')
+plt.xticks(rotation=45)
+
+plt.subplot(1, 2, 2)
+for group in residual_analysis['racial_group'].unique():
+    group_data = residual_analysis[residual_analysis['racial_group'] == group]
+    plt.scatter(group_data['actual'], group_data['predicted'], 
+               label=group, alpha=0.6)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
+plt.xlabel('Valor Real')
+plt.ylabel('Valor Predicho')
+plt.title('Predicciones vs. Valores Reales por Grupo')
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+```
+
+## Parte II: Titanic
+
+### 1. Cargar y Preparar Dataset Titanic
+
+```python
+# Cargar Titanic dataset
+titanic_url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+titanic_df = pd.read_csv(titanic_url)
+
+# Preparar datos
+titanic_clean = titanic_df[['Survived', 'Pclass', 'Sex', 'Age', 'Fare']].dropna()
+
+# Crear variable de interseccionalidad (género + clase)
+titanic_clean['Gender_Class'] = titanic_clean['Sex'] + '_Class' + titanic_clean['Pclass'].astype(str)
+
+# Preparar features para modelo
+titanic_clean['Sex_encoded'] = titanic_clean['Sex'].map({'male': 0, 'female': 1})
+X_titanic = titanic_clean[['Pclass', 'Sex_encoded', 'Age', 'Fare']]
+y_titanic = titanic_clean['Survived']
+sensitive_feature_titanic = titanic_clean['Sex']
+
+print(f"✅ Titanic dataset preparado: {titanic_clean.shape}")
+print(f"Tasa de supervivencia general: {y_titanic.mean():.3f}")
+```
+
+### 2. Análisis de Sesgo Interseccional
+
+```python
+# Análisis de supervivencia por grupo
+survival_analysis = titanic_clean.groupby(['Sex', 'Pclass']).agg({
+    'Survived': ['count', 'mean', 'std']
+}).round(3)
+
+print("📊 Análisis de supervivencia por género y clase:")
+print(survival_analysis)
+
+# Visualizar sesgo interseccional
+fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+
+# Tasa de supervivencia por género
+survival_by_gender = titanic_clean.groupby('Sex')['Survived'].mean()
+survival_by_gender.plot(kind='bar', ax=axes[0,0])
+axes[0,0].set_title('Tasa de Supervivencia por Género')
+axes[0,0].set_ylabel('Tasa de Supervivencia')
+
+# Tasa de supervivencia por clase
+survival_by_class = titanic_clean.groupby('Pclass')['Survived'].mean()
+survival_by_class.plot(kind='bar', ax=axes[0,1])
+axes[0,1].set_title('Tasa de Supervivencia por Clase')
+axes[0,1].set_ylabel('Tasa de Supervivencia')
+
+# Heatmap interseccional
+pivot_survival = titanic_clean.pivot_table(
+    values='Survived', index='Sex', columns='Pclass', aggfunc='mean'
+)
+sns.heatmap(pivot_survival, annot=True, cmap='RdYlBu', ax=axes[1,0])
+axes[1,0].set_title('Tasa de Supervivencia: Género × Clase')
+
+# Distribución por grupo interseccional
+titanic_clean['Gender_Class'].value_counts().plot(kind='bar', ax=axes[1,1])
+axes[1,1].set_title('Distribución de Pasajeros por Grupo')
+axes[1,1].tick_params(axis='x', rotation=45)
+
+plt.tight_layout()
+plt.show()
+```
+
+### 3. Modelo Base y Detección de Sesgo
+
+```python
+# Split de datos
+X_train_t, X_test_t, y_train_t, y_test_t, sens_train_t, sens_test_t = train_test_split(
+    X_titanic, y_titanic, sensitive_feature_titanic, test_size=0.3, random_state=42
+)
+
+# Modelo base (Random Forest)
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train_t, y_train_t)
+y_pred_t = rf_model.predict(X_test_t)
+
+# Métricas de equidad
+metric_frame_titanic = MetricFrame(
+    metrics={
+        'accuracy': accuracy_score,
+        'selection_rate': selection_rate
+    },
+    y_true=y_test_t,
+    y_pred=y_pred_t,
+    sensitive_features=sens_test_t
+)
+
+print("📈 Métricas del modelo base por género:")
+print(metric_frame_titanic.by_group)
+
+# Calcular métricas de equidad específicas
+# Demographic Parity: mide si la tasa de predicción positiva (clasificar como sobreviviente) es igual
+# entre grupos. Un valor cercano a 0 indica equidad, mientras que valores alejados indican sesgo.
+# Elegí esta métrica porque es importante en contextos donde queremos igualdad de oportunidades
+# independientemente del grupo protegido.
+
+# Equalized Odds: más estricta que Demographic Parity, requiere que tanto TPR (True Positive Rate)
+# como FPR (False Positive Rate) sean iguales entre grupos. Esto es más apropiado cuando queremos
+# que el modelo sea igualmente preciso para todos los grupos, no solo que prediga igual proporción.
+demo_parity_diff = demographic_parity_difference(
+    y_test_t, y_pred_t, sensitive_features=sens_test_t
+)
+eq_odds_diff = equalized_odds_difference(
+    y_test_t, y_pred_t, sensitive_features=sens_test_t
+)
+
+print(f"\n⚖️ Métricas de Equidad:")
+print(f"Diferencia en Paridad Demográfica: {demo_parity_diff:.3f}")
+print(f"Diferencia en Igualdad de Oportunidades: {eq_odds_diff:.3f}")
+```
+
+### 4. Corrección de Sesgo con Fairlearn
+
+```python
+# Aplicar corrección de sesgo
+# Elegí DemographicParity como constraint porque queremos que el modelo prediga supervivencia con
+# igual probabilidad para ambos géneros, independientemente de la precisión. Esto es apropiado para
+# el contexto del Titanic donde queremos evitar sesgo de género en las predicciones.
+
+# ExponentiatedGradient es un algoritmo de optimización que busca el mejor trade-off entre
+# precisión y equidad. Reduje n_estimators a 50 (de 100) para acelerar el entrenamiento del
+# mitigador, ya que ExponentiatedGradient requiere múltiples iteraciones del modelo base.
+constraint = DemographicParity()
+mitigator = ExponentiatedGradient(
+    estimator=RandomForestClassifier(n_estimators=50, random_state=42),
+    constraints=constraint
+)
+
+# Entrenar modelo corregido
+mitigator.fit(X_train_t, y_train_t, sensitive_features=sens_train_t)
+y_pred_fair = mitigator.predict(X_test_t)
+
+# Métricas del modelo corregido
+metric_frame_fair = MetricFrame(
+    metrics={
+        'accuracy': accuracy_score,
+        'selection_rate': selection_rate
+    },
+    y_true=y_test_t,
+    y_pred=y_pred_fair,
+    sensitive_features=sens_test_t
+)
+
+# Métricas de equidad del modelo corregido
+demo_parity_diff_fair = demographic_parity_difference(
+    y_test_t, y_pred_fair, sensitive_features=sens_test_t
+)
+eq_odds_diff_fair = equalized_odds_difference(
+    y_test_t, y_pred_fair, sensitive_features=sens_test_t
+)
+
+print("📈 Métricas del modelo corregido por género:")
+print(metric_frame_fair.by_group)
+print(f"\n⚖️ Métricas de Equidad Corregidas:")
+print(f"Diferencia en Paridad Demográfica: {demo_parity_diff_fair:.3f}")
+print(f"Diferencia en Igualdad de Oportunidades: {eq_odds_diff_fair:.3f}")
+
+# Comparación visual
+comparison_df = pd.DataFrame({
+    'Modelo': ['Base', 'Base', 'Corregido', 'Corregido'],
+    'Género': ['female', 'male', 'female', 'male'],
+    'Accuracy': [
+        metric_frame_titanic.by_group.loc['female', 'accuracy'],
+        metric_frame_titanic.by_group.loc['male', 'accuracy'],
+        metric_frame_fair.by_group.loc['female', 'accuracy'],
+        metric_frame_fair.by_group.loc['male', 'accuracy']
+    ],
+    'Selection_Rate': [
+        metric_frame_titanic.by_group.loc['female', 'selection_rate'],
+        metric_frame_titanic.by_group.loc['male', 'selection_rate'],
+        metric_frame_fair.by_group.loc['female', 'selection_rate'],
+        metric_frame_fair.by_group.loc['male', 'selection_rate']
+    ]
+})
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+sns.barplot(data=comparison_df, x='Modelo', y='Accuracy', hue='Género', ax=axes[0])
+axes[0].set_title('Precisión por Modelo y Género')
+
+sns.barplot(data=comparison_df, x='Modelo', y='Selection_Rate', hue='Género', ax=axes[1])
+axes[1].set_title('Tasa de Selección por Modelo y Género')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Qué significa el resultado
+
+### Señales que aparecieron
+
+#### Boston Housing
+1. **Sesgo racial sistemático**: las áreas con mayor proporción afroamericana tienen valuaciones menores
+2. **Correlaciones problemáticas**: Variables socioeconómicas correlacionadas con raza perpetúan discriminación
+3. **Impacto en predicciones**: Modelos reproducen y amplifican sesgos históricos
+
+#### Titanic
+1. **Sesgo de género evidente**: Mujeres con 74% vs. hombres con 19% de supervivencia
+2. **Interseccionalidad**: El sesgo se amplifica al combinar género y clase social
+3. **Corrección parcial**: Fairlearn reduce el sesgo, pero no lo elimina
+
+### Cuándo medir y cuándo mitigar
+
+#### Solo detección: Boston Housing
+- **Sesgo histórico profundo**: Datos reflejan discriminación sistemática
+- **Contexto legal**: Usar raza explícitamente es ilegal en muchos contextos
+- **Transparencia**: Documentar y reportar sesgos sin intentar "corregir" automáticamente
+
+#### Detección y corrección: Titanic
+- **Sesgo contextual**: Protocolo "mujeres y niños primero" puede ser aceptable
+- **Métricas claras**: Objetivos de equidad bien definidos
+- **Trade-offs aceptables**: Pequeña pérdida de precisión por ganancia en equidad
+
+### Antes de desplegar
+
+1. **Auditoría continua**: Monitorear métricas de equidad en producción
+2. **Documentación transparente**: Registrar decisiones y limitaciones
+3. **Revisión humana**: Mantener supervisión humana en decisiones críticas
+4. **Actualización regular**: Re-entrenar modelos cuando cambien los datos
+
+## Limitaciones y Trabajo Futuro
+
+### Limitaciones Actuales
+- **Definición de equidad**: Múltiples definiciones pueden ser mutuamente excluyentes
+- **Grupos protegidos**: Identificación de todas las características sensibles
+- **Sesgo de interseccionalidad**: Complejidad de múltiples características protegidas
+
+### Investigación Futura
+- **Métodos de corrección avanzados**: Técnicas que preserven mejor la utilidad
+- **Detección automática**: Identificación de sesgos sin conocimiento previo
+- **Evaluación longitudinal**: Impacto de correcciones a largo plazo
+
+## Recursos Adicionales
+
+### Enlaces Útiles
+- [Fairlearn Documentation](https://fairlearn.org/)
+- [Algorithmic Accountability Act](https://www.congress.gov/bill/117th-congress/house-bill/6580)
+- [Google AI Principles](https://ai.google/principles/)
+- [Partnership on AI Tenets](https://www.partnershiponai.org/tenets/)
+
+### Herramientas Utilizadas
+- **Fairlearn**: Framework principal para equidad en ML
+- **scikit-learn**: Modelos base y métricas
+- **pandas/numpy**: Manipulación de datos
+- **matplotlib/seaborn**: Visualizaciones
+
+## Qué queda pendiente
+
+No hay una métrica única que resuelva el problema. Boston Housing pide detenerse en la detección y explicar el sesgo; Titanic permite probar una mitigación, pero Fairlearn no lo elimina por completo. La siguiente revisión debería comparar Calibration e Individual Fairness, medir intersecciones de género, raza y clase, y dejar una auditoría continua antes de usar un modelo en decisiones reales.
+
+---

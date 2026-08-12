@@ -1,0 +1,137 @@
+{
+  "retrievedAt": "2026-08-11",
+  "purpose": "Provenance for the data supplied to alternative chart pages. Entries marked source-only deliberately contain no chart values: their original data file was not present in either repository, or the available script can fall back to synthetic data.",
+  "units": [
+    {
+      "unit": "01",
+      "status": "materialized",
+      "dataFile": "../tanstack-comparison.json",
+      "source": "https://raw.githubusercontent.com/mwaskom/seaborn-data/71e2436a092d714350de0fc409ca8a8714e7e78f/iris.csv",
+      "code": "src/content/blog/EDA-y-Fuentes/01-Exploracion-del-Dataset-Iris.mdx",
+      "notes": "Original code loads seaborn.load_dataset('iris'); the commit-pinned CSV and its SHA-256 are recorded in tanstack-comparison.json."
+    },
+    {
+      "unit": "02",
+      "status": "no-chart-data",
+      "code": "src/content/blog/EDA-y-Fuentes/02-Publicacion-del-Portfolio-en-Vercel.mdx",
+      "notes": "The unit has no embedded chart image or analytical dataset."
+    },
+    {
+      "unit": "03",
+      "status": "materialized",
+      "dataFile": "../tanstack-comparison.json",
+      "source": "https://raw.githubusercontent.com/swapnilg4u/Netflix-Data-Analysis/ed43f20aade686a7231369edbe571683588867a0/netflix_titles.csv",
+      "code": "src/content/blog/EDA-y-Fuentes/03-EDA-Netflix-Dataset-con-pandas.mdx",
+      "notes": "The commit-pinned CSV, its SHA-256 and every aggregation transformation are in tanstack-comparison.json. The source contains 6,234 rows and release years through 2020; no values were adjusted to match narrative text."
+    },
+    {
+      "unit": "04",
+      "status": "source-only",
+      "source": [
+        "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2023-01.parquet",
+        "https://d37ci6vzurychx.cloudfront.net/misc/taxi+_zone_lookup.csv"
+      ],
+      "code": "src/content/blog/EDA-y-Fuentes/04-EDA-Multi-fuentes-y-Joins.mdx",
+      "notes": "The original unit demonstrates joins, but contains no embedded chart image. No downloaded aggregate is needed for its comparison copy."
+    },
+    {
+      "unit": "05",
+      "status": "materialized",
+      "dataFile": "ames.json",
+      "source": "https://www.kaggle.com/api/v1/datasets/download/shashanknecrothapa/ames-housing-dataset?datasetVersionNumber=1",
+      "code": "src/content/blog/Calidad-y-Etica/05-Missing-Data-Detective.mdx",
+      "notes": "The local Ames file was absent, so the exact CSV was downloaded from the pinned source URL and its archive hash is stored in ames.json. The generator reproduces the missing-value recipe, outlier counts, distributions and correlation deltas used by the chart replacement."
+    },
+    {
+      "unit": "06",
+      "status": "materialized",
+      "dataFile": "ames.json",
+      "source": "https://www.kaggle.com/api/v1/datasets/download/shashanknecrothapa/ames-housing-dataset?datasetVersionNumber=1",
+      "code": "src/content/blog/Calidad-y-Etica/06-Feature-Scaling-Anti-Leakage-Pipeline.mdx",
+      "notes": "The exact source archive, hash and 30-bin histograms for the six selected variables and five transformer panels are materialized in ames.json; the generator applies the transformations shown by the unit."
+    },
+    {
+      "unit": "07",
+      "status": "materialized",
+      "dataFile": "fairlearn.json",
+      "source": [
+        "https://lib.stat.cmu.edu/datasets/boston",
+        "https://raw.githubusercontent.com/datasciencedojo/datasets/f0ccab6a7ceafdff780052166fb6fab3311398eb/titanic.csv"
+      ],
+      "code": "src/content/blog/Calidad-y-Etica/07-Detectar-Corregir-Sesgo-Fairlearn.mdx",
+      "notes": "fairlearn.json stores the grouped Boston summaries and Titanic gender/class/intersection counts computed from the two exact URLs; no synthetic fallback is used."
+    },
+    {
+      "unit": "08",
+      "status": "materialized",
+      "dataFile": "unit08.json",
+      "source": [
+        "Seeded example in the original unit's MDX",
+        "https://lib.stat.cmu.edu/datasets/boston"
+      ],
+      "code": "src/content/blog/Feature-Engineering/08-Feature-Engineering-con-Pandas.mdx",
+      "notes": "unit08.json regenerates the seed-42 synthetic frame and 30-bin distributions from the MDX, plus the Boston predictions, metrics and rankings from a SHA-256-verified source."
+    },
+    {
+      "unit": "09",
+      "status": "published-summary",
+      "source": "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
+      "code": [
+        "src/content/blog/Feature-Engineering/09-Encoding-Avanzado-y-Target-Encoding.mdx",
+        "../portfolio-ia/python-test/extra_practica9.py"
+      ],
+      "notes": "The five figures are reconstructed from the cardinalities, model metrics, feature importances and distributions published directly in the original unit. The last comparison is backed by the linked source script; no synthetic fallback is used."
+    },
+    {
+      "unit": "10",
+      "status": "materialized",
+      "dataFile": "unit10.json",
+      "source": [
+        "https://www.kaggle.com/api/v1/datasets/download/shashanknecrothapa/ames-housing-dataset?datasetVersionNumber=1",
+        "https://raw.githubusercontent.com/ageron/handson-ml2/master/datasets/housing/housing.csv"
+      ],
+      "code": "../portfolio-ia/python-test/extra_practica10.py",
+      "notes": "unit10.json contains the Ames PCA loadings and the California housing PCA and t-SNE embeddings regenerated by the pinned, SHA-256-verified source pipeline."
+    },
+    {
+      "unit": "11",
+      "status": "materialized",
+      "dataFile": "unit11.json",
+      "source": "https://archive.ics.uci.edu/static/public/352/online+retail.zip",
+      "code": "src/content/blog/Feature-Engineering/11-Temporal-Feature-Engineering.mdx",
+      "notes": "unit11.json contains temporal windows, rolling cart statistics, RFM distributions, cyclic encodings, Fourier analysis, decomposition and model metrics regenerated from the SHA-256-verified UCI workbook."
+    },
+    {
+      "unit": "12",
+      "status": "raster-only",
+      "source": "https://bitsandbricks.github.io/data/CABA_rc.geojson",
+      "code": "src/content/blog/Datos-Especiales/12-Geoespacial-con-GeoPandas.mdx",
+      "notes": "Geometry, Folium/Leaflet interaction and tiles cannot be represented faithfully by the chart library, so the original visual remains the only published version."
+    },
+    {
+      "unit": "13",
+      "status": "raster-only",
+      "source": "skimage.data.camera() referenced by the original unit",
+      "code": "src/content/blog/Datos-Especiales/13-Imagenes-OpenCV.mdx",
+      "notes": "The figures are image-processing outputs, including source-image panels, so the original raster visuals remain the only published version."
+    },
+    {
+      "unit": "14",
+      "status": "raster-only",
+      "code": "src/content/blog/Datos-Especiales/14-Audio-Processing.mdx",
+      "notes": "Waveform, FFT, spectrogram and feature matrices depend on the original audio artifact and remain the only faithful published version."
+    },
+    {
+      "unit": "15",
+      "status": "no-chart-data",
+      "code": "src/content/blog/Pipelines-ETL/15-Google-Cloud.mdx",
+      "notes": "The unit has no embedded chart image or analytical dataset."
+    },
+    {
+      "unit": "16",
+      "status": "no-chart-data",
+      "code": "src/content/blog/Pipelines-ETL/16-Google-Cloud-Dataprep.mdx",
+      "notes": "The unit has no embedded chart image or analytical dataset."
+    }
+  ]
+}

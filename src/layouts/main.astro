@@ -4,6 +4,11 @@ import { getCollection } from "astro:content"
 import { ClientRouter } from "astro:transitions"
 import { ArticleNavigation } from "@/components/article-navigation"
 import { BlogSearch } from "@/components/blog-search"
+import {
+  getArticleDisplayTitle,
+  getArticleHref,
+  getPublishedArticles,
+} from "@/lib/article-variants"
 
 type ArticleHeading = {
   depth: number
@@ -17,6 +22,11 @@ interface Props {
   articleNavigation?: {
     title: string
     headings: ArticleHeading[]
+    variant?: {
+      href: string
+      label: string
+      shortLabel: string
+    }
   }
 }
 
@@ -27,11 +37,11 @@ const {
 } = Astro.props
 const pageTitle = title === "Blog" ? title : `${title} — Blog`
 const posts = await getCollection("blog")
-const searchablePosts = posts.map((post) => ({
-  title: post.data.title,
+const searchablePosts = getPublishedArticles(posts).map((post) => ({
+  title: getArticleDisplayTitle(post, posts),
   description: post.data.description,
   category: post.id.includes("/") ? post.id.split("/")[0] : "general",
-  href: `/blog/${post.id}/`,
+  href: getArticleHref(post),
 }))
 ---
 
@@ -58,6 +68,7 @@ const searchablePosts = posts.map((post) => ({
             <ArticleNavigation
               title={articleNavigation.title}
               headings={articleNavigation.headings}
+              variant={articleNavigation.variant}
               client:load
             />
           </div>

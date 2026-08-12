@@ -1,0 +1,559 @@
+---
+title: "Features derivadas con pandas"
+description: "Cómo crear ratios, transformaciones y variables compuestas con pandas, y comprobar si aportan algo a un modelo de precios."
+---
+import {
+  Unit08BostonFeatureImportance,
+  Unit08DerivedFeatureDistributions,
+  Unit08FeatureDistributionAnalysis,
+  Unit08ModelComparison,
+  Unit08MutualInformation,
+  Unit08RandomForestImportance,
+} from "@/components/tanstack-comparison/units05-08/unit08-feature-importance"
+
+# Crear features derivadas y comprobar si ayudan
+
+## Qué quería comprobar
+
+- Crear ratios, transformaciones y scores a partir de columnas existentes.
+- Mirar si esas columnas nuevas cambian la distribución o agregan ruido.
+- Comparar Mutual Information con la importancia de Random Forest.
+- Probar el mismo recorrido en datos sintéticos y en Ames Housing.
+
+## La pregunta
+
+Una columna nueva puede ser más útil que otra ronda de recolección, pero solo si codifica una relación que el modelo no estaba viendo.
+
+**Caso:** una inmobiliaria quiere predecir precios a partir de superficie, habitaciones, antigüedad y variables del entorno. La prueba consiste en crear señales que no aparecen como columnas directas.
+
+Si funcionan, esas señales pueden ayudar a:
+- Ajustar precios de manera más justa
+- Identificar oportunidades de inversión
+- Mitigar sesgos derivados de datos incompletos
+- Mejorar la transparencia en las valoraciones
+
+## Cómo lo probé
+
+### 1. Setup y Generación del Dataset Sintético
+
+Empecé con un dataset sintético que imita un mercado inmobiliario; así podía controlar las relaciones antes de llevarlas a datos reales.
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.feature_selection import mutual_info_regression
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+import warnings
+warnings.filterwarnings('ignore')
+
+# Configuración
+np.random.seed(42)
+plt.style.use('seaborn-v0_8')
+sns.set_palette("viridis")
+
+# Generar dataset sintético de viviendas
+n_samples = 1000
+
+data = {
+    'price': np.random.lognormal(mean=12, sigma=0.5, size=n_samples),
+    'sqft': np.random.normal(2000, 500, n_samples).clip(800, 5000),
+    'bedrooms': np.random.choice([2, 3, 4, 5], size=n_samples, p=[0.2, 0.4, 0.3, 0.1]),
+    'year_built': np.random.randint(1950, 2020, n_samples),
+    'lot_size': np.random.normal(8000, 2000, n_samples).clip(3000, 15000),
+    'distance_to_city': np.random.exponential(10, n_samples).clip(0, 50),
+    'school_rating': np.random.choice([1, 2, 3, 4, 5], size=n_samples, p=[0.1, 0.2, 0.3, 0.3, 0.1]),
+    'crime_rate': np.random.gamma(shape=2, scale=5, size=n_samples).clip(0, 50)
+}
+
+df = pd.DataFrame(data)
+print(f"Dataset sintético creado: {df.shape[0]} filas, {df.shape[1]} columnas")
+```
+
+**Decisiones de partida:**
+- **Dataset sintético:** Permite controlar las relaciones entre variables y validar técnicas antes de aplicarlas a datos reales
+- **Tamaño:** 1000 muestras para balancear velocidad computacional con suficiencia estadística
+- **Variables:** Incluyen aspectos estructurales (sqft, bedrooms), temporales (year_built), y contextuales (school_rating, crime_rate)
+
+### 2. Creación de Features Derivadas
+
+Separé las nuevas columnas por tipo de relación:
+
+#### 2.1 Ratios y Proporciones
+
+Los ratios capturan relaciones de eficiencia y valor relativo:
+
+```python
+# Ratios de precio y superficie
+df['price_per_sqft'] = df['price'] / df['sqft']
+df['sqft_per_bedroom'] = df['sqft'] / df['bedrooms'].replace(0, 1)  # Evitar división por cero
+df['price_per_bedroom'] = df['price'] / df['bedrooms'].replace(0, 1)
+
+# Densidad de construcción
+df['build_density'] = df['sqft'] / df['lot_size']
+```
+
+**Cómo las leería:**
+- `price_per_sqft`: Valor por metro cuadrado, útil para comparar propiedades
+- `sqft_per_bedroom`: Espacio promedio por habitación, indica comodidad
+- `build_density`: Proporción de terreno construido, relacionado con densidad urbana
+
+#### 2.2 Features Temporales
+
+Capturan la antigüedad y modernidad de las propiedades:
+
+```python
+# Edad de la propiedad
+current_year = 2024
+df['property_age'] = current_year - df['year_built']
+
+# Categorización de edad
+df['age_category'] = pd.cut(
+    df['property_age'], 
+    bins=[0, 10, 25, 50, 100, np.inf],
+    labels=['Nueva', 'Reciente', 'Media', 'Antigua', 'Muy Antigua']
+)
+
+# Propiedad nueva (binaria)
+df['is_new_property'] = (df['property_age'] <= 5).astype(int)
+```
+
+**Razonamiento:** la antigüedad no suele tener una relación recta con el precio. Una casa nueva puede valer más, pero una propiedad histórica también puede tener un precio premium.
+
+#### 2.3 Transformaciones Matemáticas
+
+Normalizan distribuciones sesgadas y capturan relaciones no lineales:
+
+```python
+# Transformación logarítmica del precio
+df['log_price'] = np.log1p(df['price'])
+
+# Transformación raíz cuadrada de superficie
+df['sqrt_sqft'] = np.sqrt(df['sqft'])
+
+# Transformación cuadrática
+df['sqft_squared'] = df['sqft'] ** 2
+```
+
+**Por qué estas transformaciones:**
+- **Log:** Precio típicamente tiene distribución log-normal; log normaliza
+- **Sqrt:** Reduce el impacto de valores extremos manteniendo la escala
+- **Cuadrática:** Captura relaciones no lineales (ej: precio aumenta más rápido con superficie)
+
+#### 2.4 Features Compuestas (Scores)
+
+Integran múltiples factores en un solo score:
+
+```python
+# Luxury score: combina tamaño, habitaciones y precio
+df['luxury_score'] = (
+    (df['sqft'] / df['sqft'].max()) * 0.4 +
+    (df['bedrooms'] / df['bedrooms'].max()) * 0.3 +
+    (df['price'] / df['price'].max()) * 0.3
+)
+
+# Location score: combina distancia, rating escolar y crimen
+df['location_score'] = (
+    (1 - df['distance_to_city'] / df['distance_to_city'].max()) * 0.4 +
+    (df['school_rating'] / 5) * 0.4 +
+    (1 - df['crime_rate'] / df['crime_rate'].max()) * 0.2
+)
+```
+
+**Ventaja:** un score compuesto junta señales que un modelo lineal sencillo tendría que aprender por separado.
+
+**Resultado:** Dataset ampliado de 10 a 22 columnas (+12 features derivadas)
+
+<Unit08DerivedFeatureDistributions client:load />
+
+**Lectura:** `log_price` queda más simétrica que la variable original. La transformación cambia la forma de la distribución; el efecto sobre un modelo hay que medirlo aparte.
+
+### 3. Análisis de Distribución y Outliers
+
+Evaluamos las distribuciones de las nuevas features y detectamos outliers:
+
+```python
+# Estadísticas descriptivas
+print("Estadísticas de features derivadas:")
+print(df[['price_per_sqft', 'sqft_per_bedroom', 'property_age']].describe())
+
+# Detección de outliers usando IQR
+def detect_outliers_iqr(df, column):
+    Q1 = df[column].quantile(0.25)
+    Q3 = df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    outliers = df[(df[column] < lower_bound) | (df[column] > upper_bound)]
+    return len(outliers), len(outliers) / len(df) * 100
+
+# Analizar outliers
+for col in ['price_per_sqft', 'sqft_per_bedroom', 'property_age']:
+    n_outliers, pct_outliers = detect_outliers_iqr(df, col)
+    print(f"{col}: {n_outliers} outliers ({pct_outliers:.1f}%)")
+```
+
+**Resultados:**
+- `price_per_sqft`: `3.7%` outliers
+- `sqft_per_bedroom`: `4.5%` outliers
+- `property_age`: `0.0%` outliers (distribución más uniforme)
+
+**Lectura:** Las nuevas features añaden detalle y la mayoría queda por debajo de 5% de outliers. Aun así, cada valor extremo necesita revisión antes de eliminarlo.
+
+<Unit08FeatureDistributionAnalysis client:load />
+
+**Lectura:** La mayoría de las columnas nuevas tiene menos de 5% de outliers; `property_age` queda en 0%. El gráfico muestra el recuento, no decide si esos casos son errores.
+
+### 4. Evaluación de Importancia de Features
+
+Aplicamos dos métodos complementarios para determinar la relevancia de las variables:
+
+#### 4.1 Mutual Information
+
+Mide dependencia estadística, capturando relaciones lineales y no lineales:
+
+```python
+# Preparar datos para evaluación
+feature_cols = [col for col in df.columns if col not in ['price', 'age_category']]
+X = df[feature_cols]
+y = df['price']
+
+# Calcular Mutual Information
+mi_scores = mutual_info_regression(X, y, random_state=42)
+
+feature_importance_mi = pd.DataFrame({
+    'feature': feature_cols,
+    'mi_score': mi_scores
+}).sort_values('mi_score', ascending=False)
+
+print("Top 5 features por Mutual Information:")
+print(feature_importance_mi.head())
+```
+
+**Resultados:** Las features más importantes según MI:
+1. `bedrooms` (0.342)
+2. `sqrt_sqft` (0.298)
+3. `sqft` (0.287)
+
+**Interpretación:** MI encuentra más dependencia en `bedrooms`, `sqrt_sqft` y `sqft`; superficie y habitaciones explican buena parte de la variación de precio en este ejemplo.
+
+<Unit08MutualInformation client:load />
+
+**Lectura:** `sqrt_sqft` aparece alto en MI. Es una señal de dependencia no lineal, no una prueba de que la transformación sea necesaria en cualquier dataset.
+
+#### 4.2 Random Forest Feature Importance
+
+Mide importancia basada en reducción de impureza en árboles:
+
+```python
+# Entrenar Random Forest
+rf = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42)
+rf.fit(X, y)
+
+feature_importance_rf = pd.DataFrame({
+    'feature': feature_cols,
+    'importance': rf.feature_importances_
+}).sort_values('importance', ascending=False)
+
+print("Top 5 features por Random Forest Importance:")
+print(feature_importance_rf.head())
+```
+
+**Resultados:** Las features más importantes según RF:
+1. `crime_rate` (0.1519)
+2. `lot_size` (0.1371)
+3. `school_rating` (0.1292)
+4. `distance_to_city` (0.1256)
+
+**Interpretación:** Random Forest coloca `crime_rate`, `lot_size` y `school_rating` arriba. El resultado refleja este conjunto y este modelo; no alcanza para afirmar causalidad.
+
+<Unit08RandomForestImportance client:load />
+
+**Lectura:** `crime_rate` y `school_rating` pesan más que varias medidas estructurales en este Random Forest. El árbol puede capturar interacciones que la correlación lineal no ve.
+
+#### 4.3 Correlación Lineal
+
+Complementa los métodos anteriores evaluando relaciones lineales:
+
+```python
+# Matriz de correlación con el precio
+correlations = df[feature_cols + ['price']].corr()['price'].sort_values(ascending=False)
+print("Correlaciones con precio:")
+print(correlations.head(10))
+```
+
+**Resultados:** Correlaciones lineales bajas en general (|r| < 0.1), lo que justifica el uso de métricas no lineales (MI, RF) para capturar relaciones reales.
+
+**Top 3 features globales (consenso entre métodos):**
+1. `crime_rate` (RF)
+2. `lot_size` (RF)
+3. `school_rating` (RF)
+
+### 5. Investigación Libre: Features Adicionales
+
+Exploramos nuevas features basadas en conocimiento de dominio:
+
+```python
+# Eficiencia de espacio
+df['space_efficiency'] = df['sqft'] / df['lot_size']
+
+# Densidad de habitaciones
+df['crowded_property'] = df['bedrooms'] / df['sqft']
+
+# Score de ubicación personalizado
+df['custom_location_score'] = (
+    (1 - df['distance_to_city'] / df['distance_to_city'].max()) * 0.3 +
+    (df['school_rating'] / 5) * 0.5 +
+    (1 - df['crime_rate'] / df['crime_rate'].max()) * 0.2
+)
+
+# Interacción precio-edad
+df['price_age_interaction'] = df['price_per_sqft'] * df['property_age']
+
+# Propiedad nueva y grande
+df['new_large_property'] = ((df['property_age'] <= 5) & (df['bedrooms'] >= 4)).astype(int)
+
+# Interacción distancia-escuela
+df['distance_school_interaction'] = df['distance_to_city'] * df['school_rating']
+```
+
+**Evaluación de correlaciones:**
+
+| Feature | Correlación con precio |
+|---------|----------------------|
+| `space_efficiency` | -0.031 |
+| `crowded_property` | 0.026 |
+| `custom_location_score` | 0.009 |
+
+**Interpretación:** Aunque las correlaciones lineales son bajas, estas variables capturan relaciones interpretables y potencialmente no lineales entre tamaño, ubicación y valor.
+
+### 6. Aplicación en Datos Reales: Ames Housing
+
+Aplicamos las mismas técnicas sobre un dataset real para validar transferibilidad:
+
+```python
+# Cargar Ames Housing
+ames_df = pd.read_csv('AmesHousing.csv')
+
+# Seleccionar variables relevantes
+ames_subset = ames_df[['SalePrice', 'GrLivArea', 'LotArea', 
+                        'YearBuilt', 'GarageCars', 'Neighborhood']].copy()
+
+# Aplicar features derivadas similares
+ames_subset['price_per_sqft'] = ames_subset['SalePrice'] / ames_subset['GrLivArea']
+ames_subset['property_age'] = 2024 - ames_subset['YearBuilt']
+ames_subset['space_efficiency'] = ames_subset['GrLivArea'] / ames_subset['LotArea']
+
+# Análisis exploratorio
+print("Estadísticas Ames Housing:")
+print(ames_subset[['price_per_sqft', 'property_age', 'space_efficiency']].describe())
+```
+
+**Hallazgos:**
+- `price_per_sqft`: Reflejó correctamente la dispersión del valor por superficie en el mercado real
+- `property_age`: Mostró relación inversa con el precio (propiedades más viejas valen menos en promedio)
+- `space_efficiency`: Capturó variaciones marginales relacionadas con el tamaño de lote
+
+**Diferencias sintético vs real:**
+- Los datos reales presentan ruido, correlaciones espurias y efectos de localización que no aparecen en datos simulados
+- Esto refuerza la necesidad del feature engineering contextual y validación con datos reales
+
+## Decisiones y límites
+
+### Decisiones de Hiperparámetros
+
+**Random Forest:**
+- `n_estimators=100`: Balance entre velocidad y precisión
+- `max_depth=10`: Permite suficiente complejidad sin overfitting excesivo
+- `random_state=42`: Reproducibilidad
+
+**Mutual Information:**
+- `random_state=42`: Para reproducibilidad en el cálculo de MI
+
+### Métricas de Evaluación
+
+**Mutual Information:**
+- **Ventaja:** Captura relaciones lineales y no lineales
+- **Interpretación:** Score más alto = mayor dependencia estadística
+- **Uso:** Identificar features con relaciones no lineales importantes
+
+**Random Forest Importance:**
+- **Ventaja:** Basado en reducción de impureza, considera interacciones
+- **Interpretación:** Importancia normalizada que suma 1.0
+- **Uso:** Identificar features más útiles para el modelo específico
+
+**Correlación Lineal:**
+- **Ventaja:** Simple e interpretable
+- **Desventaja:** Solo captura relaciones lineales
+- **Uso:** Validación complementaria, especialmente útil cuando baja correlación indica necesidad de métodos no lineales
+
+### Features Más Importantes
+
+**Sintético:**
+1. `crime_rate` (RF: 0.1519)
+2. `lot_size` (RF: 0.1371)
+3. `school_rating` (RF: 0.1292)
+
+**Ames Housing:**
+1. `price_per_sqft` (consistente y explicativa)
+2. `property_age` (relación inversa clara con precio)
+
+**Sorpresas:**
+- Baja correlación de variables esperadas como `GarageCars` en algunos contextos
+- Alta relevancia de `crime_rate`, que no es una variable estructural pero mueve la predicción de precio
+
+### Posibles Mejoras
+
+1. **Transformaciones avanzadas:**
+   - PolynomialFeatures para capturar interacciones
+   - Box-Cox transformations para normalización más sofisticada
+   
+2. **Codificación categórica:**
+   - One-Hot Encoding para Neighborhood en Ames Housing
+   - Target Encoding para variables categóricas de alta cardinalidad
+
+3. **Selección automática:**
+   - Recursive Feature Elimination (RFE)
+   - Lasso para regularización y selección simultánea
+
+4. **Análisis de componentes:**
+   - PCA para reducir dimensionalidad
+   - Análisis de factores para identificar dimensiones latentes
+
+## Garantías de Reproducibilidad
+
+1. **Scripts versionados** en GitHub con fecha y documentación completa
+2. **Random seeds:** `np.random.seed(42)` y `random_state=42` en todos los modelos
+3. **Documentación completa** de cada transformación y justificación
+4. **Guardado de outputs** intermedios en carpetas organizadas
+5. **Pipelines de sklearn** para automatización sin pasos manuales
+
+## Herramientas y Técnicas Utilizadas
+
+- **pandas:** Manipulación y creación de features derivadas
+- **numpy:** Operaciones numéricas y transformaciones matemáticas
+- **scikit-learn:** Modelos de machine learning y feature selection
+- **matplotlib/seaborn:** Visualizaciones estadísticas y distribuciones
+
+## Otra comprobación: Boston Housing
+
+Para ver si las señales sobrevivían fuera de Ames Housing, repetí el proceso en **Boston Housing**.
+
+### Por qué este dataset
+
+Lo elegí porque:
+
+1. Es un dataset diferente al Ames Housing, permitiendo validar que las técnicas funcionan en distintos contextos
+2. Tiene características similares (precio de viviendas, variables demográficas) pero estructura diferente
+3. Permite comparar qué features son universales vs específicas del dominio
+4. Es un dataset clásico que permite comparación con literatura existente
+5. Tiene menos features originales, lo que hace que las features derivadas tengan relativamente más impacto
+
+### Qué quería contrastar
+
+Buscaba comprobar:
+
+- Que features derivadas similares (ratios, interacciones) también funcionen bien en este dataset
+- Que algunas features sean específicas del dominio (Ames) vs universales
+- Que Mutual Information y Random Forest den rankings similares
+- Que ratios de precio/área sean importantes en ambos datasets
+- Que features de edad/temporalidad tengan peso similar
+
+### Qué comparé
+
+Usé las mismas familias de features:
+
+1. **Ratios:** `price_per_room`, `crime_per_capita`, `nox_per_industry`
+2. **Transformaciones matemáticas:** `sqrt_lstat`, `log_crim`
+3. **Features de interacción:** `rm_x_age`, `lstat_x_age`
+4. **Features temporales:** `distance_per_age`
+
+Entrené un Random Forest con las columnas originales y otro con las derivadas, y comparé sus métricas.
+
+<Unit08ModelComparison client:load />
+
+**Lectura:** Con features derivadas, R² pasa de 0.89 a 0.95 y MSE de 7.90 a 3.43. Es una mejora en este experimento; hace falta validarla con otra partición y otro dataset.
+
+<Unit08BostonFeatureImportance client:load />
+
+**Lectura:** `price_per_room` queda primero tanto en Random Forest como en MI. El acuerdo entre métodos es útil aquí, pero no convierte al ratio en una regla universal.
+
+### Resultados
+
+**Mejora con features derivadas:**
+- **R²:** 0.8923 → 0.9533 (+6.84%)
+- **MSE:** 7.9015 → 3.4264 (-56.64%)
+
+**Top 10 Features (Random Forest):**
+1. `price_per_room`: 0.9330
+2. `RM`: 0.0251
+3. `sq_rm`: 0.0214
+4. `sqrt_lstat`: 0.0036
+5. `B`: 0.0030
+
+**Top 10 Features (Mutual Information):**
+1. `price_per_room`: 1.7097
+2. `sqrt_lstat`: 0.6716
+3. `LSTAT`: 0.6678
+4. `RM`: 0.5090
+5. `lstat_x_age`: 0.5002
+
+### Qué quedó de la prueba
+
+1. **Validación de generalización:** Las técnicas de feature engineering funcionan bien en datasets diferentes. La mejora de R² del 6.84% y reducción de MSE del 56.64% confirma que las técnicas aprendidas son aplicables a otros contextos.
+
+2. **Features universales vs específicas:** Ratios de precio/área son importantes en ambos datasets (universales). Features de interacción (RM × AGE) también son valiosas en ambos. Transformaciones logarítmicas ayudan a normalizar distribuciones sesgadas.
+
+3. **Diferencias entre datasets:** Boston Housing es más compacto (menos features originales), por lo que las features derivadas tienen relativamente más impacto. Mutual Information y Random Forest dan rankings similares (correlación alta).
+
+4. **Una señal domina:** `price_per_room` tiene una importancia de 0.9330. Conviene comprobar que no esté filtrando información del objetivo antes de llevarla a producción.
+
+5. **Siguiente criterio:** repetir la prueba en más de un dataset y revisar los ratios con cuidado. MI y RF juntos dan una lectura más completa que cualquiera por separado.
+
+## Qué probaría después
+
+### Lo que funcionó en esta prueba
+
+1. **El contexto manda:** un ratio o una transformación vale cuando representa una relación del dominio.
+
+2. **Features más importantes:** `price_per_sqft` y `property_age` demostraron ser las más consistentes y explicativas tanto en datos sintéticos como reales
+
+3. **Transformaciones matemáticas son valiosas:** Las transformaciones logarítmicas y de raíz cuadrada mejoran distribuciones y capturan relaciones no lineales
+
+4. **Métodos complementarios:** Mutual Information y Random Forest Importance revelan diferentes aspectos de importancia, siendo útiles en conjunto
+
+5. **Diferencias entre datos sintéticos y reales:** Los datos reales presentan ruido y efectos contextuales que refuerzan la necesidad de validación con datos reales
+
+### Siguiente ronda
+
+1. **Explorar técnicas avanzadas:**
+   - PolynomialFeatures para capturar interacciones entre variables
+   - Box-Cox transformations para normalización más sofisticada
+   - Target Encoding para variables categóricas de alta cardinalidad
+
+2. **Selección automática de features:**
+   - Implementar Recursive Feature Elimination (RFE)
+   - Evaluar Lasso para regularización y selección simultánea
+   - Comparar diferentes estrategias de selección
+
+3. **Validación más robusta:**
+   - Cross-validation para evaluar impacto de features en performance
+   - A/B testing de diferentes conjuntos de features
+   - Análisis de sensibilidad de importancia de features
+
+4. **Pipeline reproducible:**
+   - Construir pipeline de sklearn para automatizar transformaciones
+   - Versionar pipelines y documentar cambios
+   - Implementar en producción con monitoreo de drift
+
+5. **Análisis de causalidad:**
+   - Investigar relaciones causales vs correlaciones
+   - Evaluar impacto de features en diferentes segmentos
+   - Análisis de fairness para evitar sesgos
+
+---
+
+_Nota: Este análisis fue realizado con fines educativos utilizando datasets sintéticos y el dataset Ames Housing de Kaggle._
