@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/main.astro"
-import { Kbd } from "@/components/ui/kbd"
+import ArticleBook from "@/components/article-book.astro"
 import { getArticleCategory } from "@/lib/article-categories"
 import {
   getArticleDisplayTitle,
@@ -35,54 +35,46 @@ for (const post of getPublishedArticles(allPosts)) {
 }
 
 const groups = Array.from(postsByFolder, ([folder, posts]) => ({
-  folder,
-  label: getArticleCategory(folder).label,
+  ...getArticleCategory(folder),
   order: Math.min(...posts.map((post) => getPostOrder(post.id))),
   posts: posts.sort(
     (a, b) =>
       getPostOrder(a.id) - getPostOrder(b.id) ||
       a.data.title.localeCompare(b.data.title, "es")
   ),
-})).sort((a, b) => a.order - b.order || a.label.localeCompare(b.label, "es"))
+}))
+  .filter((group) => group.slug !== "general")
+  .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label, "es"))
 ---
 
 <Layout>
-  <section class="mx-auto flex max-w-3xl flex-col gap-8 p-6">
-    <header class="flex flex-col gap-2">
-      <h1 class="font-medium">Posts</h1>
-      <p>
-        Notas publicadas en Markdown. Usa <Kbd>⌘K</Kbd> para buscar.
-      </p>
-    </header>
+  <section class="mx-auto flex max-w-3xl flex-col gap-12 p-6">
+    {
+      groups.map((group) => (
+        <section id={group.slug} class="flex scroll-mt-20 flex-col gap-6">
+          <h2 class="font-medium">
+            <a href={group.href}>{group.label}</a>
+          </h2>
+          <ul class="grid grid-cols-1 justify-items-center gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {group.posts.map((post) => {
+              const routeId = getArticleRouteId(post).replaceAll("/", "-")
+              const number = post.id.split("/").at(-1)?.match(/^\d+/)?.[0]
 
-    <div class="flex flex-col gap-10">
-      {
-        groups.map((group) => (
-          <section id={group.folder} class="scroll-mt-20 flex flex-col gap-4">
-            <h2 class="font-medium">{group.label}</h2>
-            <ul class="flex flex-col gap-6">
-              {group.posts.map((post) => (
+              return (
                 <li>
-                  <article class="flex flex-col gap-1">
-                    <h3
-                      transition:name={`article-title-${getArticleRouteId(post).replaceAll("/", "-")}`}
-                      class="font-medium"
-                    >
-                      <a
-                        href={getArticleHref(post)}
-                        data-astro-prefetch="hover"
-                      >
-                        {getArticleDisplayTitle(post)}
-                      </a>
-                    </h3>
-                    <p>{post.data.description}</p>
-                  </article>
+                  <ArticleBook
+                    href={getArticleHref(post)}
+                    number={number}
+                    slug={group.slug}
+                    title={getArticleDisplayTitle(post)}
+                    transitionName={`article-title-${routeId}`}
+                  />
                 </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      }
-    </div>
+              )
+            })}
+          </ul>
+        </section>
+      ))
+    }
   </section>
 </Layout>

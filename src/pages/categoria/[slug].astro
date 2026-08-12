@@ -1,0 +1,82 @@
+---
+import { getCollection } from "astro:content"
+
+import ArticleBook from "@/components/article-book.astro"
+import { getArticleCategory } from "@/lib/article-categories"
+import {
+  getArticleDisplayTitle,
+  getArticleHref,
+  getArticleRouteId,
+  getPublishedArticles,
+} from "@/lib/article-variants"
+import Layout from "@/layouts/main.astro"
+
+export async function getStaticPaths() {
+  const posts = getPublishedArticles(await getCollection("blog"))
+  const categories = new Map(
+    posts.map((post) => {
+      const category = getArticleCategory(post.id)
+      return [category.slug, category]
+    })
+  )
+
+  return Array.from(categories.values(), (category) => ({
+    params: { slug: category.slug },
+    props: { category },
+  }))
+}
+
+interface Props {
+  category: ReturnType<typeof getArticleCategory>
+}
+
+const { category } = Astro.props
+const posts = getPublishedArticles(await getCollection("blog"))
+  .filter((post) => getArticleCategory(post.id).slug === category.slug)
+  .sort((a, b) => {
+    const aOrder = Number(
+      a.id.split("/").at(-1)?.match(/^\d+/)?.[0] ?? Infinity
+    )
+    const bOrder = Number(
+      b.id.split("/").at(-1)?.match(/^\d+/)?.[0] ?? Infinity
+    )
+
+    return aOrder - bOrder || a.data.title.localeCompare(b.data.title, "es")
+  })
+---
+
+<Layout
+  title={category.label}
+  description={`Posts de ${category.label}.`}
+  categoryNavigation={category}
+>
+  <section class="mx-auto flex max-w-3xl flex-col gap-8 p-6">
+    <header class="flex flex-col gap-2">
+      <h1 class="font-medium">{category.label}</h1>
+    </header>
+
+    <ul
+      class="grid grid-cols-1 justify-items-center gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
+    >
+      {
+        posts.map((post) => {
+          const routeId = getArticleRouteId(post).replaceAll("/", "-")
+          const number = post.id.split("/").at(-1)?.match(/^\d+/)?.[0]
+
+          return (
+            <li>
+              <ArticleBook
+                heading="h2"
+                href={getArticleHref(post)}
+                number={number}
+                slug={category.slug}
+                title={getArticleDisplayTitle(post)}
+                transitionName={`article-title-${routeId}`}
+              />
+            </li>
+          )
+        })
+      }
+    </ul>
+  </section>
+</Layout>

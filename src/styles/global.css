@@ -59,6 +59,7 @@
   --font-heading: var(--font-manrope);
   --font-sans: var(--font-text);
   --font-serif: var(--font-libre-baskerville);
+  --font-mono: var(--font-lilex);
   --font-math: "Latin Modern Math", "Libre Baskerville Variable", serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);

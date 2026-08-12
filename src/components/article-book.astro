@@ -1,0 +1,102 @@
+---
+import {
+  RiBookOpenLine,
+  RiDatabase2Line,
+  RiFlowChart,
+  RiScales3Line,
+  RiShapesLine,
+  RiToolsLine,
+  type RemixiconComponentType,
+} from "@remixicon/react"
+
+import { PerspectiveBook } from "@/components/perspective-book"
+
+interface Props {
+  heading?: "h2" | "h3"
+  href: string
+  number?: string
+  slug: string
+  title: string
+  transitionName: string
+}
+
+type BookCover = {
+  className: string
+  icon: RemixiconComponentType
+  unit: string
+}
+
+const bookCovers: Record<string, BookCover> = {
+  "eda-y-fuentes": {
+    className: "bg-[#284B3D] text-[#D7F9E9]",
+    icon: RiDatabase2Line,
+    unit: "Unidad 1",
+  },
+  "calidad-y-etica": {
+    className: "bg-[#594214] text-[#FFF1B8]",
+    icon: RiScales3Line,
+    unit: "Unidad 2",
+  },
+  "feature-engineering": {
+    className: "bg-[#253F73] text-[#E0EAFF]",
+    icon: RiToolsLine,
+    unit: "Unidad 3",
+  },
+  "datos-especiales": {
+    className: "bg-[#6D1834] text-[#FFD9E5]",
+    icon: RiShapesLine,
+    unit: "Unidad 4",
+  },
+  "pipelines-etl": {
+    className: "bg-[#3E2A68] text-[#EEE4FF]",
+    icon: RiFlowChart,
+    unit: "Unidad 5",
+  },
+}
+
+const fallbackCover: BookCover = {
+  className: "bg-muted text-foreground",
+  icon: RiBookOpenLine,
+  unit: "Unidad",
+}
+
+const {
+  heading = "h3",
+  href,
+  number,
+  slug,
+  title,
+  transitionName,
+} = Astro.props
+const cover = bookCovers[slug] ?? fallbackCover
+const Icon = cover.icon
+const Heading = heading
+---
+
+<a
+  href={href}
+  aria-label={`Abrir ${title}`}
+  class="block w-min rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4"
+  data-astro-prefetch="hover"
+>
+  <PerspectiveBook
+    size="default"
+    className={`${cover.className} h-full justify-start`}
+    textured
+  >
+    <div class="flex h-full flex-col justify-between">
+      <div class="flex flex-col gap-5">
+        <Heading
+          transition:name={transitionName}
+          class="text-base leading-5 font-semibold text-balance"
+        >
+          {title}
+        </Heading>
+        <Icon className="size-6" aria-hidden="true" />
+      </div>
+      <span class="font-serif text-sm font-medium">
+        {cover.unit}{number && ` · ${number}`}
+      </span>
+    </div>
+  </PerspectiveBook>
+</a>

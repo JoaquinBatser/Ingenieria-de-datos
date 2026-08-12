@@ -63,6 +63,10 @@ export type SearchablePost = {
 
 type BlogNavigationProps = {
   article?: ArticleNavigation
+  category?: {
+    href: string
+    label: string
+  }
   posts: SearchablePost[]
 }
 
@@ -103,7 +107,11 @@ function ArticleMenu({ article, showCategory = false }: ArticleMenuProps) {
   )
 }
 
-export function BlogNavigation({ article, posts }: BlogNavigationProps) {
+export function BlogNavigation({
+  article,
+  category,
+  posts,
+}: BlogNavigationProps) {
   const [searchOpen, setSearchOpen] = React.useState(false)
 
   React.useEffect(() => {
@@ -127,8 +135,8 @@ export function BlogNavigation({ article, posts }: BlogNavigationProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 hidden backdrop-blur md:block">
-        <div className="mx-auto flex max-w-3xl items-center gap-2 py-2 px-6">
+      <header className="sticky top-0 z-40 hidden bg-background md:block">
+        <div className="mx-auto flex max-w-3xl items-center gap-2 px-6 py-2">
           <Breadcrumb
             aria-label="Breadcrumbs"
             className="flex min-w-0 flex-1 items-center"
@@ -148,9 +156,9 @@ export function BlogNavigation({ article, posts }: BlogNavigationProps) {
                   <House6FillIcon data-icon="inline-start" />
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator />
               {article ? (
                 <>
+                  <BreadcrumbSeparator />
                   <BreadcrumbItem className="shrink-0">
                     <BreadcrumbLink
                       render={
@@ -188,11 +196,14 @@ export function BlogNavigation({ article, posts }: BlogNavigationProps) {
                     </DropdownMenu>
                   </BreadcrumbItem>
                 </>
-              ) : (
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Posts</BreadcrumbPage>
-                </BreadcrumbItem>
-              )}
+              ) : category ? (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{category.label}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              ) : null}
             </BreadcrumbList>
           </Breadcrumb>
 
@@ -255,10 +266,12 @@ export function BlogNavigation({ article, posts }: BlogNavigationProps) {
                       <ArticleMenu article={article} showCategory />
                     </DropdownMenuContent>
                   </DropdownMenu>
-                ) : (
+                ) : category ? (
                   <BreadcrumbPage className="flex h-11 items-center justify-center rounded-2xl border px-3 text-sm font-medium">
-                    Posts
+                    {category.label}
                   </BreadcrumbPage>
+                ) : (
+                  <BreadcrumbPage className="sr-only">Inicio</BreadcrumbPage>
                 )}
               </BreadcrumbItem>
             </BreadcrumbList>
@@ -284,8 +297,8 @@ export function BlogNavigation({ article, posts }: BlogNavigationProps) {
         <Command>
           <CommandInput autoFocus placeholder="Buscar..." />
           <CommandList>
-            <CommandEmpty>No se encontraron posts.</CommandEmpty>
-            <CommandGroup heading="Posts">
+            <CommandEmpty>No se encontraron unidades.</CommandEmpty>
+            <CommandGroup heading="Unidades">
               {posts.map((post) => (
                 <CommandItem
                   key={post.href}

@@ -17,6 +17,6 @@ export function getArticleCategory(id: string) {
   return {
     slug,
     label: categoryLabels[slug] ?? slug.replaceAll("-", " "),
-    href: `/#${slug}`,
+    href: `/categoria/${slug}/`,
   }
 }
