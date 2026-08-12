@@ -3,6 +3,7 @@ import { Chart } from "@tanstack/charts/react"
 import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { tooltip } from "@tanstack/charts/tooltip"
 
+import { ChartCarousel } from "@/components/chart-carousel"
 import amesData from "@/data/tanstack/ames.json"
 
 type HistogramRow = { series: string; x: number; count: number }
@@ -85,11 +86,11 @@ function transformerCharts(transformer: TransformerKey) {
 
 function TransformerComparison({ transformer }: { transformer: TransformerKey }) {
   return (
-    <section aria-label={`Comparación de ${transformer}`} className="grid gap-6 md:grid-cols-3">
+    <ChartCarousel label={`Comparación de ${transformer}`}>
       {transformerCharts(transformer).map(({ label, definition }) => (
         <Chart key={label} definition={definition} height={320} ariaLabel={label} />
       ))}
-    </section>
+    </ChartCarousel>
   )
 }
 
@@ -116,11 +117,11 @@ const logLotAreaCharts = [
 
 export function Unit06Histograms() {
   return (
-    <section aria-label="Histogramas de las variables seleccionadas" className="grid gap-6 md:grid-cols-2">
+    <ChartCarousel label="Histogramas de las variables seleccionadas">
       {rawCharts.map(({ feature, definition }) => (
         <Chart key={feature} definition={definition} height={320} ariaLabel={`Distribución de ${feature}`} />
       ))}
-    </section>
+    </ChartCarousel>
   )
 }
 
@@ -146,10 +147,10 @@ export function Unit06FunctionTransformer() {
 
 export function Unit06LogComparison() {
   return (
-    <section aria-label="Comparación de la transformación logarítmica" className="grid gap-6 md:grid-cols-3">
+    <ChartCarousel label="Comparación de la transformación logarítmica">
       {logLotAreaCharts.map(({ label, definition }) => (
         <Chart key={label} definition={definition} height={320} ariaLabel={label} />
       ))}
-    </section>
+    </ChartCarousel>
   )
 }

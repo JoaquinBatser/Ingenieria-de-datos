@@ -4,6 +4,7 @@ import { scaleBand } from "@tanstack/charts/scales/band"
 import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { tooltip } from "@tanstack/charts/tooltip"
 
+import { ChartCarousel } from "@/components/chart-carousel"
 import fairlearnData from "@/data/tanstack/fairlearn.json"
 
 type BostonRow = { racial: number; price: number }
@@ -69,9 +70,9 @@ const priceBoxplot = defineChart({
 
 export function Unit07BiasAnalysis() {
   return (
-    <section aria-label="Distribución y boxplot de precios por grupo racial" className="grid gap-6 md:grid-cols-2">
+    <ChartCarousel label="Distribución y boxplot de precios por grupo racial">
       <Chart definition={priceHistogram} height={380} ariaLabel="Distribución de precios por grupo racial" />
       <Chart definition={priceBoxplot} height={380} ariaLabel="Boxplot de precios por grupo racial" />
-    </section>
+    </ChartCarousel>
   )
 }

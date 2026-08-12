@@ -2,8 +2,8 @@
 import "@/styles/global.css"
 import { getCollection } from "astro:content"
 import { ClientRouter } from "astro:transitions"
-import { ArticleNavigation } from "@/components/article-navigation"
-import { BlogSearch } from "@/components/blog-search"
+import { BlogNavigation } from "@/components/blog-navigation"
+import { getArticleCategory } from "@/lib/article-categories"
 import {
   getArticleDisplayTitle,
   getArticleHref,
@@ -20,13 +20,13 @@ interface Props {
   title?: string
   description?: string
   articleNavigation?: {
+    href: string
     title: string
-    headings: ArticleHeading[]
-    variant?: {
+    category: {
       href: string
       label: string
-      shortLabel: string
     }
+    headings: ArticleHeading[]
   }
 }
 
@@ -38,9 +38,9 @@ const {
 const pageTitle = title === "Blog" ? title : `${title} — Blog`
 const posts = await getCollection("blog")
 const searchablePosts = getPublishedArticles(posts).map((post) => ({
-  title: getArticleDisplayTitle(post, posts),
+  title: getArticleDisplayTitle(post),
   description: post.data.description,
-  category: post.id.includes("/") ? post.id.split("/")[0] : "general",
+  category: getArticleCategory(post.id).label,
   href: getArticleHref(post),
 }))
 ---
@@ -55,30 +55,13 @@ const searchablePosts = getPublishedArticles(posts).map((post) => ({
     <ClientRouter />
   </head>
   <body>
-    <main class="pb-20">
+    <BlogNavigation
+      article={articleNavigation}
+      posts={searchablePosts}
+      client:load
+    />
+    <main class="pb-20 md:pb-0">
       <slot />
     </main>
-    <aside
-      aria-label="Navegación del blog"
-      class="pointer-events-none fixed inset-x-0 bottom-0 flex items-end justify-end gap-2 p-4 sm:p-6 xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,48rem)_minmax(0,1fr)] xl:gap-0 xl:p-0"
-    >
-      {
-        articleNavigation && (
-          <div class="pointer-events-auto min-w-0 xl:col-start-1 xl:max-w-full xl:overflow-hidden xl:p-6">
-            <ArticleNavigation
-              title={articleNavigation.title}
-              headings={articleNavigation.headings}
-              variant={articleNavigation.variant}
-              client:load
-            />
-          </div>
-        )
-      }
-      <div
-        class="pointer-events-auto xl:col-start-3 xl:justify-self-end xl:p-6"
-      >
-        <BlogSearch posts={searchablePosts} client:load />
-      </div>
-    </aside>
   </body>
 </html>

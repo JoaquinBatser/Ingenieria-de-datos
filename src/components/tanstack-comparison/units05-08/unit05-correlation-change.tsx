@@ -5,6 +5,7 @@ import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { scaleOrdinal } from "@tanstack/charts/scales/ordinal"
 import { tooltip } from "@tanstack/charts/tooltip"
 
+import { ChartCarousel } from "@/components/chart-carousel"
 import amesData from "@/data/tanstack/ames.json"
 
 type HistogramRow = { series: string; x: number; count: number }
@@ -252,7 +253,7 @@ export function Unit05MissingPatterns() {
 
 export function Unit05OutliersAnalysis() {
   return (
-    <section aria-label="Outliers por variable" className="grid gap-6 md:grid-cols-2">
+    <ChartCarousel label="Outliers por variable">
       {outlierCharts.map(({ feature, logarithmic, outlierCount, definition }) => (
         <Chart
           key={feature}
@@ -261,29 +262,29 @@ export function Unit05OutliersAnalysis() {
           ariaLabel={`Boxplot de ${feature}${logarithmic ? " en escala logarítmica" : ""}; ${outlierCount} outliers según IQR de los valores originales`}
         />
       ))}
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function Unit05DistributionComparison() {
   return (
-    <section aria-label="Distribuciones antes y después de imputar" className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <ChartCarousel label="Distribuciones antes y después de imputar">
       {numericDistributionCharts.map(({ feature, definition }) => (
         <Chart key={feature} definition={definition} height={320} ariaLabel={`Distribución de ${feature}: original e imputado`} />
       ))}
       {categoryDistributionCharts.map(({ feature, definition }) => (
         <Chart key={feature} definition={definition} height={320} ariaLabel={`Distribución de ${feature}: original e imputado`} />
       ))}
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function Unit05CorrelationComparison() {
   return (
-    <section aria-label="Matrices de correlación antes y después de imputar" className="grid gap-6 xl:grid-cols-2">
+    <ChartCarousel label="Matrices de correlación antes y después de imputar">
       {correlationCharts.map(({ state, definition }) => (
         <Chart key={state} definition={definition} height={560} ariaLabel={`Correlaciones - ${state}`} />
       ))}
-    </section>
+    </ChartCarousel>
   )
 }

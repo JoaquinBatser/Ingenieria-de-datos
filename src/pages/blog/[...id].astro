@@ -3,20 +3,19 @@ import type { CollectionEntry } from "astro:content"
 import { getCollection, render } from "astro:content"
 
 import CodeBlock from "@/components/code-block.astro"
+import { getArticleCategory } from "@/lib/article-categories"
 import {
   getArticleDisplayTitle,
   getArticleHref,
   getArticleRouteId,
-  getArticleVariant,
   getPublishedArticles,
-  isAlternativeArticle,
-  validateArticleVariants,
+  validateArticleRoutes,
 } from "@/lib/article-variants"
 import Layout from "@/layouts/main.astro"
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog")
-  validateArticleVariants(posts)
+  validateArticleRoutes(posts)
 
   return getPublishedArticles(posts).map((post) => ({
     params: { id: getArticleRouteId(post) },
@@ -30,25 +29,19 @@ interface Props {
 
 const { post } = Astro.props
 const { Content, headings } = await render(post)
-const posts = await getCollection("blog")
 const articleTransitionName = `article-title-${getArticleRouteId(post).replaceAll("/", "-")}`
-const articleVariant = getArticleVariant(post, posts)
-const isAlternative = isAlternativeArticle(post)
-const displayTitle = getArticleDisplayTitle(post, posts)
-const variantNavigation = articleVariant && {
-  href: getArticleHref(articleVariant),
-  label: isAlternative ? "Ver unidad original" : "Ver la alternativa",
-  shortLabel: isAlternative ? "Original" : "Alternativa",
-}
+const displayTitle = getArticleDisplayTitle(post)
+const category = getArticleCategory(post.id)
 ---
 
 <Layout
   title={displayTitle}
   description={post.data.description}
   articleNavigation={{
+    href: getArticleHref(post),
     title: displayTitle,
+    category,
     headings,
-    variant: variantNavigation,
   }}
 >
   <article class="mx-auto flex max-w-3xl flex-col gap-8 p-6">

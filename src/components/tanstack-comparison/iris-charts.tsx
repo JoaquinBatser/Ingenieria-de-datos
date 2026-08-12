@@ -15,6 +15,7 @@ import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { scaleOrdinal } from "@tanstack/charts/scales/ordinal"
 import { tooltip } from "@tanstack/charts/tooltip"
 
+import { ChartCarousel } from "@/components/chart-carousel"
 import comparisonData from "@/data/tanstack-comparison.json"
 
 const irisRows = comparisonData.iris.rows
@@ -273,19 +274,17 @@ export function IrisCorrelationHeatmapChart() {
 
 export function IrisBoxplotsChart() {
   return (
-    <section aria-label="Boxplots de medidas de Iris por especie">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <Chart
-          definition={petalLengthBoxplot}
-          height={390}
-          ariaLabel="Distribución del largo del pétalo por especie"
-        />
-        <Chart
-          definition={sepalWidthBoxplot}
-          height={390}
-          ariaLabel="Distribución del ancho del sépalo por especie"
-        />
-      </div>
-    </section>
+    <ChartCarousel label="Boxplots de medidas de Iris por especie">
+      <Chart
+        definition={petalLengthBoxplot}
+        height={390}
+        ariaLabel="Distribución del largo del pétalo por especie"
+      />
+      <Chart
+        definition={sepalWidthBoxplot}
+        height={390}
+        ariaLabel="Distribución del ancho del sépalo por especie"
+      />
+    </ChartCarousel>
   )
 }

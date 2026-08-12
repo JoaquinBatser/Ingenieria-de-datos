@@ -3,6 +3,8 @@ import { Chart } from "@tanstack/charts/react"
 import { Chart as CanvasChart } from "@tanstack/charts/react/canvas"
 import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { tooltip } from "@tanstack/charts/tooltip"
+
+import { ChartCarousel } from "@/components/chart-carousel"
 import unit10Data from "@/data/tanstack/unit10.json"
 
 const pcaRows = unit10Data.pcaEmbedding.map((row, index) => ({
@@ -95,7 +97,7 @@ export function PcaLoadingsChart() {
 
 export function PcaEmbeddingsChart() {
   return (
-    <section aria-label="Comparación visual de PCA y t-SNE" className="grid gap-8 xl:grid-cols-2">
+    <ChartCarousel label="Comparación visual de PCA y t-SNE">
       <figure>
         <figcaption>
           PCA (Var: {(unit10Data.pcaEmbeddingVariance * 100).toFixed(2)}%; muestra reproducible de {pcaRows.length.toLocaleString("es-UY")} de {unit10Data.pcaEmbeddingPopulation.toLocaleString("es-UY")})
@@ -114,6 +116,6 @@ export function PcaEmbeddingsChart() {
           height={520}
         />
       </figure>
-    </section>
+    </ChartCarousel>
   )
 }

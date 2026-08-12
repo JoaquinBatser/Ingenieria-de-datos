@@ -19,6 +19,7 @@ import { scaleOrdinal } from "@tanstack/charts/scales/ordinal"
 import { scalePoint } from "@tanstack/charts/scales/point"
 import { tooltip } from "@tanstack/charts/tooltip"
 
+import { ChartCarousel } from "@/components/chart-carousel"
 import comparisonData from "@/data/tanstack-comparison.json"
 
 const netflix = comparisonData.netflix
@@ -299,20 +300,18 @@ const genresBubbleDefinition = defineChart({
 
 export function NetflixMissingDataChart() {
   return (
-    <section aria-label="Porcentajes y patrón general de datos faltantes">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <Chart
-          definition={missingDataDefinition}
-          height={390}
-          ariaLabel="Porcentaje de datos faltantes por columna en el catálogo Netflix"
-        />
-        <Chart
-          definition={missingOverviewHeatmapDefinition}
-          height={390}
-          ariaLabel="Patrón de datos faltantes en las doce columnas del catálogo Netflix"
-        />
-      </div>
-    </section>
+    <ChartCarousel label="Porcentajes y patrón general de datos faltantes">
+      <Chart
+        definition={missingDataDefinition}
+        height={390}
+        ariaLabel="Porcentaje de datos faltantes por columna en el catálogo Netflix"
+      />
+      <Chart
+        definition={missingOverviewHeatmapDefinition}
+        height={390}
+        ariaLabel="Patrón de datos faltantes en las doce columnas del catálogo Netflix"
+      />
+    </ChartCarousel>
   )
 }
 
@@ -328,20 +327,18 @@ export function NetflixMissingHeatmapChart() {
 
 export function NetflixContentTypesChart() {
   return (
-    <section aria-label="Distribución y proporción de películas y series">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <Chart
-          definition={contentCountDefinition}
-          height={360}
-          ariaLabel="Cantidad de películas y series"
-        />
-        <Chart
-          definition={contentShareDefinition}
-          height={360}
-          ariaLabel="Proporción de películas y series"
-        />
-      </div>
-    </section>
+    <ChartCarousel label="Distribución y proporción de películas y series">
+      <Chart
+        definition={contentCountDefinition}
+        height={360}
+        ariaLabel="Cantidad de películas y series"
+      />
+      <Chart
+        definition={contentShareDefinition}
+        height={360}
+        ariaLabel="Proporción de películas y series"
+      />
+    </ChartCarousel>
   )
 }
 
@@ -367,38 +364,34 @@ export function NetflixCountriesChart() {
 
 export function NetflixRatingsChart() {
   return (
-    <section aria-label="Distribución de ratings total y por tipo de contenido">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <Chart
-          definition={ratingsDefinition}
-          height={410}
-          ariaLabel="Distribución total de ratings"
-        />
-        <Chart
-          definition={ratingsByTypeDefinition}
-          height={410}
-          ariaLabel="Distribución de ratings para películas y series"
-        />
-      </div>
-    </section>
+    <ChartCarousel label="Distribución de ratings total y por tipo de contenido">
+      <Chart
+        definition={ratingsDefinition}
+        height={410}
+        ariaLabel="Distribución total de ratings"
+      />
+      <Chart
+        definition={ratingsByTypeDefinition}
+        height={410}
+        ariaLabel="Distribución de ratings para películas y series"
+      />
+    </ChartCarousel>
   )
 }
 
 export function NetflixGenresChart() {
   return (
-    <section aria-label="Ranking y diagrama de burbujas de géneros de Netflix">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <Chart
-          definition={genresDefinition}
-          height={520}
-          ariaLabel="Diez géneros más frecuentes"
-        />
-        <Chart
-          definition={genresBubbleDefinition}
-          height={520}
-          ariaLabel="Frecuencia de los quince géneros más populares"
-        />
-      </div>
-    </section>
+    <ChartCarousel label="Ranking y diagrama de burbujas de géneros de Netflix">
+      <Chart
+        definition={genresDefinition}
+        height={520}
+        ariaLabel="Diez géneros más frecuentes"
+      />
+      <Chart
+        definition={genresBubbleDefinition}
+        height={520}
+        ariaLabel="Frecuencia de los quince géneros más populares"
+      />
+    </ChartCarousel>
   )
 }

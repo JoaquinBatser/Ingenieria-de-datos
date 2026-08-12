@@ -1,27 +1,15 @@
 ---
 import Layout from "@/layouts/main.astro"
 import { Kbd } from "@/components/ui/kbd"
+import { getArticleCategory } from "@/lib/article-categories"
 import {
   getArticleDisplayTitle,
   getArticleHref,
   getArticleRouteId,
   getPublishedArticles,
-  isAlternativeArticle,
-  validateArticleVariants,
+  validateArticleRoutes,
 } from "@/lib/article-variants"
 import { getCollection } from "astro:content"
-
-const getFolder = (id: string) =>
-  id.includes("/") ? id.split("/")[0] : "general"
-
-const folderLabels: Record<string, string> = {
-  "eda-y-fuentes": "EDA & Fuentes",
-  "calidad-y-etica": "Calidad & Ética",
-  "feature-engineering": "Feature Engineering",
-  "datos-especiales": "Datos Especiales",
-  "pipelines-etl": "Pipelines ETL",
-  general: "General",
-}
 
 const getPostOrder = (id: string) => {
   const filename = id.split("/").at(-1)
@@ -36,10 +24,10 @@ const postsByFolder = new Map<
 >()
 
 const allPosts = await getCollection("blog")
-validateArticleVariants(allPosts)
+validateArticleRoutes(allPosts)
 
 for (const post of getPublishedArticles(allPosts)) {
-  const folder = getFolder(post.id)
+  const folder = getArticleCategory(post.id).slug
   const folderPosts = postsByFolder.get(folder) ?? []
 
   folderPosts.push(post)
@@ -48,12 +36,11 @@ for (const post of getPublishedArticles(allPosts)) {
 
 const groups = Array.from(postsByFolder, ([folder, posts]) => ({
   folder,
-  label: folderLabels[folder] ?? folder.replaceAll("-", " "),
+  label: getArticleCategory(folder).label,
   order: Math.min(...posts.map((post) => getPostOrder(post.id))),
   posts: posts.sort(
     (a, b) =>
       getPostOrder(a.id) - getPostOrder(b.id) ||
-      Number(isAlternativeArticle(a)) - Number(isAlternativeArticle(b)) ||
       a.data.title.localeCompare(b.data.title, "es")
   ),
 })).sort((a, b) => a.order - b.order || a.label.localeCompare(b.label, "es"))
@@ -71,7 +58,7 @@ const groups = Array.from(postsByFolder, ([folder, posts]) => ({
     <div class="flex flex-col gap-10">
       {
         groups.map((group) => (
-          <section class="flex flex-col gap-4">
+          <section id={group.folder} class="scroll-mt-20 flex flex-col gap-4">
             <h2 class="font-medium">{group.label}</h2>
             <ul class="flex flex-col gap-6">
               {group.posts.map((post) => (
@@ -85,7 +72,7 @@ const groups = Array.from(postsByFolder, ([folder, posts]) => ({
                         href={getArticleHref(post)}
                         data-astro-prefetch="hover"
                       >
-                        {getArticleDisplayTitle(post, allPosts)}
+                        {getArticleDisplayTitle(post)}
                       </a>
                     </h3>
                     <p>{post.data.description}</p>

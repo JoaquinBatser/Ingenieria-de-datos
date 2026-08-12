@@ -15,6 +15,8 @@ import { scaleBand } from "@tanstack/charts/scales/band"
 import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { scaleOrdinal } from "@tanstack/charts/scales/ordinal"
 import { tooltip } from "@tanstack/charts/tooltip"
+
+import { ChartCarousel } from "@/components/chart-carousel"
 import unit11Data from "@/data/tanstack/unit11.json"
 
 const windowScatterRows = unit11Data.windowScatter.map((row, index) => ({
@@ -172,10 +174,10 @@ const modelComparisonChart = defineChart({
 
 export function TemporalWindowActivityChart() {
   return (
-    <section aria-label="Distribución temporal de ventas" className="grid gap-8 xl:grid-cols-2">
+    <ChartCarousel label="Distribución temporal de ventas">
       <figure><figcaption>Promedio de Órdenes por Ventana Temporal</figcaption><Chart definition={windowChart} height={380} ariaLabel="Promedio de órdenes en ventanas de siete, treinta y noventa días" /></figure>
       <figure><figcaption>Actividad Reciente vs Histórica (muestra reproducible de {windowScatterRows.length.toLocaleString("es-UY")} de {unit11Data.windowScatterPopulation.toLocaleString("es-UY")} observaciones)</figcaption><CanvasChart definition={activityChart} height={380} ariaLabel="Órdenes recientes frente a órdenes históricas para cada observación" /></figure>
-    </section>
+    </ChartCarousel>
   )
 }
 
@@ -190,31 +192,31 @@ export function TemporalRollingCartChart() {
 
 export function TemporalRfmDistributionsChart() {
   return (
-    <section aria-label="Distribuciones RFM" className="grid gap-8 xl:grid-cols-3">
+    <ChartCarousel label="Distribuciones RFM">
       <figure><figcaption>Recency Distribution</figcaption><Chart definition={recencyChart} height={340} ariaLabel="Distribución de recency" /></figure>
       <figure><figcaption>Frequency Distribution</figcaption><Chart definition={frequencyChart} height={340} ariaLabel="Distribución de frequency" /></figure>
       <figure><figcaption>Monetary Distribution</figcaption><Chart definition={monetaryChart} height={340} ariaLabel="Distribución de monetary" /></figure>
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function TemporalCyclicEncodingChart() {
   return (
-    <section aria-label="Encoding cíclico y efecto de fin de semana" className="grid gap-8 xl:grid-cols-3">
+    <ChartCarousel label="Encoding cíclico y efecto de fin de semana">
       <figure><figcaption>Encoding Cíclico de Hora del Día</figcaption><Chart definition={hourCyclicChart} height={340} ariaLabel="Encoding seno coseno de las horas observadas" /></figure>
       <figure><figcaption>Encoding Cíclico de Día de Semana</figcaption><Chart definition={dayCyclicChart} height={340} ariaLabel="Encoding seno coseno de los días observados" /></figure>
       <figure><figcaption>Efecto Weekend en Cart Size</figcaption><Chart definition={weekendChart} height={340} ariaLabel="Cart size promedio durante semana y fin de semana" /></figure>
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function TemporalFourierAnalysisChart() {
   return (
-    <section aria-label="Análisis temporal con Fourier y descomposición" className="grid gap-8">
+    <ChartCarousel label="Análisis temporal con Fourier y descomposición">
       <figure><figcaption>Serie Temporal Original</figcaption><Chart definition={temporalSeriesChart} height={300} ariaLabel="Serie temporal de probabilidad objetivo" /></figure>
       <figure><figcaption>Power Spectrum (Fourier Transform)</figcaption><Chart definition={spectrumChart} height={300} ariaLabel="Espectro de potencia con referencias semanal y mensual" /></figure>
       <figure><figcaption>Seasonal Decomposition (Primeros 200 días)</figcaption><Chart definition={decompositionChart} height={360} ariaLabel="Serie original, tendencia y tendencia más estacionalidad" /></figure>
-    </section>
+    </ChartCarousel>
   )
 }
 

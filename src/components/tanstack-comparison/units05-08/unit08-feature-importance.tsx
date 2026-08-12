@@ -4,6 +4,7 @@ import { scaleBand } from "@tanstack/charts/scales/band"
 import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { tooltip } from "@tanstack/charts/tooltip"
 
+import { ChartCarousel } from "@/components/chart-carousel"
 import unit08Data from "@/data/tanstack/unit08.json"
 
 type HistogramRow = { series: string; x: number; count: number }
@@ -133,21 +134,21 @@ const derivedPredictionChart = predictionChart("Features derivadas")
 
 export function Unit08DerivedFeatureDistributions() {
   return (
-    <section aria-label="Distribuciones de features derivadas" className="grid gap-6 md:grid-cols-3">
+    <ChartCarousel label="Distribuciones de features derivadas">
       {derivedCharts.map(({ series, definition }) => (
         <Chart key={series} definition={definition} height={320} ariaLabel={`Distribución de ${series}`} />
       ))}
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function Unit08FeatureDistributionAnalysis() {
   return (
-    <section aria-label="Análisis de distribuciones" className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <ChartCarousel label="Análisis de distribuciones">
       {analysisCharts.map(({ series, definition }) => (
         <Chart key={series} definition={definition} height={300} ariaLabel={`Distribución de ${series}`} />
       ))}
-    </section>
+    </ChartCarousel>
   )
 }
 
@@ -173,7 +174,7 @@ export function Unit08RandomForestImportance() {
 
 export function Unit08ModelComparison() {
   return (
-    <section aria-label="Valores reales y predichos de ambos modelos" className="grid gap-6 md:grid-cols-2">
+    <ChartCarousel label="Valores reales y predichos de ambos modelos">
       <figure>
         <figcaption>Modelo Original · R² = 0.8923, MSE = 7.9015</figcaption>
         <Chart definition={originalPredictionChart} height={420} ariaLabel="Modelo original: valores reales y predichos" />
@@ -186,13 +187,13 @@ export function Unit08ModelComparison() {
           ariaLabel="Modelo con features derivadas: valores reales y predichos"
         />
       </figure>
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function Unit08BostonFeatureImportance() {
   return (
-    <section aria-label="Importancia de features en Boston Housing" className="grid gap-6 md:grid-cols-2">
+    <ChartCarousel label="Importancia de features en Boston Housing">
       <Chart
         definition={bostonMutualInformationChart}
         height={520}
@@ -203,6 +204,6 @@ export function Unit08BostonFeatureImportance() {
         height={520}
         ariaLabel="Top 10 features de Boston Housing por Random Forest"
       />
-    </section>
+    </ChartCarousel>
   )
 }

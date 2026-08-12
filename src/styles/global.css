@@ -20,6 +20,10 @@
   view-transition-name: var(--article-title-transition);
 }
 
+.article-content :where(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-block-start: 4.5rem;
+}
+
 .typeset > [data-code-block] {
   margin-block-start: var(--typeset-flow);
 }

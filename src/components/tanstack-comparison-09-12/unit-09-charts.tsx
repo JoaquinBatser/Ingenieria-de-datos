@@ -12,6 +12,8 @@ import { scaleBand } from "@tanstack/charts/scales/band"
 import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { tooltip } from "@tanstack/charts/tooltip"
 
+import { ChartCarousel } from "@/components/chart-carousel"
+
 const cardinalityRows = [
   { feature: "workclass", categories: 9, tier: "Baja (≤10)" },
   { feature: "education", categories: 16, tier: "Media (≤50)" },
@@ -205,40 +207,40 @@ export function EncodingCardinalityChart() {
 
 export function EncodingResultsChart() {
   return (
-    <section aria-label="Comparación de cuatro estrategias de encoding" className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+    <ChartCarousel label="Comparación de cuatro estrategias de encoding">
       <figure><figcaption>Accuracy Comparison</figcaption><Chart definition={accuracyChart} height={320} ariaLabel="Accuracy por estrategia de encoding" /></figure>
       <figure><figcaption>AUC-ROC Comparison</figcaption><Chart definition={aucChart} height={320} ariaLabel="AUC ROC por estrategia de encoding" /></figure>
       <figure><figcaption>F1-Score Comparison</figcaption><Chart definition={f1Chart} height={320} ariaLabel="F1 por estrategia de encoding" /></figure>
       <figure><figcaption>Training Time Comparison</figcaption><Chart definition={timeChart} height={320} ariaLabel="Tiempo de entrenamiento por estrategia de encoding" /></figure>
       <figure><figcaption>Number of Features Comparison</figcaption><Chart definition={featureCountChart} height={320} ariaLabel="Cantidad de features por estrategia de encoding" /></figure>
       <figure><figcaption>Trade-off: Accuracy vs Dimensionality</figcaption><Chart definition={tradeoffChart} height={320} ariaLabel="Accuracy frente a cantidad de features" /></figure>
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function EncodingFeatureImportanceChart() {
   return (
-    <section aria-label="Importancia por tipo de feature" className="grid gap-8 md:grid-cols-2">
+    <ChartCarousel label="Importancia por tipo de feature">
       <figure><figcaption>Importancia Total por Tipo de Feature</figcaption><Chart definition={totalImportanceChart} height={320} ariaLabel="Importancia total numérica y one hot" /></figure>
       <figure><figcaption>Importancia Promedio por Tipo de Feature</figcaption><Chart definition={averageImportanceChart} height={320} ariaLabel="Importancia promedio numérica y one hot" /></figure>
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function EncodingFeatureDistributionChart() {
   return (
-    <section aria-label="Ranking y distribución de importancias" className="grid gap-8 xl:grid-cols-2">
+    <ChartCarousel label="Ranking y distribución de importancias">
       <figure><figcaption>Top Features - Random Forest</figcaption><Chart definition={rankedImportanceChart} height={720} ariaLabel="Ranking de las treinta importancias del Random Forest" /></figure>
       <figure><figcaption>Distribución de Feature Importances</figcaption><Chart definition={importanceDistributionChart} height={420} ariaLabel="Histograma de importancias con promedio" /></figure>
-    </section>
+    </ChartCarousel>
   )
 }
 
 export function EncodingExtraResultsChart() {
   return (
-    <section aria-label="Comparación adicional de encodings y modelos" className="grid gap-8 md:grid-cols-2">
+    <ChartCarousel label="Comparación adicional de encodings y modelos">
       <figure><figcaption>Comparación de Accuracy por Encoding y Modelo</figcaption><Chart definition={extraMetricChart("accuracy", "Accuracy")} height={360} ariaLabel="Accuracy de Target y CatBoost Encoding con Random Forest y Gradient Boosting" /></figure>
       <figure><figcaption>Comparación de ROC AUC por Encoding y Modelo</figcaption><Chart definition={extraMetricChart("auc", "ROC AUC")} height={360} ariaLabel="AUC de Target y CatBoost Encoding con Random Forest y Gradient Boosting" /></figure>
-    </section>
+    </ChartCarousel>
   )
 }
