@@ -1,19 +1,19 @@
 ---
-title: "Medir el sesgo antes de corregirlo"
-description: "Dos ejercicios con Fairlearn sobre Boston Housing y Titanic: cómo medir diferencias entre grupos y decidir cuándo una corrección tiene sentido."
+title: "Evaluación y mitigación de sesgos con Fairlearn"
+description: "Evaluación de disparidades entre grupos en Boston Housing y Titanic mediante Fairlearn, con criterios para determinar cuándo corresponde aplicar mitigación."
 ---
 import { Unit07BiasAnalysis } from "@/components/tanstack-comparison/units05-08/unit07-boston-racial-price"
 
 
-## Qué quería aprender
+## Objetivos del análisis
 
 - Detectar sesgo histórico en dos datasets muy distintos.
 - Medir cuánto llega ese sesgo a las predicciones.
 - Comparar un reporte de detección con una mitigación automática.
 - Decidir cuándo corregir es razonable y cuándo solo corresponde documentar.
-- Dejar criterios para no desplegar un modelo a ciegas.
+- Definir criterios de evaluación previos al despliegue del modelo.
 
-## Por qué separar los casos
+## Justificación de los casos de estudio
 
 Un modelo aprende de lo que encuentra en sus datos. Si esos datos reflejan una desigualdad, la predicción puede repetirla o hacerla más difícil de detectar. El mismo tratamiento no sirve para todos los contextos:
 
@@ -22,7 +22,7 @@ Un modelo aprende de lo que encuentra en sus datos. Si esos datos reflejan una d
 - **Contratación**: Perpetuación de desigualdades históricas
 - **Sistema judicial**: Sesgos en predicción de reincidencia
 
-### Qué puede salir mal
+### Riesgos del modelado
 
 Un algoritmo entrenado con datos históricos puede:
 - **Perpetuar discriminación** sistemática del pasado
@@ -30,7 +30,7 @@ Un algoritmo entrenado con datos históricos puede:
 - **Crear nuevas formas** de discriminación indirecta
 - **Afectar grupos vulnerables** de manera desproporcionada
 
-## Recorrido
+## Metodología
 
 ### 1. Configuración del Entorno
 
@@ -95,7 +95,7 @@ print(f"✅ Boston Housing cargado: {boston_df.shape}")
 print(f"Variable racial Bk decodificada (proporción afroamericana)")
 ```
 
-### 2. Mirar el sesgo antes del modelo
+### 2. Evaluación del sesgo previo al modelado
 
 ```python
 # Crear grupos raciales para análisis
@@ -147,7 +147,7 @@ plt.show()
 
 <Unit07BiasAnalysis client:load />
 
-**Lectura:** Las medianas de `MEDV` cambian entre los grupos definidos por la proporción de población afroamericana. El gráfico no prueba por sí solo una causa, pero sí deja claro que el modelo recibiría una señal histórica que no se puede tratar como neutral.
+**Interpretación:** Las medianas de `MEDV` cambian entre los grupos definidos por la proporción de población afroamericana. El gráfico no prueba por sí solo una causa, pero sí deja claro que el modelo recibiría una señal histórica que no se puede tratar como neutral.
 
 ### 3. Cuantificar Sesgo en Predicciones
 
@@ -464,7 +464,7 @@ plt.show()
 - **pandas/numpy**: Manipulación de datos
 - **matplotlib/seaborn**: Visualizaciones
 
-## Qué queda pendiente
+## Evaluaciones pendientes
 
 No hay una métrica única que resuelva el problema. Boston Housing pide detenerse en la detección y explicar el sesgo; Titanic permite probar una mitigación, pero Fairlearn no lo elimina por completo. La siguiente revisión debería comparar Calibration e Individual Fairness, medir intersecciones de género, raza y clase, y dejar una auditoría continua antes de usar un modelo en decisiones reales.
 

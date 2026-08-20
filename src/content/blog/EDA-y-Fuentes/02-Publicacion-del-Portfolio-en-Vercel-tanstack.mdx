@@ -1,11 +1,11 @@
 ---
-title: "Cómo publiqué el portfolio con Vercel"
-description: "Registro del cambio de GitHub Pages y MkDocs a Next.js, Fumadocs y Vercel: estructura, despliegue y rutina para publicar nuevas prácticas."
+title: "Arquitectura y despliegue del portfolio en Vercel"
+description: "Documentación de la migración desde GitHub Pages y MkDocs hacia Next.js, Fumadocs y Vercel, incluida la arquitectura, el despliegue y el flujo de publicación."
 ---
 
-## El stack que quedó
+## Arquitectura tecnológica
 
-El sitio terminó apoyándose en estas piezas:
+La implementación se compone de las siguientes tecnologías:
 
 - **Next.js 15.5.2**: Framework de React para aplicaciones web modernas
 - **Fumadocs**: Sistema de documentación especializado para crear portafolios técnicos
@@ -13,7 +13,7 @@ El sitio terminó apoyándose en estas piezas:
 - **TypeScript**: Tipos para mantener el código bajo control
 - **Tailwind CSS**: Framework de CSS para estilos responsivos
 
-## Qué quedó funcionando
+## Resultado de la implementación
 
 Al cerrar la migración tenía:
 
@@ -23,7 +23,7 @@ Al cerrar la migración tenía:
 - Estructura de documentación organizada por secciones  
 - Sistema de navegación automático entre prácticas  
 
-## Cómo está ordenado
+## Organización del proyecto
 
 ### Estructura de Archivos
 
@@ -52,7 +52,7 @@ portfolio-ia/
 | **Deployment**     | Vercel (automático)       | GitHub Pages (manual)      |
 | **Customización**  | JSX/TSX completo          | Templates limitados        |
 
-## El despliegue, paso a paso
+## Procedimiento de despliegue
 
 ### 1. Configuración del Repositorio
 
@@ -87,7 +87,7 @@ export const source = loader({
 });
 ```
 
-## Qué encuentra quien entra
+## Estructura de navegación
 
 ### Portada
 
@@ -119,16 +119,16 @@ También deja disponibles:
 - Code blocks con syntax highlighting
 - Imágenes optimizadas con Next.js Image
 
-## La rutina de publicación
+## Flujo de publicación
 
-### Cada cambio sigue este recorrido
+### Secuencia de integración y despliegue
 
 1. **Editar**: Modificar un archivo `.mdx` en `content/docs/`.
 2. **Probar**: Ejecutar `npm run dev` y revisar la página localmente.
 3. **Guardar**: Hacer commit y push a GitHub.
 4. **Publicar**: Vercel despliega automáticamente.
 
-### Lo que ahorro con este flujo
+### Efectos operativos del flujo
 
 - **Tiempo de deploy**: ~30 segundos vs ~2-3 minutos de GitHub Actions
 - **Preview automático**: URL única para cada PR
@@ -150,7 +150,7 @@ El panel de Vercel muestra:
 - **Repositorio**: [GitHub - portfolio-ia](https://github.com/JoaquinBatser/portfolio-ia)
 - **Dashboard Vercel**: Panel de control para deployments
 
-## Qué haría después
+## Mejoras posteriores
 
 El cambio dejó el contenido en MDX, las previsualizaciones ligadas a cada PR y los despliegues en manos de Vercel. En la práctica, publicar una práctica nueva ya no requiere mantener un workflow separado.
 

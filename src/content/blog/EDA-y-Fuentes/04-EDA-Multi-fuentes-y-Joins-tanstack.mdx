@@ -1,12 +1,12 @@
 ---
-title: "Tres millones de viajes, tres fuentes y varios joins"
-description: "Análisis de los taxis amarillos de NYC: cómo unir viajes, zonas y eventos para leer demanda, tarifas y cobertura."
+title: "Integración multifuente de tres millones de viajes de taxi"
+description: "Integración de viajes, zonas geográficas y eventos de NYC para analizar demanda, tarifas, cobertura y rendimiento de uniones sobre tres millones de registros."
 
 ---
 
 [Jupyter Notebook original](../EDA-y-Fuentes-Jupyters/04-EDA-Multi-fuentes-y-Joins-Jupyter.mdx)
 
-## La pregunta
+## Planteamiento del análisis
 
 Un archivo de viajes dice cuánto se movieron los taxis, pero no explica dónde ocurrió cada viaje ni si ese día había un evento. Por eso uní tres fuentes con pandas: viajes, zonas geográficas y calendario.
 
@@ -20,7 +20,7 @@ El análisis junta:
 - **Información de zonas geográficas completas**: Mapa completo de las 265 zonas oficiales de taxi en los cinco distritos (boroughs) de NYC.
 - **Calendario de eventos especiales**: Registro de eventos importantes que podrían afectar el tráfico y demanda de taxis en la ciudad.
 
-### Para qué sirve la unión
+### Objetivo de la integración
 
 Con los viajes solos se ve el volumen. Al añadir zona y calendario se puede:
 
@@ -28,7 +28,7 @@ Con los viajes solos se ve el volumen. Al añadir zona y calendario se puede:
 2. **Detectar cobertura desigual**: comparar los boroughs con la misma métrica.
 3. **Medir días distintos**: contrastar viajes, distancia y tarifa cuando hay eventos.
 
-## Qué tenía que resolver
+## Requisitos del análisis
 
 ### En los datos
 
@@ -45,7 +45,7 @@ Con los viajes solos se ve el volumen. Al añadir zona y calendario se puede:
 - Calcular tarifa media, revenue por kilómetro y propina.
 - Dejar un reporte que se pueda volver a ejecutar.
 
-## Cómo se armó el análisis
+## Metodología de integración
 
 ### 1. Carga y Preparación de Datos
 
@@ -329,7 +329,7 @@ El agregado por borough queda así:
 | Staten Island | 21,457    | 0.7%           | $35.64          | $2.56      | 12.8%        |
 | EWR           | 5,712     | 0.2%           | $89.12          | $2.31      | 16.2%        |
 
-**Lectura:**
+**Interpretación:**
 
 - **Manhattan** concentra el 71.8% de los viajes, tiene $5.24 por km y la tasa de propina más alta (18.2% sobre la tarifa base).
 
@@ -349,7 +349,7 @@ La comparación entre días normales y días con eventos especiales da:
 | Día Especial     | 171,824   | 3.28 millas        | $24.37          |
 | **Diferencia %** | **+6.1%** | **+7.2%**          | **+10.1%**      |
 
-**Lectura:**
+**Interpretación:**
 
 - La tarifa media sube **10.1%** en días con eventos.
 - La distancia media sube **7.2%**.
@@ -382,7 +382,7 @@ La matriz de correlación sirve para poner esas cifras en contexto:
 | tip_amount - total_amount    | 0.611       | Correlación moderada positiva   |
 | tip_amount - trip_distance   | 0.482       | Correlación moderada positiva   |
 
-**Lectura:**
+**Interpretación:**
 
 - `fare_amount` y `total_amount` casi se mueven juntos.
 - `trip_distance` también se relaciona con el costo total.
@@ -475,7 +475,7 @@ def pipeline_taxi_simple():
     return resultados
 ```
 
-### Qué aporta el flujo
+### Propiedades del flujo
 
 El flujo resuelve cinco tareas concretas:
 
@@ -506,7 +506,7 @@ Con esto el análisis se puede repetir y cada ejecución queda auditada en los l
 
 4. **La automatización evita trabajo repetido**: Prefect permite volver a correr el mismo recorrido y revisar qué ocurrió.
 
-### Dónde mirar primero
+### Prioridades de análisis
 
 1. **Planificación Estratégica de Flota**:
 
@@ -560,7 +560,7 @@ Con esto el análisis se puede repetir y cada ejecución queda auditada en los l
 
 Los resultados de enero son una foto, no una serie. Manhattan concentra el 71.8% de los viajes; los eventos elevan la tarifa un 10.1%; Staten Island y Bronx quedan por debajo del 4% combinado. Repetiría el pipeline durante varios meses, sumaría taxis verdes y ridesharing y cruzaría la demanda con clima, tráfico y eventos deportivos. Con esas fuentes recién tendría sentido entrenar un modelo de demanda o montar un dashboard en tiempo real.
 
-## Preguntas que conviene dejar documentadas
+## Decisiones técnicas documentadas
 
 ### 1. ¿Qué diferencia hay entre un LEFT JOIN y un INNER JOIN?
 

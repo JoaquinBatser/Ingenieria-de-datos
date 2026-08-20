@@ -1,6 +1,6 @@
 ---
-title: "PCA o selección de variables"
-description: "Comparación de PCA y selección de features sobre Ames Housing: cuánta información se conserva, qué tan explicable queda el modelo y qué pasa con el leakage."
+title: "Comparación entre PCA y selección de variables"
+description: "Comparación de PCA y métodos de selección de variables sobre Ames Housing según varianza retenida, capacidad explicativa y control de fuga de información."
 ---
 import {
   PcaEmbeddingsChart,
@@ -10,14 +10,14 @@ import {
 # PCA o selección de variables: dos formas de reducir una tabla
 
 
-## Qué quería comparar
+## Objetivos de la comparación
 
 - Aplicar PCA y leer su varianza acumulada.
 - Seleccionar columnas con métodos filter, wrapper y embedded.
 - Medir qué se gana o se pierde en rendimiento e interpretación.
 - Mantener el split separado de cualquier decisión de selección.
 
-## La pregunta
+## Definición del problema
 
 **Ames Housing** trae ~80 características por casa. La pregunta es si hace falta conservarlas todas para predecir `SalePrice`.
 
@@ -37,7 +37,7 @@ import {
   - **Categóricas:** Neighborhood, HouseStyle, RoofStyle, Exterior, Foundation (~40 categóricas)
   - **Numéricas discretas:** BedroomAbvGr, FullBath, Fireplaces, GarageCars
 
-## Recorrido
+## Metodología experimental
 
 ### 1. Preparación y Carga de Datos
 
@@ -151,7 +151,7 @@ print(f"PC3: {explained_variance[2]:.3%}")
 
 <PcaLoadingsChart client:load />
 
-**Lectura:** hacen falta 39 componentes para llegar al 80% de varianza. La tabla puede bajar de 81 a 39 columnas y conservar el 80% de la información, una reducción de 51.9%.
+**Interpretación:** hacen falta 39 componentes para llegar al 80% de varianza. La tabla puede bajar de 81 a 39 columnas y conservar el 80% de la información, una reducción de 51.9%.
 
 ```python
 n_components_80 = np.argmax(cumulative_variance >= 0.80) + 1
@@ -546,7 +546,7 @@ MI obtiene el mejor resultado y supera al modelo original en esta comparación. 
 
 Como contraste visual comparé **t-SNE** y **UMAP** con PCA.
 
-### Qué quería ver
+### Pregunta de evaluación
 
 Elegí explorar t-SNE y UMAP porque:
 
@@ -581,7 +581,7 @@ Evaluamos cada técnica en:
 
 <PcaEmbeddingsChart client:load />
 
-**Lectura:** t-SNE y UMAP dibujan grupos más claros que PCA en 2D, porque priorizan estructura local. Para modelar, PCA conserva mejor la varianza global.
+**Interpretación:** t-SNE y UMAP dibujan grupos más claros que PCA en 2D, porque priorizan estructura local. Para modelar, PCA conserva mejor la varianza global.
 
 ### Resultados
 

@@ -1,6 +1,6 @@
 ---
-title: "Qué hacer con los datos que faltan"
-description: "Revisión del dataset Ames Housing: patrones MCAR, MAR y MNAR, detección de outliers, imputación y decisiones éticas que conviene dejar registradas."
+title: "Diagnóstico y tratamiento de datos faltantes"
+description: "Evaluación de Ames Housing: mecanismos MCAR, MAR y MNAR, detección de valores atípicos, estrategias de imputación y criterios éticos de trazabilidad."
 ---
 import {
   Unit05CorrelationComparison,
@@ -9,11 +9,11 @@ import {
   Unit05OutliersAnalysis,
 } from "@/components/tanstack-comparison/units05-08/unit05-correlation-change"
 
-# Datos faltantes: cómo los revisé en Ames Housing
+# Diagnóstico de datos faltantes en Ames Housing
 
 
 
-## Qué quería resolver
+## Objetivos del análisis
 
 - Separar los faltantes por patrón: MCAR, MAR o MNAR.
 - Comparar IQR y Z-Score para localizar valores extremos.
@@ -21,18 +21,18 @@ import {
 - Encerrar la limpieza en un pipeline de sklearn.
 - Dejar explícito qué supuestos introduce cada decisión.
 
-## El problema
+## Definición del problema
 
 El dataset **Ames Housing** describe propiedades, pero llega con campos vacíos y valores extremos. Antes de entrenar un modelo necesito saber qué se perdió y qué observaciones son raras, porque rellenar o borrar cambia la historia de los precios.
 
 La revisión busca cuatro cosas:
 
 - identificar patrones en los faltantes;
-- localizar valores extremos sin borrarlos a ciegas;
+- localizar valores extremos sin eliminarlos antes de verificar su validez;
 - limpiar sin romper las relaciones entre columnas;
 - explicar qué grupos pueden quedar peor representados.
 
-### Por qué importa
+### Impacto analítico
 
 En una valoración inmobiliaria, una tabla incompleta puede afectar:
 - **Predicciones precisas** de precios de propiedades
@@ -40,7 +40,7 @@ En una valoración inmobiliaria, una tabla incompleta puede afectar:
 - **Evaluaciones justas** que no discriminen grupos específicos
 - **Transparencia** en los procesos de valoración
 
-## Recorrido
+## Metodología
 
 ### 1. Configuración y Carga de Datos
 
@@ -112,7 +112,7 @@ print(f"Columnas con missing data: {len(missing_columns)}")
 
 <Unit05MissingPatterns client:load />
 
-**Lectura:** El gráfico deja ver qué columnas quedan vacías en las mismas filas. Si una propiedad acumula varios faltantes, la ausencia puede estar ligada a una característica observada; no conviene tratarla como ruido sin comprobarlo.
+**Interpretación:** El gráfico deja ver qué columnas quedan vacías en las mismas filas. Si una propiedad acumula varios faltantes, la ausencia puede estar ligada a una característica observada; no conviene tratarla como ruido sin comprobarlo.
 
 ### 4. Detección de Outliers
 
@@ -180,7 +180,7 @@ for col in ['SalePrice', 'Lot Area', 'Year Built', 'Garage Area']:
 
 <Unit05OutliersAnalysis client:load />
 
-**Lectura:** IQR y Z-Score no señalan la misma cantidad de filas, sobre todo en `SalePrice` y `Lot Area`. Una propiedad de lujo o un lote grande puede ser extremo y correcto; antes de eliminarlo hay que volver al registro y al contexto.
+**Interpretación:** IQR y Z-Score no señalan la misma cantidad de filas, sobre todo en `SalePrice` y `Lot Area`. Una propiedad de lujo o un lote grande puede ser extremo y correcto; antes de eliminarlo hay que volver al registro y al contexto.
 
 ### 5. Estrategias de Imputación
 
@@ -302,11 +302,11 @@ for i, col in enumerate(['SalePrice', 'Lot Area', 'Year Built', 'Garage Area', '
 
 <Unit05DistributionComparison client:load />
 
-**Lectura:** La imputación mueve sobre todo las colas de las distribuciones. Comparar forma y varianza antes de seguir evita que un relleno silencioso termine pareciendo un dato real.
+**Interpretación:** La imputación mueve sobre todo las colas de las distribuciones. Comparar forma y varianza antes de seguir evita que un relleno silencioso termine pareciendo un dato real.
 
 <Unit05CorrelationComparison client:load />
 
-**Lectura:** Las correlaciones se mantienen relativamente estables después de imputar. Es una señal útil, aunque no reemplaza revisar cada variable ni medir el efecto en el modelo.
+**Interpretación:** Las correlaciones se mantienen relativamente estables después de imputar. Es una señal útil, aunque no reemplaza revisar cada variable ni medir el efecto en el modelo.
 
 ## Decisiones y límites
 
@@ -363,7 +363,7 @@ Nuestro pipeline garantiza transparencia y reproducibilidad mediante:
 - **matplotlib/seaborn**: Visualizaciones estadísticas
 - **scipy**: Métodos estadísticos para detección de outliers
 
-## Qué queda por probar
+## Validaciones pendientes
 
 El resultado no es una tabla “verdadera”, sino una tabla con decisiones documentadas. Compararía mediana, media y KNN, probaría MICE en patrones complejos y mediría el cambio con Kolmogorov-Smirnov y Anderson-Darling. También repetiría el modelo con IQR 1.5 y 3.0 para ver qué umbral cambia de verdad las predicciones.
 

@@ -1,92 +1,69 @@
 ---
-title: "Portfolio de Inteligencia Artificial y Ciencia de Datos"
-description: "Documentación completa de prácticas y proyectos en análisis exploratorio de datos, visualización y deployment de aplicaciones con tecnologías modernas"
+title: "Portfolio técnico de Inteligencia Artificial y Ciencia de Datos"
+description: "Documentación de proyectos sobre análisis exploratorio, calidad de datos, ingeniería de variables, datos no estructurados y flujos de procesamiento."
 ---
 
-Bienvenido a mi portfolio académico, donde documento mi aprendizaje y desarrollo de competencias en Inteligencia Artificial, Ciencia de Datos y Análisis Exploratorio. Este sitio presenta una colección de prácticas, proyectos y reflexiones organizadas por áreas temáticas.
+Este portfolio documenta prácticas de Inteligencia Artificial y Ciencia de Datos mediante implementaciones reproducibles, decisiones metodológicas y análisis de resultados. Cada artículo delimita el problema, describe el procedimiento y registra las restricciones que condicionan la interpretación.
 
-## Sobre este Portfolio
+## Arquitectura del sitio
 
-Este portfolio está construido utilizando tecnologías modernas de desarrollo web y está organizado como una documentación técnica profesional:
+La publicación utiliza los siguientes componentes:
 
-- **Framework**: Next.js 15 con TypeScript
-- **Sistema de documentación**: Fumadocs
-- **Deployment**: Vercel con CI/CD automático
-- **Contenido**: MDX para documentación interactiva
+- **Astro 7 y TypeScript** para la generación del sitio y el control estático de tipos.
+- **MDX** para integrar documentación, código y componentes interactivos.
+- **React y TanStack Charts** para las visualizaciones que requieren ejecución en el cliente.
+- **Vercel** para el despliegue automatizado.
 
-## Áreas de Conocimiento
+## Áreas de trabajo
 
-### EDA y Fuentes de Datos
+### Análisis exploratorio y fuentes de datos
 
-Esta sección contiene prácticas enfocadas en el análisis exploratorio de datos (EDA) y la integración de múltiples fuentes de información:
+Los artículos de esta sección abordan la inspección estadística, la validación de calidad y la integración de fuentes heterogéneas.
 
-#### Análisis de Datasets Clásicos
-- **Exploración del Dataset Iris**: Introducción a técnicas básicas de EDA usando uno de los datasets más conocidos en machine learning
-- **Entrada de Familiarización**: Primeros pasos en el análisis de datos y configuración del entorno de trabajo
+- **Iris:** control de tipos y valores faltantes, estadística descriptiva, correlaciones y evaluación visual de la separabilidad entre especies.
+- **Netflix:** análisis de datos faltantes, composición del catálogo, distribución geográfica y evolución temporal.
+- **Taxis de NYC:** integración de aproximadamente tres millones de viajes con zonas geográficas y calendarios de eventos mediante uniones tabulares.
+- **Publicación web:** documentación de la arquitectura y del proceso de despliegue del portfolio.
 
-#### Proyectos de Análisis Avanzado
-- **[EDA Netflix Dataset con pandas](./EDA%20y%20Fuentes/03-EDA-Netflix-Dataset-con-pandas)**: Análisis completo del catálogo de Netflix utilizando visualizaciones avanzadas con matplotlib y seaborn. Incluye:
-  - Análisis de tipos de contenido (películas vs series)
-  - Distribuciones geográficas por países
-  - Tendencias temporales en lanzamientos
-  - Patrones en clasificaciones y géneros
-  - Dashboard interactivo con múltiples visualizaciones
+### Calidad, equidad y validez experimental
 
-- **[EDA Multi-fuentes y Joins](./EDA%20y%20Fuentes/04-EDA-Multi-fuentes-y-Joins)**: Proyecto avanzado integrando múltiples datasets con técnicas de joins en pandas. Características principales:
-  - Procesamiento de **3 millones de registros** de taxis de NYC
-  - Integración de datos de viajes, zonas geográficas y calendario de eventos
-  - Análisis de patrones metropolitanos y optimización operativa
-  - Técnicas avanzadas de manipulación y optimización de memoria
+Esta sección examina problemas que pueden invalidar una evaluación o producir resultados desiguales entre grupos.
 
-#### Deployment y DevOps
-- **[Publicación del Portfolio con Vercel](./EDA%20y%20Fuentes/02-Publicacion-del-Portfolio-en-Vercel)**: Documentación completa del proceso de deployment usando tecnologías modernas:
-  - Migración de GitHub Pages a Vercel
-  - Configuración de fumadocs vs MkDocs
-  - Workflow de CI/CD automático
-  - Optimización de performance y SEO
+- Clasificación de mecanismos de ausencia MCAR, MAR y MNAR.
+- Detección de valores atípicos y comparación de estrategias de imputación.
+- Escalado de variables sin fuga de información entre entrenamiento y validación.
+- Medición y mitigación de disparidades con Fairlearn.
 
-### Calidad y Ética en IA
+### Ingeniería y selección de variables
 
-Sección dedicada a los aspectos éticos y de calidad en el desarrollo de sistemas de Inteligencia Artificial:
+Los experimentos comparan técnicas para representar información, reducir dimensionalidad y conservar capacidad predictiva.
 
-- Principios éticos en el desarrollo de IA
-- Validación y calidad de datos
-- Sesgos algorítmicos y fairness
-- Responsabilidad en sistemas automatizados
+- Razones, transformaciones matemáticas y variables compuestas con pandas.
+- Codificación Label, One-Hot, Target, Leave-One-Out, Binary y CatBoost.
+- Comparación de PCA con métodos *filter*, *wrapper* y *embedded*.
+- Variables temporales basadas en rezagos, ventanas móviles, RFM y codificación cíclica.
 
-## Competencias Desarrolladas
+### Datos geoespaciales, imágenes y audio
 
-### Técnicas
-- **Análisis de Datos**: pandas, numpy, matplotlib, seaborn
-- **Visualización**: Creación de dashboards y gráficos informativos
-- **Integración de Datos**: Joins, limpieza y transformación de datasets
-- **Escalabilidad**: Procesamiento eficiente de datasets masivos (3M+ registros)
-- **Deployment**: Next.js, Vercel, CI/CD, TypeScript
+Los artículos dedicados a datos no tabulares describen representaciones y operaciones específicas de cada modalidad.
 
-### Metodológicas
-- **Pensamiento analítico**: Convertir datos en preguntas y decisiones comprobables
-- **Documentación técnica**: Creación de documentación clara y estructurada
-- **Gestión de proyectos**: Organización y planificación de análisis complejos
-- **Comunicación**: Presentación efectiva de resultados y hallazgos
+- **GeoPandas:** sistemas de referencia de coordenadas, densidad, uniones espaciales, áreas de influencia y agregación territorial.
+- **OpenCV:** espacios de color, ajuste de contraste, filtrado, detección de esquinas y descriptores locales.
+- **librosa:** formas de onda, análisis frecuencial, espectrogramas, MFCC y extracción de variables para clasificación.
 
-## Estructura de la Documentación
+### Flujos de datos en Google Cloud
 
-Cada práctica está organizada siguiendo un formato consistente:
+Las prácticas de infraestructura registran el acceso a proyectos temporales, la administración básica con IAM, la habilitación de API y la preparación de datos mediante Dataprep, Dataflow y BigQuery.
 
-1. **Contexto y Objetivos**: Definición clara del problema y metas de aprendizaje
-2. **Metodología**: Descripción del proceso y técnicas utilizadas
-3. **Implementación**: Código comentado y explicaciones paso a paso
-4. **Resultados y Visualizaciones**: Presentación clara de hallazgos
-5. **Reflexiones**: Análisis crítico y lecciones aprendidas
+## Estructura metodológica
 
-## Evolución del Aprendizaje
+Los artículos siguen una secuencia común cuando el ejercicio lo permite:
 
-Este portfolio documenta mi progresión desde conceptos básicos hasta proyectos complejos:
+1. definición del problema y de las preguntas de análisis;
+2. descripción de los datos y sus restricciones;
+3. preparación reproducible del entorno;
+4. implementación y visualización de resultados;
+5. interpretación limitada a la evidencia disponible;
+6. registro de decisiones, riesgos y evaluaciones pendientes.
 
-- **Nivel Inicial**: Datasets simples, análisis exploratorio básico
-- **Nivel Intermedio**: Visualizaciones avanzadas, análisis de datos reales
-- **Nivel Avanzado**: Integración multi-fuente, procesamiento a escala, deployment profesional
-
----
-
-*Este portfolio está en constante evolución, reflejando mi crecimiento académico y profesional en el campo de la Inteligencia Artificial y Ciencia de Datos.*
+El objetivo es mantener trazabilidad entre los datos de entrada, las transformaciones aplicadas y las conclusiones presentadas.

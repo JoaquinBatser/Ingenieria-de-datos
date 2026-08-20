@@ -1,6 +1,6 @@
 ---
-title: "Features derivadas con pandas"
-description: "Cómo crear ratios, transformaciones y variables compuestas con pandas, y comprobar si aportan algo a un modelo de precios."
+title: "Ingeniería de variables derivadas con pandas"
+description: "Construcción y evaluación de razones, transformaciones y variables compuestas con pandas para un modelo de valoración inmobiliaria."
 ---
 import {
   Unit08BostonFeatureImportance,
@@ -11,16 +11,16 @@ import {
   Unit08RandomForestImportance,
 } from "@/components/tanstack-comparison/units05-08/unit08-feature-importance"
 
-# Crear features derivadas y comprobar si ayudan
+# Construcción y evaluación de variables derivadas
 
-## Qué quería comprobar
+## Objetivos del análisis
 
 - Crear ratios, transformaciones y scores a partir de columnas existentes.
-- Mirar si esas columnas nuevas cambian la distribución o agregan ruido.
+- Evaluar si las nuevas columnas modifican la distribución o incorporan ruido.
 - Comparar Mutual Information con la importancia de Random Forest.
-- Probar el mismo recorrido en datos sintéticos y en Ames Housing.
+- Repetir el procedimiento sobre datos sintéticos y Ames Housing.
 
-## La pregunta
+## Hipótesis de trabajo
 
 Una columna nueva puede ser más útil que otra ronda de recolección, pero solo si codifica una relación que el modelo no estaba viendo.
 
@@ -32,9 +32,9 @@ Si funcionan, esas señales pueden ayudar a:
 - Mitigar sesgos derivados de datos incompletos
 - Mejorar la transparencia en las valoraciones
 
-## Cómo lo probé
+## Metodología experimental
 
-### 1. Setup y Generación del Dataset Sintético
+### 1. Configuración y generación del conjunto de datos sintético
 
 Empecé con un dataset sintético que imita un mercado inmobiliario; así podía controlar las relaciones antes de llevarlas a datos reales.
 
@@ -169,7 +169,7 @@ df['location_score'] = (
 
 <Unit08DerivedFeatureDistributions client:load />
 
-**Lectura:** `log_price` queda más simétrica que la variable original. La transformación cambia la forma de la distribución; el efecto sobre un modelo hay que medirlo aparte.
+**Interpretación:** `log_price` queda más simétrica que la variable original. La transformación cambia la forma de la distribución; el efecto sobre un modelo hay que medirlo aparte.
 
 ### 3. Análisis de Distribución y Outliers
 
@@ -201,11 +201,11 @@ for col in ['price_per_sqft', 'sqft_per_bedroom', 'property_age']:
 - `sqft_per_bedroom`: `4.5%` outliers
 - `property_age`: `0.0%` outliers (distribución más uniforme)
 
-**Lectura:** Las nuevas features añaden detalle y la mayoría queda por debajo de 5% de outliers. Aun así, cada valor extremo necesita revisión antes de eliminarlo.
+**Interpretación:** Las nuevas features añaden detalle y la mayoría queda por debajo de 5% de outliers. Aun así, cada valor extremo necesita revisión antes de eliminarlo.
 
 <Unit08FeatureDistributionAnalysis client:load />
 
-**Lectura:** La mayoría de las columnas nuevas tiene menos de 5% de outliers; `property_age` queda en 0%. El gráfico muestra el recuento, no decide si esos casos son errores.
+**Interpretación:** La mayoría de las columnas nuevas tiene menos de 5% de outliers; `property_age` queda en 0%. El gráfico muestra el recuento, no decide si esos casos son errores.
 
 ### 4. Evaluación de Importancia de Features
 
@@ -242,7 +242,7 @@ print(feature_importance_mi.head())
 
 <Unit08MutualInformation client:load />
 
-**Lectura:** `sqrt_sqft` aparece alto en MI. Es una señal de dependencia no lineal, no una prueba de que la transformación sea necesaria en cualquier dataset.
+**Interpretación:** `sqrt_sqft` aparece alto en MI. Es una señal de dependencia no lineal, no una prueba de que la transformación sea necesaria en cualquier dataset.
 
 #### 4.2 Random Forest Feature Importance
 
@@ -272,7 +272,7 @@ print(feature_importance_rf.head())
 
 <Unit08RandomForestImportance client:load />
 
-**Lectura:** `crime_rate` y `school_rating` pesan más que varias medidas estructurales en este Random Forest. El árbol puede capturar interacciones que la correlación lineal no ve.
+**Interpretación:** `crime_rate` y `school_rating` pesan más que varias medidas estructurales en este Random Forest. El árbol puede capturar interacciones que la correlación lineal no ve.
 
 #### 4.3 Correlación Lineal
 
@@ -452,7 +452,7 @@ Lo elegí porque:
 4. Es un dataset clásico que permite comparación con literatura existente
 5. Tiene menos features originales, lo que hace que las features derivadas tengan relativamente más impacto
 
-### Qué quería contrastar
+### Hipótesis de contraste
 
 Buscaba comprobar:
 
@@ -475,11 +475,11 @@ Entrené un Random Forest con las columnas originales y otro con las derivadas, 
 
 <Unit08ModelComparison client:load />
 
-**Lectura:** Con features derivadas, R² pasa de 0.89 a 0.95 y MSE de 7.90 a 3.43. Es una mejora en este experimento; hace falta validarla con otra partición y otro dataset.
+**Interpretación:** Con features derivadas, R² pasa de 0.89 a 0.95 y MSE de 7.90 a 3.43. Es una mejora en este experimento; hace falta validarla con otra partición y otro dataset.
 
 <Unit08BostonFeatureImportance client:load />
 
-**Lectura:** `price_per_room` queda primero tanto en Random Forest como en MI. El acuerdo entre métodos es útil aquí, pero no convierte al ratio en una regla universal.
+**Interpretación:** `price_per_room` queda primero tanto en Random Forest como en MI. El acuerdo entre métodos es útil aquí, pero no convierte al ratio en una regla universal.
 
 ### Resultados
 

@@ -1,6 +1,6 @@
 ---
-title: "Features temporales con pandas"
-description: "Cómo construir lags, ventanas móviles, RFM y variables cíclicas con Online Retail, validando siempre con el tiempo correcto."
+title: "Ingeniería de variables temporales con pandas"
+description: "Construcción de rezagos, ventanas móviles, métricas RFM y variables cíclicas sobre Online Retail mediante validación temporal estricta."
 ---
 import {
   TemporalCyclicEncodingChart,
@@ -11,10 +11,10 @@ import {
   TemporalWindowActivityChart,
 } from "@/components/tanstack-comparison-09-12/unit-11-charts"
 
-# Qué compran los usuarios cuando miro el tiempo
+# Modelado del comportamiento de compra mediante variables temporales
 
 
-## Qué quería medir
+## Objetivos del análisis
 
 - Guardar la historia de cada usuario con `.shift()`.
 - Resumir tendencias recientes con rolling y expanding windows.
@@ -23,7 +23,7 @@ import {
 - Representar horas y días con sin/cos.
 - Añadir indicadores externos usando solo información ya conocida.
 
-## La pregunta
+## Definición del problema
 
 **Online Retail** contiene transacciones del Reino Unido entre 2010 y 2011. Quise saber si la historia de compras ayuda a anticipar una recompra y a separar usuarios que están perdiendo actividad.
 
@@ -50,7 +50,7 @@ import {
 - `UnitPrice`: Precio unitario
 - `Country`: País de origen
 
-## Recorrido
+## Metodología
 
 ### 1. Preparación y Carga de Datos
 
@@ -130,7 +130,7 @@ df = df.sort_values(['user_id', 'order_date']).reset_index(drop=True)
 
 <TemporalWindowActivityChart client:load />
 
-**Lectura:** los días entre órdenes varían mucho y la mediana ronda ~36 días. Esa dispersión justifica guardar lags y ventanas, no solo un promedio global.
+**Interpretación:** los días entre órdenes varían mucho y la mediana ronda ~36 días. Esa dispersión justifica guardar lags y ventanas, no solo un promedio global.
 
 ### 2. Agregación a Nivel de Orden
 
@@ -224,7 +224,7 @@ orders_df['rolling_cart_std_3'] = (
 
 <TemporalRollingCartChart client:load />
 
-**Lectura:** el rolling mean de las últimas 3 órdenes suaviza el cart size actual. La diferencia entre ambos muestra cambios recientes sin mirar la compra que se quiere predecir.
+**Interpretación:** el rolling mean de las últimas 3 órdenes suaviza el cart size actual. La diferencia entre ambos muestra cambios recientes sin mirar la compra que se quiere predecir.
 
 **Ventaja clave:** `.shift(1)` antes de `.rolling()` previene data leakage automáticamente, excluyendo la orden actual del cálculo.
 
@@ -288,14 +288,14 @@ orders_df['monetary_total'] = orders_df['expanding_total_spent']
 
 <TemporalRfmDistributionsChart client:load />
 
-**Lectura:** `Monetary` tiene una cola larga: algunos usuarios gastan mucho más que otros. `Recency`, `Frequency` y `Monetary` aportan señales distintas.
+**Interpretación:** `Monetary` tiene una cola larga: algunos usuarios gastan mucho más que otros. `Recency`, `Frequency` y `Monetary` aportan señales distintas.
 
 **Correlación RFM:**
 - Recency vs Frequency: 0.021 (baja correlación)
 - Recency vs Monetary: 0.263 (correlación moderada)
 - Frequency vs Monetary: -0.326 (correlación negativa moderada)
 
-**Lectura:** RFM separa cuánto hace que compró alguien, con qué frecuencia y cuánto gasta; las tres medidas se complementan.
+**Interpretación:** RFM separa cuánto hace que compró alguien, con qué frecuencia y cuánto gasta; las tres medidas se complementan.
 
 ### 7. Time Window Aggregations (7d, 30d, 90d)
 
@@ -351,7 +351,7 @@ orders_df = orders_df.groupby('user_id', group_keys=False).apply(calculate_time_
 - **Spend 30d promedio:** $922.79
 - **Spend 90d promedio:** $2,392.72
 
-**Lectura:** comparar ventanas ayuda a encontrar usuarios que se están activando (7d > 30d/3) o quedando inactivos (7d = 0 pero 90d > 0).
+**Interpretación:** comparar ventanas ayuda a encontrar usuarios que se están activando (7d > 30d/3) o quedando inactivos (7d = 0 pero 90d > 0).
 
 ### 8. Product Diversity Features
 
@@ -427,7 +427,7 @@ orders_df['month_cos'] = np.cos(2 * np.pi * (orders_df['month'] - 1) / 12)
 
 <TemporalCyclicEncodingChart client:load />
 
-**Lectura:** en el espacio sin/cos, las 23h quedan cerca de las 0h y el domingo cerca del lunes. Esa continuidad evita que el modelo trate el reloj como una línea con extremos alejados.
+**Interpretación:** en el espacio sin/cos, las 23h quedan cerca de las 0h y el domingo cerca del lunes. Esa continuidad evita que el modelo trate el reloj como una línea con extremos alejados.
 
 **Ventaja del encoding cíclico:**
 - Las 23h están 'cerca' de las 0h en el espacio sin/cos
@@ -470,7 +470,7 @@ orders_df['unemployment_rate'] = orders_df['unemployment_rate'].ffill()
 orders_df['consumer_confidence'] = orders_df['consumer_confidence'].ffill()
 ```
 
-**Regla de oro:** SÓLO forward fill (ffill), NUNCA backward fill (bfill)
+**Restricción temporal:** aplicar únicamente *forward fill* (`ffill`); el uso de *backward fill* (`bfill`) introduciría información futura.
 - **Forward:** Usar información pasada para rellenar presente/futuro (OK)
 - **Backward:** Usar información futura para rellenar pasado (DATA LEAKAGE!)
 
@@ -651,7 +651,7 @@ print(f"Improvement: {(full_auc_mean - base_auc_mean):.4f} ({((full_auc_mean - b
 - **Full Model (con temporal):** AUC = 0.7204 ± 0.0763
 - **Improvement:** +0.0580 (+8.7%)
 
-**Lectura:** el modelo con variables temporales alcanza un AUC 8.7 puntos porcentuales mayor en esta validación.
+**Interpretación:** el modelo con variables temporales alcanza un AUC 8.7 puntos porcentuales mayor en esta validación.
 
 ### 13. Feature Importance Analysis
 
@@ -789,7 +789,7 @@ print("\n✅ Si todo es SÍ, probablemente no hay leakage!")
 - **No features sospechosas** en top 5
 - **Temporal consistency:** ✅ Todos los folds tienen train max < val min
 
-**Lectura:** no apareció evidencia clara de data leakage; los folds respetan el orden temporal y las features principales usan historia.
+**Interpretación:** no apareció evidencia clara de data leakage; los folds respetan el orden temporal y las features principales usan historia.
 
 ## Decisiones y límites
 
@@ -866,7 +866,7 @@ print("\n✅ Si todo es SÍ, probablemente no hay leakage!")
 
 Como extensión probé **Fourier** (FFT) y **Seasonal Decomposition** para buscar ciclos que los lags manuales no capturan.
 
-### Qué quería saber
+### Pregunta de evaluación
 
 Elegí explorar Fourier y Seasonal Decomposition porque:
 
@@ -898,11 +898,11 @@ Utilizamos **Time Series Cross-Validation** para validación realista.
 
 <TemporalFourierAnalysisChart client:load />
 
-**Lectura:** FFT marca las frecuencias semanal (1/7) y mensual (1/30); la descomposición separa tendencia, estacionalidad y residual.
+**Interpretación:** FFT marca las frecuencias semanal (1/7) y mensual (1/30); la descomposición separa tendencia, estacionalidad y residual.
 
 <TemporalModelComparisonChart client:load />
 
-**Lectura:** sumar Fourier a las features manuales mejora el AUC en +1.14% en esta validación. La ganancia es pequeña, pero la señal es complementaria.
+**Interpretación:** sumar Fourier a las features manuales mejora el AUC en +1.14% en esta validación. La ganancia es pequeña, pero la señal es complementaria.
 
 ### Resultados
 

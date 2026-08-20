@@ -1,6 +1,6 @@
 ---
-title: "Una primera lectura del dataset Iris"
-description: "Recorrido por el dataset Iris: carga, controles de calidad, correlaciones y gráficos para ver qué variables separan mejor a sus tres especies."
+title: "Análisis exploratorio del conjunto de datos Iris"
+description: "Análisis del conjunto de datos Iris mediante controles de calidad, estadística descriptiva, correlaciones y evaluación visual de la separabilidad entre especies."
 ---
 
 import {
@@ -9,29 +9,29 @@ import {
   IrisPairplotChart,
 } from "@/components/tanstack-comparison/iris-charts"
 
-## Qué quiero comprobar
+## Objetivos del análisis
 
 - Cargar el dataset y revisar su forma, tipos y valores faltantes.
 - Comparar las medidas del sépalo y del pétalo entre especies.
 - Usar correlaciones y gráficos para decidir qué variables conviene llevar a un primer modelo.
 - Dejar anotadas las preguntas que tendría sentido probar después.
 
-## Punto de partida
+## Descripción del conjunto de datos
 
 Iris reúne 150 flores descritas por cuatro medidas: largo y ancho del sépalo, y largo y ancho del pétalo. Ronald Fisher publicó estos datos en 1936; hoy siguen siendo una buena mesa de trabajo para mirar un dataset antes de entrenar un clasificador.
 
 ### Preguntas
 
 1. ¿Se separan las especies con una o dos medidas?
-2. ¿Qué variables están contando casi la misma historia?
+2. ¿Qué variables presentan información redundante?
 3. ¿Hay valores atípicos que merezcan una revisión?
 4. ¿Las tres especies aparecen en la misma proporción?
 
-## Cómo lo revisé
+## Metodología
 
 ### 1. Configuración y Carga de Datos
 
-Para esta primera pasada usé `pandas`, `seaborn` y `matplotlib`.
+El análisis utiliza `pandas` para la manipulación tabular y `seaborn` y `matplotlib` para la inspección gráfica.
 
 ```python
 import pandas as pd
@@ -50,7 +50,7 @@ df.head()
 
 ### 2. Chequeos Básicos y Diccionario de Datos
 
-Antes de dibujar nada revisé tipos, nulos y estadísticas descriptivas.
+Antes de generar visualizaciones, verifiqué los tipos de datos, los valores nulos y las estadísticas descriptivas.
 
 ```python
 # Información general
@@ -96,7 +96,7 @@ plt.show()
 
 <IrisPairplotChart client:visible />
 
-**Lectura:** *Setosa* queda separada de las otras dos especies en casi todas las combinaciones. La separación se ve con más claridad en `petal_length` y `petal_width`, que son las dos medidas que probaría primero en un clasificador.
+**Interpretación:** *Setosa* queda separada de las otras dos especies en casi todas las combinaciones. La separación se ve con más claridad en `petal_length` y `petal_width`, que son las dos medidas que probaría primero en un clasificador.
 
 #### Mapa de Calor de Correlaciones
 
@@ -109,7 +109,7 @@ plt.show()
 
 <IrisCorrelationHeatmapChart client:visible />
 
-**Lectura:** `petal_length` y `petal_width` tienen una correlación positiva de 0.96. En un modelo sencillo las dos pueden aportar información repetida; conviene comparar el resultado usando una sola y usando ambas, o probar una reducción como PCA.
+**Interpretación:** `petal_length` y `petal_width` tienen una correlación positiva de 0.96. En un modelo sencillo las dos pueden aportar información repetida; conviene comparar el resultado usando una sola y usando ambas, o probar una reducción como PCA.
 
 #### Boxplots por Especie
 
@@ -127,15 +127,15 @@ plt.show()
 
 <IrisBoxplotsChart client:visible />
 
-**Lectura:** *Setosa* concentra los pétalos más pequeños y menos variables. El ancho del sépalo se solapa bastante entre especies y muestra algunos valores atípicos en *Virginica*; por sí solo parece una señal más débil.
+**Interpretación:** *Setosa* concentra los pétalos más pequeños y menos variables. El ancho del sépalo se solapa bastante entre especies y muestra algunos valores atípicos en *Virginica*; por sí solo parece una señal más débil.
 
-## Lo que quedó claro
+## Resultados principales
 
-1. **Setosa se distingue rápido**: sus pétalos son mucho más pequeños que los de *Versicolor* y *Virginica*.
+1. **Setosa presenta una separación clara**: sus pétalos son considerablemente más pequeños que los de *Versicolor* y *Virginica*.
 2. **Las medidas del pétalo están muy relacionadas**: la correlación entre ellas es 0.96.
-3. **Versicolor y Virginica se pisan**: cuesta separarlas, aunque el largo del pétalo sigue ayudando.
+3. **Versicolor y Virginica presentan solapamiento**: su separación es menos definida, aunque la longitud del pétalo conserva capacidad discriminante.
 4. **La tabla viene lista para experimentar**: no hay nulos y cada especie tiene 50 muestras.
 
-## Siguiente prueba
+## Evaluación posterior
 
 Probaría K-Nearest Neighbors y un árbol de decisión con las medidas del pétalo. Luego compararía ese resultado con un modelo que incluya las cuatro variables y con un K-Means sin etiquetas.

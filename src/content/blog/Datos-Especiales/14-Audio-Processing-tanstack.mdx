@@ -1,18 +1,18 @@
 ---
-title: "Cómo leer un archivo de audio"
-description: "Recorrido por señales de audio con librosa: forma de onda, FFT, espectrogramas, MFCCs y un pipeline sencillo para clasificación."
+title: "Representación y análisis de señales de audio"
+description: "Análisis de señales de audio con librosa mediante formas de onda, FFT, espectrogramas, MFCC y un flujo reproducible de clasificación."
 ---
 
-# Audio como dato: del archivo a las features
+# Audio como dato: de la señal a las variables predictoras
 
-## Qué quería sacar de la señal
+## Objetivos del análisis
 
 - Entender qué significan sampling rate, duración, amplitud y canales.
 - Mirar la señal en el tiempo y en frecuencia.
 - Convertirla en MFCCs y otras features que un modelo pueda usar.
 - Comparar una clasificación sencilla con algunas lecturas de tempo y pitch.
 
-## Por qué convertir sonido en números
+## Representación numérica del audio
 
 La misma señal aparece en tareas distintas:
 - **Asistentes de voz** (Alexa, Siri, Google Assistant)
@@ -34,7 +34,7 @@ Trabajaremos con audio de diferentes fuentes:
 - **Formato:** WAV, MP3
 - **Aplicación:** Clasificación de género musical, reconocimiento de voz
 
-## Recorrido
+## Metodología
 
 ### 1. Preparación del Entorno
 
@@ -126,7 +126,7 @@ plt.show()
 
 ![Forma de Onda](/images/practica14/p14_waveform.png)
 
-**Cómo leerla:**
+**Interpretación:**
 - **Eje X**: Tiempo
 - **Eje Y**: Amplitud normalizada (típicamente -1 a 1)
 - **Zonas densas**: Mayor actividad sonora (ej: voz, música)
@@ -158,7 +158,7 @@ plt.show()
 
 ![Espectro de Frecuencia](/images/practica14/p14_fft.png)
 
-**Cómo leerla:**
+**Interpretación:**
 - **Picos**: Frecuencias dominantes en la señal
 - **Voz humana**: Concentrada en 80-300 Hz (fundamental) + armónicos
 - **Música**: Distribución más amplia según instrumentos
@@ -190,7 +190,7 @@ plt.show()
 - **Eje Y**: Frecuencia
 - **Color**: Intensidad (dB)
 
-**Para qué sirve:** ver formantes de voz, patrones rítmicos o la entrada de un instrumento.
+**Aplicación:** permite identificar formantes de voz, patrones rítmicos y la entrada temporal de instrumentos.
 
 ### 7. Espectrograma Mel
 
@@ -283,7 +283,7 @@ plt.show()
 
 ![Características Espectrales](/images/practica14/p14_spectral_features.png)
 
-**Cómo leerlas:**
+**Interpretación:**
 - **ZCR**: Alto para sonidos sin tono (percusión), bajo para tonos puros
 - **Spectral Centroid**: "Brillo" del sonido (~donde está el centro de energía)
 - **Spectral Rolloff**: Indica presencia de altas frecuencias
@@ -469,7 +469,7 @@ plt.tight_layout()
 
 **Solución:** ajustar `StandardScaler` con el conjunto de entrenamiento y reutilizarlo en validación y prueba.
 
-## Qué queda de esta primera pasada
+## Resultados de la evaluación inicial
 
 Con librosa pude:
 

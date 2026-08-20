@@ -1,11 +1,11 @@
 ---
-title: "Leer CABA con GeoPandas"
-description: "Recorrido por los radios censales de CABA: CRS, áreas, densidad, joins espaciales, buffers y mapas con GeoPandas."
+title: "Análisis geoespacial de CABA con GeoPandas"
+description: "Análisis de radios censales de CABA mediante sistemas de referencia, cálculo de áreas y densidad, uniones espaciales, áreas de influencia y cartografía con GeoPandas."
 ---
 
 # Radios censales de CABA con GeoPandas
 
-## Qué quería obtener
+## Objetivos del análisis
 
 - Cargar los radios censales y comprobar que sus geometrías sean utilizables.
 - Elegir un CRS métrico antes de calcular áreas o distancias.
@@ -14,7 +14,7 @@ description: "Recorrido por los radios censales de CABA: CRS, áreas, densidad, 
 - Comparar un mapa estático con una vista interactiva.
 - Probar proximidad y una grilla H3.
 
-## La tabla
+## Conjunto de datos
 
 La tabla contiene **radios censales de la Ciudad Autónoma de Buenos Aires (CABA)**. Cada radio es un polígono usado por el censo para reunir información demográfica.
 
@@ -24,7 +24,7 @@ Con ella quiero:
 - **Estudiar relaciones espaciales** entre diferentes variables
 - **Crear visualizaciones informativas** para toma de decisiones
 
-### Qué trae el archivo
+### Esquema y procedencia
 
 - **Fuente:** GeoJSON de radios censales de CABA
 - **Registros:** ~3,554 radios censales
@@ -42,7 +42,7 @@ Con ella quiero:
 - `AREA_KM2`: Área en kilómetros cuadrados
 - `geometry`: Geometría del polígono
 
-## Recorrido
+## Metodología
 
 ### 1. Preparación del Entorno
 
@@ -166,7 +166,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Lectura:** Los radios céntricos concentran mayor densidad; en la periferia las densidades bajan.
+**Interpretación:** Los radios céntricos concentran mayor densidad; en la periferia las densidades bajan.
 
 ### 5. Agregación por Barrio
 
@@ -230,7 +230,7 @@ radios_cercanos = radios_m[radios_m.geometry.intersects(buffer_500m.iloc[0])]
 print(f"Radios dentro de 500m del Obelisco: {len(radios_cercanos)}")
 ```
 
-**Para qué sirve:** este buffer permite estudiar **cobertura de servicios**, **zonas de influencia** y **accesibilidad**.
+**Aplicación analítica:** este buffer permite estimar **cobertura de servicios**, **zonas de influencia** y **accesibilidad**.
 
 ### 8. Visualización con Mapa Base
 
@@ -280,7 +280,7 @@ print("Ejemplo de hexágonos H3:")
 print(sample_radios[['RADIO_ID', 'h3_hexagons']].head())
 ```
 
-**Qué aporta H3:**
+**Propiedades de H3:**
 - Tamaño uniforme de celdas
 - Vecindad bien definida
 - Eficiente para agregaciones espaciales
@@ -317,7 +317,7 @@ print(sample_radios[['RADIO_ID', 'h3_hexagons']].head())
 
 GeoPandas alcanza para los mapas estáticos. Para inspeccionar puntos y hacer zoom usé **Folium**, que genera mapas de Leaflet.js desde Python.
 
-### Qué aporta Folium
+### Capacidades de Folium
 
 - **Interactividad:** Zoom, paneo y popups con información detallada.
 - **Mapas base:** Fácil acceso a OpenStreetMap, Stamen, CartoDB, etc.
@@ -356,9 +356,9 @@ m
 
 ![Vista Previa Mapa Interactivo](/images/practica12/folium_preview.png)
 
-**Lectura:** La imagen es una captura estática del mapa. La versión HTML permite acercarse y abrir cada marcador; el heatmap resume densidad sin dibujar miles de puntos encima.
+**Interpretación:** La imagen es una captura estática del mapa. La versión HTML permite acercarse y abrir cada marcador; el heatmap resume densidad sin dibujar miles de puntos encima.
 
-## Qué queda para otra vuelta
+## Extensiones pendientes
 
 El CRS correcto es la condición para que las áreas y distancias tengan sentido. Con eso resuelto, los joins, agregados y mapas responden preguntas distintas sin mezclar escalas. La siguiente versión debería añadir autocorrelación espacial con Moran's I, datos de varios momentos y un dashboard para explorar barrio, comuna y radio.
 

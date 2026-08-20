@@ -1,11 +1,11 @@
 ---
-title: "Qué hago con una imagen antes de analizarla"
-description: "Recorrido por el preprocesamiento de imágenes con OpenCV: canales de color, contraste, filtros, esquinas y descriptores."
+title: "Preprocesamiento y descripción de imágenes con OpenCV"
+description: "Evaluación del preprocesamiento de imágenes con OpenCV: espacios de color, contraste, filtrado, detección de esquinas y descriptores locales."
 ---
 
 # Preprocesamiento de imágenes con OpenCV
 
-## Qué quería comprobar
+## Objetivos del análisis
 
 - Leer una imagen como matriz y comprobar su rango y canales.
 - Elegir RGB, HSV o Lab según la pregunta.
@@ -13,7 +13,7 @@ description: "Recorrido por el preprocesamiento de imágenes con OpenCV: canales
 - Quitar ruido sin borrar los bordes.
 - Detectar esquinas y comparar ORB con SIFT.
 
-## El punto de partida
+## Contexto técnico
 
 Antes de clasificar o detectar objetos hay que saber qué imagen recibió el modelo. El mismo paso sirve para **visión por computadora**, **reconocimiento facial**, **vehículos autónomos** o **análisis médico**, pero los parámetros no son intercambiables.
 
@@ -30,7 +30,7 @@ En esta práctica revisé cómo:
 - **Formatos:** PNG, color (RGB) y escala de grises
 - **Aplicación:** Demostración de técnicas de preprocesamiento
 
-## Recorrido
+## Metodología
 
 ### 1. Preparación del Entorno
 
@@ -188,7 +188,7 @@ plt.tight_layout()
 ```
 
 **Ventaja:** mejora el contraste global.
-**Límite:** puede amplificar ruido y no mira el contexto local.
+**Limitación:** puede amplificar el ruido porque no considera el contexto local.
 
 #### 6.2 CLAHE (Adaptive Histogram Equalization)
 
@@ -243,7 +243,7 @@ plt.tight_layout()
 
 ![Filtros de Suavizado](/images/practica13/p13_filters.png)
 
-**Elección rápida:**
+**Criterios de selección:**
 - **Gaussian**: Suavizado general
 - **Median**: Ruido impulsivo
 - **Bilateral**: Cuando se necesita preservar bordes
@@ -415,7 +415,7 @@ plt.axis('off')
 - **ORB** para aplicaciones en tiempo real
 - **SIFT** cuando se necesita máxima robustez
 
-## Qué probaría después
+## Experimentos posteriores
 
 La elección depende de la tarea: HSV ayuda a separar color, Lab a comparar tonos, CLAHE a recuperar detalle local y ORB o SIFT a encontrar puntos repetibles. Después probaría YOLO o una CNN con un conjunto de imágenes separado, y mediría qué preprocesamiento mejora el resultado en vez de asumir que uno sirve para todo.
 

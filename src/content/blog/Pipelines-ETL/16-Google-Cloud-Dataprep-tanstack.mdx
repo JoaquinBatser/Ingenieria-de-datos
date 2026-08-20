@@ -1,19 +1,19 @@
 ---
-title: "Práctica 16: Limpiar un dataset de ecommerce con Cloud Dataprep"
-description: "Registro de un flujo de Dataprep y BigQuery: explorar nulos, corregir tipos, deduplicar y dejar una tabla lista para reportes."
+title: "Preparación de datos de comercio electrónico con Cloud Dataprep"
+description: "Implementación de un flujo entre Dataprep y BigQuery para perfilar valores nulos, corregir tipos, eliminar duplicados y generar una tabla analítica."
 ---
 
-## Qué quería dejar listo
+## Objetivo del flujo
 
-Usé **Cloud Dataprep by Alteryx** para recorrer un dataset de ecommerce en una interfaz visual y dejarlo preparado para BigQuery.
+Utilicé **Cloud Dataprep by Alteryx** para perfilar y transformar un conjunto de datos de comercio electrónico antes de cargarlo en BigQuery.
 
-El recorrido fue:
+El flujo comprende las siguientes etapas:
 1.  Conectar datasets de BigQuery a Dataprep.
 2.  Explorar la calidad del dataset con Dataprep.
 3.  Crear un pipeline de transformación de datos.
 4.  Ejecutar jobs de transformación y enviar los resultados a BigQuery.
 
-## El recorrido
+## Procedimiento
 
 ### 1. Configuración Inicial y BigQuery
 
@@ -56,6 +56,6 @@ La salida quedó configurada en la tabla `revenue_reporting` de BigQuery y ejecu
 
 Al terminar comprobé en BigQuery que `revenue_reporting` existía con los datos transformados.
 
-## Qué queda listo
+## Resultado del procesamiento
 
 El flujo deja una tabla con tipos corregidos, duplicados fuera, sesiones filtradas y columnas de apoyo. El siguiente paso sería programarlo con Cloud Scheduler, añadir expresiones regulares a la receta y conectar `revenue_reporting` a Looker Studio; también mediría el costo de Dataflow antes de llevarlo a más volumen.

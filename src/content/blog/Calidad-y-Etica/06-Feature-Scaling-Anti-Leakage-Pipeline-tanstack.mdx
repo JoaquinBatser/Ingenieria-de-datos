@@ -1,6 +1,6 @@
 ---
-title: "Escalado y pipelines sin data leakage"
-description: "Comparación de scalers y transformadores con Ames Housing, incluyendo el split correcto para que el preprocesamiento no contamine la validación."
+title: "Escalado de variables y prevención de fuga de información"
+description: "Evaluación de métodos de escalado y transformación sobre Ames Housing, con particiones independientes para preservar la validez experimental."
 ---
 import {
   Unit06FunctionTransformer,
@@ -13,7 +13,7 @@ import {
 } from "@/components/tanstack-comparison/units05-08/unit06-scale-ratios"
 
 
-## Qué quería medir
+## Objetivos de evaluación
 
 - Ver qué columnas tienen escalas que pueden dominar el modelo.
 - Comparar `MinMaxScaler`, `StandardScaler` y `RobustScaler`.
@@ -21,13 +21,13 @@ import {
 - Mostrar qué cambia cuando el escalado se ajusta antes del split.
 - Dejar el preprocesamiento dentro de un pipeline reproducible.
 
-## El problema
+## Definición del problema
 
 En **Ames Housing**, una superficie puede estar medida en cientos de miles mientras que una calificación queda en un rango corto. Si el algoritmo usa distancias, esa diferencia puede hacer que una columna pese demasiado.
 
 La revisión busca identificar esas columnas, elegir un scaler con una razón clara y evitar que el conjunto de validación enseñe sus estadísticas al entrenamiento.
 
-### Dónde se nota
+### Efectos sobre el modelado
 
 Un escalado mal puesto puede:
 - **Sesgar algoritmos basados en distancia** (KNN, SVM) hacia features con mayor escala
@@ -35,7 +35,7 @@ Un escalado mal puesto puede:
 - **Introducir data leakage** si se escala incorrectamente
 - **Reducir la interpretabilidad** del modelo
 
-## Recorrido
+## Metodología experimental
 
 ### 1. Configuración del Entorno
 
@@ -120,7 +120,7 @@ plt.tight_layout()
 
 <Unit06Histograms client:load />
 
-**Lectura:** `Lot Area` va de 1,300 a 215,245 y `Overall Qual` de 1 a 10. El ratio supera 165:1. KNN y SVM pueden dejar que `Lot Area` domine la distancia aunque `Overall Qual` sea útil.
+**Interpretación:** `Lot Area` va de 1,300 a 215,245 y `Overall Qual` de 1 a 10. El ratio supera 165:1. KNN y SVM pueden dejar que `Lot Area` domine la distancia aunque `Overall Qual` sea útil.
 
 ### 4. Preparación de Datos y Split Anti-Leakage
 
@@ -307,27 +307,27 @@ Para ver qué ocurre con distribuciones más torcidas, comparé algunos transfor
 
 <Unit06YeoJohnson client:load />
 
-**Lectura:** Yeo-Johnson puede trabajar con ceros y negativos, a diferencia de Box-Cox. Es una opción para `SalePrice` cuando una transformación log directa no es válida.
+**Interpretación:** Yeo-Johnson puede trabajar con ceros y negativos, a diferencia de Box-Cox. Es una opción para `SalePrice` cuando una transformación log directa no es válida.
 
 <Unit06QuantileTransformer client:load />
 
-**Lectura:** `QuantileTransformer` lleva primero la distribución a una uniforme y luego a una normal. Puede corregir sesgos fuertes, pero cuesta más y puede crear artefactos con muchos valores repetidos.
+**Interpretación:** `QuantileTransformer` lleva primero la distribución a una uniforme y luego a una normal. Puede corregir sesgos fuertes, pero cuesta más y puede crear artefactos con muchos valores repetidos.
 
 <Unit06MaxAbsScaler client:load />
 
-**Lectura:** `MaxAbsScaler` divide por el máximo absoluto y deja cada columna en [-1, 1]. Conserva el signo y funciona bien con datos dispersos, pero no centra las columnas en cero.
+**Interpretación:** `MaxAbsScaler` divide por el máximo absoluto y deja cada columna en [-1, 1]. Conserva el signo y funciona bien con datos dispersos, pero no centra las columnas en cero.
 
 <Unit06NormalizerL2 client:load />
 
-**Lectura:** `Normalizer` trabaja fila por fila y deja cada muestra con norma L2 igual a 1. Sirve cuando se comparan vectores completos, por ejemplo en texto o imágenes; no sustituye al escalado por columna en una regresión común.
+**Interpretación:** `Normalizer` trabaja fila por fila y deja cada muestra con norma L2 igual a 1. Sirve cuando se comparan vectores completos, por ejemplo en texto o imágenes; no sustituye al escalado por columna en una regresión común.
 
 <Unit06FunctionTransformer client:load />
 
-**Lectura:** La transformación log comprime valores grandes y reduce la asimetría hacia la derecha. Solo puede aplicarse cuando los valores son estrictamente positivos, así que `SalePrice` y `Lot Area` requieren ese chequeo.
+**Interpretación:** La transformación log comprime valores grandes y reduce la asimetría hacia la derecha. Solo puede aplicarse cuando los valores son estrictamente positivos, así que `SalePrice` y `Lot Area` requieren ese chequeo.
 
 <Unit06LogComparison client:load />
 
-**Lectura:** Después del log, `SalePrice` queda más simétrica. La combinación puede ayudar antes de `StandardScaler`, pero conviene verificar la forma de cada columna en lugar de aplicarla por rutina.
+**Interpretación:** Después del log, `SalePrice` queda más simétrica. La combinación puede ayudar antes de `StandardScaler`, pero conviene verificar la forma de cada columna en lugar de aplicarla por rutina.
 
 ## Lo que cambió según el scaler
 
@@ -384,7 +384,7 @@ Para ver qué ocurre con distribuciones más torcidas, comparé algunos transfor
 - **matplotlib/seaborn**: Visualizaciones
 - **Pipeline**: Automatización anti-leakage
 
-## Qué probaría después
+## Experimentos posteriores
 
 La regla que queda es sencilla: separar primero, ajustar el scaler después y evaluar cada algoritmo con el mismo protocolo. En Ames Housing, `RobustScaler` es el candidato cuando los outliers pesan; los árboles apenas dependen del escalado. El siguiente experimento sería una búsqueda con `GridSearchCV` para `n_neighbors`, `C`, `gamma` y `n_estimators`, seguida de una validación cruzada y un monitor de drift.
 

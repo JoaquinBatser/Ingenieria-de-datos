@@ -1,6 +1,6 @@
 ---
-title: "Cómo codificar categorías sin perder información"
-description: "Comparación de Label, One-Hot, Target, Leave-One-Out, Binary y CatBoost Encoding sobre Adult Income, con atención al leakage y a la cardinalidad."
+title: "Evaluación de métodos de codificación categórica"
+description: "Comparación de Label, One-Hot, Target, Leave-One-Out, Binary y CatBoost Encoding sobre Adult Income, con control de cardinalidad y fuga de información."
 ---
 import {
   EncodingCardinalityChart,
@@ -10,11 +10,11 @@ import {
   EncodingResultsChart,
 } from "@/components/tanstack-comparison-09-12/unit-09-charts"
 
-# Codificar categorías sin inventar un orden
+# Codificación de variables categóricas sin ordinalidad artificial
 
 _El código y análisis presentado en este documento refleja el trabajo del autor._
 
-## Qué quería comparar
+## Objetivos de la comparación
 
 - Ver qué supone cada encoding para una categoría.
 - Medir precisión, número de columnas y tiempo.
@@ -22,7 +22,7 @@ _El código y análisis presentado en este documento refleja el trabajo del auto
 - Comprobar la importancia con Random Forest y SHAP.
 - Ajustar Target Encoding sin que el target se filtre al test.
 
-## La pregunta
+## Definición del problema
 
 **Problema:** Predecir si el ingreso anual de una persona supera los $50K basándose en datos del censo de EE.UU.
 
@@ -59,7 +59,7 @@ _El código y análisis presentado en este documento refleja el trabajo del auto
 - `sex`: Sexo (2 categorías)
 - `native-country`: País de origen (42 categorías)
 
-## Recorrido
+## Metodología experimental
 
 ### 1. Setup y Carga de Datos
 
@@ -160,7 +160,7 @@ print(f"  {high_card_cols}")
 
 <EncodingCardinalityChart client:load />
 
-**Lectura:** `native-country` tiene 42 categorías; One-Hot añadiría 41 columnas para esa variable. La cifra explica por qué conviene comparar una representación más compacta.
+**Interpretación:** `native-country` tiene 42 categorías; One-Hot añadiría 41 columnas para esa variable. La cifra explica por qué conviene comparar una representación más compacta.
 
 ### 3. Experimento 1: Label Encoding
 
@@ -502,7 +502,7 @@ results_pipeline, pipeline_branched = experiment_branched_pipeline(
 
 <EncodingResultsChart client:load />
 
-**Lectura:** Label Encoding consigue el mejor AUC (0.91), mientras que el Pipeline Branched queda más equilibrado entre Accuracy, AUC y F1. La elección depende de qué métrica y qué mantenimiento importen.
+**Interpretación:** Label Encoding consigue el mejor AUC (0.91), mientras que el Pipeline Branched queda más equilibrado entre Accuracy, AUC y F1. La elección depende de qué métrica y qué mantenimiento importen.
 
 ### 7. Análisis de Feature Importance y SHAP
 
@@ -562,11 +562,11 @@ print(importance_df.head(10))
 
 <EncodingFeatureImportanceChart client:load />
 
-**Lectura:** Las variables numéricas concentran 76.6% de la importancia; `fnlwgt` y `age` encabezan el ranking. Las categóricas aportan, pero no son la señal principal en este modelo.
+**Interpretación:** Las variables numéricas concentran 76.6% de la importancia; `fnlwgt` y `age` encabezan el ranking. Las categóricas aportan, pero no son la señal principal en este modelo.
 
 <EncodingFeatureDistributionChart client:load />
 
-**Lectura:** SHAP deja ver interacciones no lineales, en especial alrededor de `age`, que no aparecen en un ranking único de importancia.
+**Interpretación:** SHAP deja ver interacciones no lineales, en especial alrededor de `age`, que no aparecen en un ranking único de importancia.
 
 ### 8. Técnicas Adicionales: Investigación Libre
 
@@ -659,7 +659,7 @@ for smoothing in smoothing_values:
 | **Dimensionalidad** | Target Encoding redujo 94 → 6 | Target Encoding |
 | **Balance global** | Pipeline Branched mantiene equilibrio | Pipeline Branched |
 
-**Lectura:**
+**Interpretación:**
 - **Target Encoding** usa menos columnas en datasets grandes, siempre que el ajuste respete la validación.
 - **Pipeline Branched** separa el tratamiento de cada grupo de columnas y deja el flujo más fácil de revisar.
 - **Label Encoding** no conviene cuando las categorías no tienen un orden natural.
@@ -825,7 +825,7 @@ X_test['occupation_encoded'] = X_test['occupation'].map(mean_target_train).filln
 
 Como prueba adicional comparé **CatBoost Encoding** con **Target Encoding** en dos modelos.
 
-### Qué quería saber
+### Pregunta de evaluación
 
 Elegí comparar CatBoost Encoding con Target Encoding porque:
 
@@ -856,7 +856,7 @@ Comparamos Accuracy y AUC-ROC para cada combinación de encoding y modelo.
 
 <EncodingExtraResultsChart client:load />
 
-**Lectura:** Gradient Boosting obtiene los mejores valores con ambos encodings; la diferencia a favor de CatBoost es ligera. El modelo final pesa tanto como el encoding.
+**Interpretación:** Gradient Boosting obtiene los mejores valores con ambos encodings; la diferencia a favor de CatBoost es ligera. El modelo final pesa tanto como el encoding.
 
 ### Resultados
 
